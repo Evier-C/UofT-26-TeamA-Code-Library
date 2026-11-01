@@ -4,6 +4,7 @@
  * License: None
  * Description: Avoid pitfalls - swap u,v if u > v. Put end time = t-1 if an edge is erased at time t.
  * Handle edges that were never removed.
+ * CN: DynConn dc(T); add\_edge(l, r, \{u, v\}) 表示边存在于时间 [l, r]；add\_query(t)；solve(uf)，uf 为 RollbackUF(n+1)，点 1..n；ans[t] 为连通块数。
  * Status: tested on https://codeforces.com/gym/100551/problem/A, cses.fi/problemset/task/2133/
  */
 #pragma once

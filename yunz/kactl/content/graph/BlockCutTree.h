@@ -5,6 +5,7 @@
  * Source: https://usaco.guide/adv/BCC-2CC
  * Description: Given an undirected adj. list `g', 0 or 1 indexed (`s'),
  * computes a block-cut tree. `id' maps nodes in `g' to nodes in `t'.
+ * CN: auto [t, isCut, id] = blockCutTree(g, s)，s 为起始编号，图须连通；t 中先割点后块，点 u 对应 id[u]。
  * Time: $O(N+M)$
  * Status: tested at https://cses.fi/problemset/task/1705/
  */

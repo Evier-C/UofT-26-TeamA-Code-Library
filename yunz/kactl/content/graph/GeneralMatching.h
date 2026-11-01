@@ -5,6 +5,7 @@
  * Source: http://www.mimuw.edu.pl/~mucha/pub/mucha_sankowski_focs04.pdf
  * Description: Matching for general graphs.
  * Fails with probability $N / mod$.
+ * CN: generalMatching(N, ed) 返回最大匹配的边；需要 matInv（MatrixInverse-mod）。
  * Time: O(N^3)
  * Status: not very well tested
  */

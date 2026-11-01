@@ -5,6 +5,7 @@
  * Source: own work
  * Description: Container where you can add lines of the form kx+m, and query maximum values at points x.
  *  Useful for dynamic programming (``convex hull trick'').
+ * CN: add(k, m) 加入 $kx+m$，query(x) 求最大值；求最小值时全部取负。
  * Time: O(\log N)
  * Status: stress-tested
  */

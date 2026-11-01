@@ -68,7 +68,7 @@ def find_start_comment(source, start=None):
     return first
 
 def processwithcomments(caption, instream, outstream, listingslang):
-    knowncommands = ['Author', 'Date', 'Description', 'Source', 'Time', 'Memory', 'License', 'Status', 'Usage', 'Details']
+    knowncommands = ['Author', 'Date', 'Description', 'CN', 'Source', 'Time', 'Memory', 'License', 'Status', 'Usage', 'Details']
     requiredcommands = ['Author', 'Description']
     includelist = []
     error = ""
@@ -163,6 +163,8 @@ def processwithcomments(caption, instream, outstream, listingslang):
         addref(caption, outstream)
         if commands.get("Description"):
             out.append(r"\defdescription{%s}" % escape(commands["Description"]))
+        if commands.get("CN"): # Chinese usage notes
+            out.append(r"\defcn{%s}" % escape(commands["CN"]))
         if commands.get("Usage"):
             out.append(r"\defusage{%s}" % codeescape(commands["Usage"]))
         if commands.get("Time"):

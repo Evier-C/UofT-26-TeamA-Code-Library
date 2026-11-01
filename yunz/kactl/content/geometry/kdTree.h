@@ -3,6 +3,7 @@
  * Date: Unknown
  * Source: Stanford Notebook
  * Description: KD-tree (2d, can be extended to 3d)
+ * CN: KDTree t(pts); t.nearest(p) 返回 \{距离平方, 点\}。
  * Status: Tested on excellentengineers
  */
 #pragma once

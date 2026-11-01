@@ -4,6 +4,7 @@
  * License: CC0
  * Source: own work
  * Description: Self-explanatory methods for string hashing.
+ * CN: HashInterval h(s); h.hashInterval(a, b) 为 [a, b) 的哈希；getHashes(s, len) 为所有长 len 子串的哈希。
  * Status: stress-tested
  */
 #pragma once

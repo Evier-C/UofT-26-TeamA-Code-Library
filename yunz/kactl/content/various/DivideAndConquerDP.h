@@ -4,6 +4,7 @@
  * Source: Codeforces
  * Description: Given $a[i] = \min_{lo(i) \le k < hi(i)}(f(i, k))$ where the (minimal)
  * optimal $k$ increases with $i$, computes $a[i]$ for $i = L..R-1$.
+ * CN: 实现 lo/hi（k 取 [lo, hi)）、f(i, k)、store；solve(L, R) 求 $i \in [L, R)$。
  * Time: O((N + (hi-lo)) \log N)
  * Status: tested on http://codeforces.com/contest/321/problem/E
  */

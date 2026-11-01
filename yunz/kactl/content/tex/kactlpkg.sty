@@ -3,6 +3,7 @@
 \ProvidesPackage{kactlpkg}
 
 \usepackage[utf8]{inputenc}             % Encoding UTF-8
+\usepackage{CJKutf8}                    % Chinese (CN: field)
 \usepackage{listings}                   % Source code listings
 \usepackage{framed}                     % Source code listings
 \usepackage[a4paper,landscape,hmargin={0.5cm,0.5cm},vmargin={1.0cm,0.4cm}]{geometry}
@@ -230,6 +231,7 @@
 	\leftcaption{}\rightcaption{}
 	\setboolean{hasdescription}{false}
 	\setboolean{hasusage}{false}
+	\setboolean{hascn}{false}
 	\setboolean{hastime}{false}
 	\setboolean{hasmemory}{false}
 	\setboolean{hasleftcaption}{false}
@@ -286,6 +288,14 @@
 \defdescription{}
 \setboolean{hasdescription}{false}
 
+\newboolean{hascn}
+\newcommand{\defcn}[1]{
+	\def\@defcn{#1}
+	\setboolean{hascn}{true}
+}
+\defcn{}
+\setboolean{hascn}{false}
+
 \newboolean{hasusage}
 \newcommand{\defusage}[1]{
 	\def\@defusage{\texttt{#1}}
@@ -317,7 +327,7 @@
 
 \long\def\@makecaption#1#2{
 	\vspace{-3pt}
-	\ifthenelse{\boolean{hasdescription}}{\codeheader{Description}{\@defdescription}}{}
+	\ifthenelse{\boolean{hasdescription}}{\codeheader{Description}{\@defdescription\ifthenelse{\boolean{hascn}}{ \textbf{用法:} \@defcn}{}}}{\ifthenelse{\boolean{hascn}}{\codeheader{用法}{\@defcn}}{}}
 	\ifthenelse{\boolean{hasusage}}{\codeheader{Usage}{\@defusage}}{}
 	\ifthenelse{\boolean{hasmemory}}{\codeheader{Memory}{\@defmemory}}{}
 	\ifthenelse{\boolean{hastime}}{\codeheader{Time}{\@deftime}}{}

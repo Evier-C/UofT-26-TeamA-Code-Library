@@ -4,6 +4,7 @@
  * Source: folklore
  * Description: Zero-indexed implicit treap. Change the 6 'todo' items
  * when using.
+ * CN: build(v) 建树返回根；range\_query(rt, l, r) 求 [l, r)；rt = range\_apply(rt, l, r, u)。默认区间翻转 + 求和，需 rng。
  * Time: $O(\log N)$
  * Status: untested
  */

@@ -8,6 +8,7 @@
  	* run of Dijkstra is slow, but this hasn't been an issue in the past. 
  	* Edge weights $\ge 0$ for every subsequent run. To get flow through 
  	* original edges, assign ID's during \texttt{ae}.
+ * CN: MCMF<F, C> g(n); g.ae(u, v, cap, cost); g.calc(s, t) 返回 \{流量, 费用\}。可负费用，不可负环。
  * Time: Ignoring first run of Dijkstra, $O(FM\log M)$ 
  	* if caps are integers and $F$ is max flow. */
 #pragma once

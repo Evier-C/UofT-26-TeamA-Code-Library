@@ -4,6 +4,7 @@
  * License: None
  * Source: https://github.com/programming-team-code/programming_team_code/blob/main/graphs/uncommon/functional_graph_processor.hpp
  * Description: 
+ * CN: func\_graph g(a)，a[i] 为后继；cycles 为各环，root\_of[v] = \{环号, 位置\}，childs 为环外的反向森林。
  * Time: O(N)
  * Status: tested on https://cses.fi/problemset/result/16581553/, https://cses.fi/problemset/result/16581641/
  */

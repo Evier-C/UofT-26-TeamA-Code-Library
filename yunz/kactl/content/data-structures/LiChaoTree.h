@@ -3,6 +3,7 @@
  * Date: 2026-03-17
  * Description: Add line segments and query maximum values on [0, M).
  * To query minimum values, change the four spots marked `chg'.
+ * CN: LiChao lc(M); lc.insert(l, r, \{k, b\}) 在 [l, r) 加线段；lc.query(x) 求最大值。
  * Time: O(\log N)
  * Status: tested on https://cses.fi/problemset/result/16592813/
  */

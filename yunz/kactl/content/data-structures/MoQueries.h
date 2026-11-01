@@ -5,6 +5,7 @@
  * Source: https://github.com/hoke-t/tamu-kactl/blob/master/content/data-structures/MoQueries.h
  * Description: Answer interval or tree path queries by moving from one query to the next by adding/removing points at the ends.
  * If values are on tree edges, change \texttt{step} to add/remove the edge $(a, c)$ and remove the initial \texttt{add} call (but keep \texttt{in}).
+ * CN: 实现 add/del/calc；mo(Q) 的 Q 为 [L, R)；树上用 moTree(Q, adj, root)，Q[i] = \{u, v\}。
  * Time: O(N \sqrt Q)
  * Status: stress-tested
  */

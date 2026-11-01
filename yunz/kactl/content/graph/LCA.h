@@ -6,6 +6,7 @@
  * Description: Data structure for computing lowest common ancestors in a tree
  * (with `rt' as root). C should be an adjacency list of the tree, either directed
  * or undirected.
+ * CN: LCA l(adj, root); l.lca(a, b)。
  * Time: $O(N \log N + Q)$
  * Status: stress-tested
  */

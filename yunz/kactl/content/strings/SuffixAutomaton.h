@@ -5,6 +5,7 @@
  * Source: https://cp-algorithms.com/string/suffix-automaton.html
  * Description: Suffix automaton. Node 0 is always the start node,
  * but the nodes are not necessarily in topological order.
+ * CN: SAM s; s.extend(c) 逐字符加入；q[v] 有 next/link/len；从 last 沿 link 走到的是终止状态。
  * Time: O(n \log \Sigma)
  * Status: untested
  */

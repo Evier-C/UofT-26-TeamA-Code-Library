@@ -4,6 +4,7 @@
  * Description: 0-indexed reroot DP assuming associativity and commutativity of +.
  * operator+ combines children into a single representation.
  * promote() finds a child's contribution to its parent.
+ * CN: 改 ART 和 base；AllRoots<ART>::calc(边表) 返回每个点为根时的结果，默认求最远距离。
  * Time: O(N).
  * Status: Tested on https://cses.fi/problemset/result/16593762/ and https://cses.fi/problemset/result/16593328/.
  */

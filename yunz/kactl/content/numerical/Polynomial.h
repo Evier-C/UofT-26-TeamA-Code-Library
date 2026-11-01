@@ -2,6 +2,7 @@
  * Author: David Rydh, Per Austrin
  * Date: 2003-03-16
  * Description:
+ * CN: Poly p\{\{a0, a1, ...\}\}; p(x) 求值，diff() 求导，divroot(x0) 除以 $(x - x_0)$。
  */
 #pragma once
 

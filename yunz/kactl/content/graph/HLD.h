@@ -8,6 +8,7 @@
  * light edges. Takes as input the adjacency list (comment out (*) in dfsSz if no parent edges),
  * a list of initial values $v$, and the root. VALS\_EDGES being true means
  * that values are stored in the edges, as opposed to the nodes.
+ * CN: HLD<VALS\_EDGES> h(adj, v, root); modifyPath/queryPath(u, w)、querySubtree(u)、get(u)，运算见 LazySegmentTree。
  * Time: O((\log N)^2)
  * Status: tested on https://cses.fi/problemset/result/16580118/
 */

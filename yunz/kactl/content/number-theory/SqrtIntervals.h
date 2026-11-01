@@ -1,6 +1,7 @@
 /**
  * Author: Kelly Dance, ChatGPT
  * Description: break 1..n into inclusive intervals in sorted order, constant on $\lfloor \frac{n}{i} \rfloor$ or $\lceil \frac{n}{i} \rceil$.
+ * CN: fdivSplit(n) / cdivSplit(n) 返回 [l, r] 列表，段内 $\lfloor n/i \rfloor$ / $\lceil n/i \rceil$ 相同。
  * Source: https://github.com/kelly-dance/mactl/blob/main/content/various/SqrtIntervals.h
  * Time: $O(\sqrt N)$
  * Status: stress-tested
