@@ -63,17 +63,18 @@ void test_n(int n, int num) {
 			oldTree[i.first].push_back({i.second, 1});
 			oldTree[i.second].push_back({i.first, 1});
 		}
+		int root = out % 2 ? 0 : rand() % n; // LCA takes an arbitrary root
 		vector<int> par(n), depth(n);
-		getPars(tree, 0, 0, 0, par, depth);
+		getPars(tree, root, root, 0, par, depth);
 		vector<vi> tbl = treeJump(par);
-		LCA new_lca(tree);
-		old::LCA old_lca(oldTree);
+		LCA new_lca(tree, root);
+		old::LCA old_lca(oldTree); // always rooted at 0
 		for (int i=0; i<100; i++) {
 			int a = rand()%n, b = rand()%n;
 			int binLca = lca(tbl, depth, a, b);
 			int newLca = new_lca.lca(a,b);
 			int oldLca = old_lca.query(a,b);
-			assert(oldLca == newLca);
+			if (root == 0) assert(oldLca == newLca);
 			assert(binLca == newLca);
 		}
 	}

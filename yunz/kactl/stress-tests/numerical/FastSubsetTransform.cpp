@@ -2,21 +2,27 @@
 
 #include "../../content/numerical/FastSubsetTransform.h"
 
+// Tests the active (XOR) variant: convolution and point_add / point_eval.
 int main() {
-	rep(k,0,10) {
-		vi a(1 << k), b = a, c = a, target = a;
+	rep(k,0,10) rep(it,0,20) {
+		int n = 1 << k;
+		vl a(n), b(n), target(n);
 		for(auto &x: a) x = rand() % 6 - 2;
 		for(auto &x: b) x = rand() % 6 - 2;
-		rep(i,0,1 << k) rep(j,0,1 << k) target[i & j] += a[i] * b[j];
-		// rep(i,0,1 << k) cout << a[i] << ' '; cout << endl;
-		// rep(i,0,1 << k) cout << b[i] << ' '; cout << endl;
-		FST(a, false);
-		FST(b, false);
-		rep(i,0,1 << k) c[i] = a[i] * b[i];
-		FST(c, true);
-		// rep(i,0,1 << k) cout << c[i] << ' '; cout << endl;
-		// rep(i,0,1 << k) cout << target[i] << ' '; cout << endl;
-		assert(c == target);
+		rep(i,0,n) rep(j,0,n) target[i ^ j] += a[i] * b[j];
+		assert(conv(a, b) == target);
+
+		vl t = a;
+		FST(t, false);
+		rep(q,0,10) {
+			int i = rand() % n;
+			ll val = rand() % 11 - 5;
+			point_add(t, i, val);
+			a[i] += val;
+			rep(j,0,n) assert(point_eval(t, j) == a[j]);
+		}
+		FST(t, true);
+		assert(t == a);
 	}
 	cout<<"Tests passed!"<<endl;
 }

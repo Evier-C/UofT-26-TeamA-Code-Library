@@ -3,7 +3,6 @@
 #include "../utilities/random.h"
 
 #include "../../content/graph/WeightedMatching.h"
-#include <bits/extc++.h> /// include-line, keep-include
 #include "../../content/graph/MinCostMaxFlow.h"
 
 void test(int N, int mxCost, int iters) {
@@ -12,27 +11,26 @@ void test(int N, int mxCost, int iters) {
 		if (n > m)
 			swap(n, m);
 
-		MCMF mcmf(n + m + 2);
+		MCMF<ll, ll> mcmf(n + m + 2);
 		int s = 0;
 		int t = 1;
 		for (int i = 0; i < n; i++)
-			mcmf.addEdge(s, i + 2, 1, 0);
+			mcmf.ae(s, i + 2, 1, 0);
 		for (int i = 0; i < m; i++)
-			mcmf.addEdge(2 + n + i, t, 1, 0);
+			mcmf.ae(2 + n + i, t, 1, 0);
 
-		vector<vi> cost(n, vi(m));
+		vector<vector<ll>> cost(n, vector<ll>(m));
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				cost[i][j] = randRange(-mxCost, mxCost);
-				mcmf.addEdge(i + 2, 2 + n + j, 1, cost[i][j]);
+				mcmf.ae(i + 2, 2 + n + j, 1, cost[i][j]);
 			}
 		}
-		mcmf.setpi(s);
-		auto maxflow = mcmf.maxflow(s, t);
+		auto maxflow = mcmf.calc(s, t);
 		auto matching = hungarian(cost);
 		assert(maxflow.first == n);
 		assert(maxflow.second == matching.first);
-		int matchSum = 0;
+		ll matchSum = 0;
 		set<int> used;
 		for (int i = 0; i < n; i++) {
 			matchSum += cost[i][matching.second[i]];
@@ -40,7 +38,6 @@ void test(int N, int mxCost, int iters) {
 			used.insert(matching.second[i]);
 		}
 		assert(matchSum == matching.first);
-		return;
 	}
 }
 signed main() {

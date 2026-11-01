@@ -1,46 +1,40 @@
 #include "../utilities/template.h"
+#include "../utilities/random.h"
 
 #include "../../content/data-structures/LazySegmentTree.h"
 
-static unsigned R;
-int ra() {
-	R *= 791231;
-	R += 1231;
-	return (int)(R >> 1);
+// Default ops: range add, range max, point set/get. Ranges are [l, r).
+void test(int N, int iters, int ops) {
+	rep(it,0,iters) {
+		lztree tr(N);
+		vector<ll> v(N);
+		rep(i,0,N) tr.set(i, v[i] = randIncl(-5, 5));
+		rep(op,0,ops) {
+			int i = randIncl(N), j = randIncl(N); // empty ranges allowed
+			if (i > j) swap(i, j);
+			int r = randRange(100);
+			if (r < 30) {
+				ll ma = idT;
+				rep(k,i,j) ma = max(ma, v[k]);
+				assert(ma == tr.query(i, j));
+			} else if (r < 70) {
+				ll x = randIncl(-5, 5);
+				tr.update(i, j, x);
+				rep(k,i,j) v[k] += x;
+			} else if (i < N) {
+				if (r < 85) {
+					ll x = randIncl(-5, 5);
+					tr.set(i, x);
+					v[i] = x;
+				} else assert(tr.get(i) == v[i]);
+			}
+		}
+	}
 }
 
-volatile int res;
 int main() {
-	int N = 10;
-	vi v(N);
-	iota(all(v), 0);
-	random_shuffle(all(v), [](int x) { return ra() % x; });
-	Node* tr = new Node(v,0,N);
-	rep(i,0,N) rep(j,0,N) if (i <= j) {
-		int ma = -inf;
-		rep(k,i,j) ma = max(ma, v[k]);
-		assert(ma == tr->query(i,j));
-	}
-	rep(it,0,1000000) {
-		int i = ra() % (N+1), j = ra() % (N+1);
-		if (i > j) swap(i, j);
-		int x = (ra() % 10) - 5;
-
-		int r = ra() % 100;
-		if (r < 30) {
-			::res = tr->query(i, j);
-			int ma = -inf;
-			rep(k,i,j) ma = max(ma, v[k]);
-			assert(ma == ::res);
-		}
-		else if (r < 70) {
-			tr->add(i, j, x);
-			rep(k,i,j) v[k] += x;
-		}
-		else {
-			tr->set(i, j, x);
-			rep(k,i,j) v[k] = x;
-		}
-	}
+	rep(N,1,70) test(N, 100, 100);
+	test(1000, 10, 2000);
+	test((1 << 17) + 3, 1, 1000);
 	cout<<"Tests passed!"<<endl;
 }
