@@ -8,13 +8,13 @@
  */
 #pragma once
 
-#include "UnionFindRollback.h"
+#include "../data-structures/UnionFindRollback.h"
 
 struct DynConn {
     int T; // DynConn(T) works over times [0..T]
     vector<vector<pii>> tree;
     vector<int> queries; // change query type as needed
-    vi ans; // 1 = Yes, 0 = No, -1 = "no query at this time"
+    vi ans; // #components (1-indexed DSU of size n+1), -1 = no query
     DynConn(int t) : T(t+2), tree(4*T), queries(4*T, -1),
         ans(T, -1) {}
     // [ql, qr] = [start time, end time] of edge

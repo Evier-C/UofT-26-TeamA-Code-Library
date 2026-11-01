@@ -36,7 +36,7 @@ auto blockCutTree = [](vector<vi> &g, int s) {
     };
     dfs(dfs, s, -1);
     // build block-cut tree
-    vector<vi> t(1); int nid = 0;
+    vector<vi> t(comps.empty()); int nid = 0;
     rep(u,s,n)
         if (is_cutpoint[u]) id[u] = nid++, t.pb({});
     for (auto &comp : comps) {

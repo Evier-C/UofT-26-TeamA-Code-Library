@@ -9,8 +9,8 @@
 #pragma once
 struct LiChao {
   struct Line {
-    int m, b;
-    int eval(int x) const { return m*x + b; }
+    ll m, b;
+    ll eval(ll x) const { return m*x + b; }
   };
   vector<Line> v;
   int M;
@@ -36,10 +36,10 @@ struct LiChao {
     };
     f(f, 0, 0, M, line);
   }
-  int query(int x) { // find max value at point x
+  ll query(int x) { // find max value at point x
     assert(0 <= x && x < M);
     auto f = [&](auto &&f, int node,
-                 int l, int r) -> int {
+                 int l, int r) -> ll {
       if (l+1 == r) return v[node].eval(x);
       auto m = midpoint(l, r);
       return max(v[node].eval(x), // chg to min

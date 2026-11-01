@@ -52,7 +52,7 @@ struct AllRoots {
     AllRoots ar(el);
     ar.down(0);
     ar.up(0);
-    rep(i,0,ar.n) ar.res[i] = ar.res[i].promote(i,-1);
+    rep(i,0,ar.n) ar.res[i] = (ar.res[i] + base).promote(i,-1);
     return ar.res;
   }
 };
