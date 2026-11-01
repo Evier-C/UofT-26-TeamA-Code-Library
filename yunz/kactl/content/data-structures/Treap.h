@@ -101,7 +101,7 @@ namespace Treap {
     [[nodiscard]] T range_query(ptr &a, int l, int r) {
         assert(0 <= l && l <= r && r <= _getsiz(a));
         auto [a1, a2, a3] = split3(a, l, r);
-        T ans = a2->agg;
+        T ans = a2 ? a2->agg : idT;
         a = merge(merge(a1, a2), a3);
         return ans;
     }

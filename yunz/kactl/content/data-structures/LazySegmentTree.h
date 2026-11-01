@@ -1,15 +1,17 @@
 /**
  * Author: Joseph Durie
  * Date: 2020-10-11
- * Description: Remember that idT and idU must be idempotent
+ * Description: Iterative lazy segtree, default range add / range max.
+ * idT, idU must be identities; h must not depend on segment length
+ * (for range add + sum, store (sum, len) in T and add f*len in h).
  * Time: O(\log N)
  */
 #pragma once
 
-typedef ll T; T idT = {}; // node type
+typedef ll T; T idT = LLONG_MIN / 4; // node type
 typedef ll U; U idU = {}; // update type
 // combine segtree nodes a and b
-T f(T a, T b) { return a + b; }
+T f(T a, T b) { return max(a, b); }
 // apply updates f and g (f compose g)
 U g(U f, U g) { return f + g; }
 // apply update f to segtree node a
@@ -40,11 +42,9 @@ struct lztree {
 		t[p += n] = v;
 		while(p > 1) calc(p /= 2);
 	}
-	T get(ll p) { // return arr[p]
-        push(p);
-        return t[p + n];
-    }
+	T get(ll p) { push(p); return t[p + n]; } // arr[p]
 	void update(ll l, ll r, U v) { // range update [l, r) using v
+		if (l >= r) return;
 		push(l), push(r - 1);
 		bool cl = false, cr = false;
 		for(l += n, r += n; l < r; l /= 2, r /= 2) {
@@ -59,6 +59,7 @@ struct lztree {
 		}
 	}
 	T query(ll l, ll r) { // range query [l, r)
+		if (l >= r) return idT;
 		push(l), push(r - 1);
 		T resl = idT, resr = idT;
 		for(l += n, r += n; l < r; l /= 2, r /= 2) {

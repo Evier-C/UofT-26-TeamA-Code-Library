@@ -24,7 +24,7 @@ template <bool VALS_EDGES> struct HLD {
         : N(sz(adj)), adj(adj), par(N, -1), siz(N, 1),
           rt(N,root),pos(N),tail(N,-1),tree(N) {
         dfsSz(root); dfsHld(root);
-        rep(i,root,sz(v)) tree.set(pos[i], v[i]); // init vals
+        rep(i,0,sz(v)) tree.set(pos[i], v[i]); // init vals
     }
 	void dfsSz(int v) {
 		for (int& u : adj[v]) {
