@@ -6,6 +6,7 @@
 % \kactlimport{SegmentTree.h}
 \kactlimport{LazySegmentTree.h}
 
+\begingroup\footnotesize\lstset{basicstyle=\scriptsize\ttfamily}
 \paragraph{懒标记写法}
 下面的代码都是 \texttt{struct SegTree} 的成员, 直接替换结构体里的同名成员, 新增的数组也写在结构体里.
 换用途只改: Node 的字段和合并两个儿子的 \texttt{merge}, build 里叶子的初值, 标记数组, \texttt{addtag} 和 \texttt{pushdown}.
@@ -137,6 +138,7 @@ void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
 }
 \end{lstlisting}
 \end{compactitem}
+\endgroup
 \kactlimport{PersistentSegmentTree.h}
 % \kactlimport{UnionFind.h}
 \kactlimport{UnionFindRollback.h}
