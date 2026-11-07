@@ -25,6 +25,16 @@
 \item \textbf{常见题}: 恰好 $k$ 段划分, 恰好选 $k$ 个不相邻元素, 恰好 $k$ 条白边的最小生成树.
 \end{compactitem}
 
+\subsection{Kruskal 重构树}
+用于 只经过边权不超过 $x$ 的边 能到达哪些点, 以及 两点间所有路径中最大边权的最小值 (最小瓶颈路) 这类问题.
+\begin{compactitem}
+\item \textbf{建树}: 边按权从小到大排序做 Kruskal. 每合并两个不同的连通块 (并查集的根为 $a, b$) 时, 新建一个点 $z$ (编号从 $n+1$ 开始), 点权 $\mathit{val}[z]=w$, 让 $z$ 成为 $a$ 和 $b$ 的父亲, 并查集里也把 $a, b$ 并到 $z$ 上. 原图的点全是叶子, 连通图建完共 $2n-1$ 个点, 根是最后新建的点.
+\item \textbf{性质}: 二叉树, 且从叶子往根走点权不降 (祖先的点权不小于子孙).
+\item \textbf{最小瓶颈路}: 原图中 $u, v$ 之间所有路径上最大边权的最小值等于 $\mathit{val}[\mathrm{lca}(u,v)]$. 不连通时两点不在同一棵树里.
+\item \textbf{只走边权不超过 $x$ 的边}: 从 $u$ 往上跳, 跳到点权不超过 $x$ 的最高祖先 $a$ (倍增), 能到达的点就是 $a$ 子树里的所有叶子. 用 dfs 序把子树变成区间, 就能配合主席树等求这些点里的第 $k$ 大等.
+\item \textbf{反过来}: 若关心路径上最小边权的最大值, 改成边权从大到小建树, 上面的不等号全部反过来.
+\end{compactitem}
+
 \subsection{调试技巧}
 	\begin{itemize}
 		\item \verb@signal(SIGSEGV, [](int) { _Exit(0); });@ 把段错误变成 Wrong Answer.
@@ -39,8 +49,8 @@
 			\begin{itemize}
 			\item \verb@x&-x@ 是 \texttt{x} 的最低位的 1.
 			\item \verb@c=x&-x,r=x+c;(((r^x)>>2)/c)|r@ 是比 \texttt{x} 大且 1 的个数相同的下一个数.
-			\item 子集和 (SOS DP): \verb@for(int b=0;b<K;b++)for(int i=0;i<(1<<K);i++)@ \\ \verb@  if(i>>b&1)D[i]+=D[i^(1<<b)];@
-			\item 枚举所有集合的所有子集, 总共 $3^n$ 次:
+			\item 子集和 (SOS DP): \\ \verb@for(int b=0;b<K;b++)@ \\ \verb@ for(int i=0;i<(1<<K);i++)@ \\ \verb@  if(i>>b&1)D[i]+=D[i^(1<<b)];@
+			\item 枚举所有集合的所有子集, 总共 $3^n$ 次. 只要非空子集时内层写成 \verb@for(int t=s;t;t=(t-1)&s)@:
 		\end{itemize}
 \begin{lstlisting}
 for(int s=0;s<(1<<n);s++) // 每个集合 s
@@ -48,7 +58,6 @@ for(int s=0;s<(1<<n);s++) // 每个集合 s
 		// 处理 (s, t)
 		if(!t)break;
 	}
-// 只要非空子集: for(int t=s;t;t=(t-1)&s)
 \end{lstlisting}
 	\subsubsection{bitset 加速 pragma (放在 bits/stdc++.h 之前)}
 		\begin{itemize}

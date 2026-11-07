@@ -1,107 +1,77 @@
-#include "../utilities/template.h"
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#include "../../content/numerical/IntDeterminant.h"
 
-const int mod = 7; // 4
-
-typedef vector<vector<ll>> vvll;
-ll det(vvll& a) { // integer determinant
-	int n = sz(a); ll ans = 1;
-	rep(i,0,n) {
-		rep(j,i+1,n) {
-			while (a[j][i] != 0) { // gcd step
-				ll t = a[i][i] / a[j][i];
-				rep(k,i,n)
-					a[i][k] = (a[i][k] - a[j][k] * t) % mod;
-				swap(a[i], a[j]);
-				ans *= -1;
-			}
-		}
-		if (!a[i][i]) return 0;
-		ans = ans * a[i][i] % mod;
-	}
-	if (ans < 0) ans += mod;
-	return ans;
+mt19937 rng(9);
+ll leibniz(vector<vector<ll>>&m,ll p){
+	int n=m.size();
+	vector<int> q(n);
+	iota(q.begin(),q.end(),0);
+	ll res=0;
+	do{
+		int inv=0;
+		for(int i=0;i<n;i++)for(int j=i+1;j<n;j++)if(q[i]>q[j])inv++;
+		ll t=1;
+		for(int i=0;i<n;i++)t=t*(((m[i][q[i]])%p+p)%p)%p;
+		res=(res+(inv&1?p-t:t))%p;
+	}while(next_permutation(q.begin(),q.end()));
+	return res%p;
 }
-
-ll idet(vvll& a) { // integer determinant
-	int n = sz(a); ll ans = 1;
-	rep(i,0,n) {
-		rep(j,i+1,n) {
-			while (a[j][i] != 0) { // gcd step
-				ll t = a[i][i] / a[j][i]; // can take mod-inv if mod p
-				rep(k,i,n) a[i][k] -= a[j][k] * t;
-				swap(a[i], a[j]);
-				ans *= -1;
-			}
-		}
-		if (!a[i][i]) return 0;
-		ans *= a[i][i];
-	}
-	return ans;
-}
-
-double det(vector<vector<double>>& a) {
-	int n = sz(a); double res = 1;
-	rep(i,0,n) {
-		int b = i;
-		rep(j,i+1,n) if (fabs(a[j][i]) > fabs(a[b][i])) b = j;
-		if (i != b) swap(a[i], a[b]), res *= -1;
-		res *= a[i][i];
-		if (res == 0) return 0;
-		rep(j,i+1,n) {
-			double v = a[j][i] / a[i][i];
-			if (v != 0) rep(k,i+1,n) a[j][k] -= v * a[i][k];
+ll pw(ll b,ll e,ll p){ll r=1%p;for(b%=p;e;e>>=1,b=b*b%p)if(e&1)r=r*b%p;return r;}
+// 模素数, 用逆元消元
+ll detPrime(vector<vector<ll>> m,ll p){
+	int n=m.size();ll res=1;
+	for(auto&r:m)for(auto&v:r)v=(v%p+p)%p;
+	for(int i=0;i<n;i++){
+		int q=-1;
+		for(int j=i;j<n;j++)if(m[j][i]){q=j;break;}
+		if(q<0)return 0;
+		if(q!=i)swap(m[q],m[i]),res=(p-res)%p;
+		res=res*m[i][i]%p;
+		ll iv=pw(m[i][i],p-2,p);
+		for(int j=i+1;j<n;j++){
+			ll t=m[j][i]*iv%p;
+			for(int k=i;k<n;k++)m[j][k]=(m[j][k]-t*m[i][k]%p+p)%p;
 		}
 	}
 	return res;
 }
-
-template<class F>
-void rec(int i, int j, vvll& A, F f) {
-	if (i == sz(A)) {
-		f();
-	}
-	else if (j == sz(A[i])) {
-		rec(i+1, 0, A, f);
-	}
-	else {
-		rep(v,0,mod) {
-			A[i][j] = v;
-			rec(i, j+1, A, f);
-		}
-	}
+void load(vector<vector<ll>>&m){
+	int n=m.size();
+	for(int i=1;i<=n;i++)for(int j=1;j<=n;j++)a[i][j]=m[i-1][j-1];
 }
-
-template<class F>
-void rec2(int i, vector<ll>& A, F f) {
-	if (i == sz(A)) f();
-	else {
-		rep(v,0,mod) {
-			A[i] = v;
-			rec2(i+1, A, f);
-		}
+int main(){
+	long long checks=0;
+	vector<ll> mods={1,2,3,4,6,7,8,12,30,97,100,1000,65536,998244353,1000000007};
+	for(int it=0;it<20000;it++){
+		int n=rng()%6+1;
+		ll p=mods[rng()%mods.size()];
+		vector<vector<ll>> m(n,vector<ll>(n));
+		ll R=rng()%2?3:(ll)2e9;
+		for(auto&r:m)for(auto&v:r)v=(ll)(rng()%(2*R+1))-R;
+		if(n>1&&rng()%4==0)m[rng()%n]=m[rng()%n];
+		load(m);
+		ll got=detMod(n,p);
+		assert(got==leibniz(m,p));
+		assert(0<=got&&got<p);
+		checks++;
 	}
-}
-
-int main() {
-	rep(n,0,4) {
-		vvll mat(n, vector<ll>(n, 0)), mat2;
-		vector<vector<double>> mat3(n, vector<double>(n, 0));
-		rec(0,0,mat,[&]() {
-			rep(i,0,n) rep(j,0,n) mat3[i][j] = mat[i][j];
-			// mat2 = mat; ll a = det(mat2);
-			int a = (int)round(det(mat3)) % mod;
-			mat2 = mat; ll b = idet(mat2) % mod;
-			if (a < 0) a += mod;
-			if (b < 0) b += mod;
-			if (a != b) {
-				rep(i,0,n) {
-					rep(j,0,n) cout << mat[i][j];
-					cout << endl;
-				}
-				cout << a << ' ' << b << endl;
-				assert(a == b);
-			}
-		});
+	// 大矩阵: 素数模与逆元消元比较; 合数模 p1*p2 用 CRT 比较
+	for(int it=0;it<60;it++){
+		int n=rng()%150+1;
+		ll p1=10007,p2=10009,p=p1*p2;
+		vector<vector<ll>> m(n,vector<ll>(n));
+		for(auto&r:m)for(auto&v:r)v=rng()%p;
+		if(rng()%3==0)m[rng()%n]=m[rng()%n];
+		load(m);
+		ll got=detMod(n,998244353);
+		assert(got==detPrime(m,998244353));
+		load(m);
+		got=detMod(n,p);
+		ll d1=detPrime(m,p1),d2=detPrime(m,p2);
+		assert(got%p1==d1&&got%p2==d2);
+		checks+=2;
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

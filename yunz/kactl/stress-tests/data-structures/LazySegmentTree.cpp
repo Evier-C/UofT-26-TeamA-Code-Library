@@ -1,31 +1,34 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/data-structures/LazySegmentTree.h"
 
-int main() {
-	mt19937 rng(9);
-	auto rnd = [&](int lo, int hi) { return lo + (int)(rng() % (unsigned)(hi - lo + 1)); };
-	long long checks = 0;
-	rep(it, 0, 3000) {
-		int n = rnd(1, 50);
-		vector<ll> a(n);
-		vector<T> in(n);
-		rep(i, 0, n) a[i] = rnd(-1000, 1000), in[i] = {a[i], a[i], 1};
-		Seg s(in);
-		rep(step, 0, 150) {
-			int l = rnd(0, n - 1), r = rnd(l + 1, n);
-			if (rng() % 2) {
-				ll v = rnd(-1000, 1000);
-				s.update(l, r, {v});
-				rep(i, l, r) a[i] += v;
-			} else {
-				T q = s.query(l, r);
-				ll sm = 0, mx = LLONG_MIN;
-				rep(i, l, r) sm += a[i], mx = max(mx, a[i]);
-				assert(q.sum == sm && q.mx == mx && q.len == r - l);
+mt19937 rng(9);
+int rnd(int lo,int hi){return lo+(int)(rng()%(unsigned)(hi-lo+1));}
+
+int main(){
+	long long checks=0;
+	for(int it=0;it<3000;it++){
+		int n=it<2990?rnd(1,50):rnd(1000,200000);
+		int steps=it<2990?150:2000;
+		vector<ll>b(n+1);
+		for(int i=1;i<=n;i++)b[i]=a[i]=rnd(-1000,1000);
+		build(1,1,n); // multi-test: rebuild over old garbage
+		for(int s=0;s<steps;s++){
+			int l=rnd(1,n),r=rnd(l,n);
+			if(n>50&&rng()%100)r=min(n,l+rnd(0,30));
+			if(rng()%2){
+				ll v=rnd(-1000,1000);
+				update(1,1,n,l,r,v);
+				for(int i=l;i<=r;i++)b[i]+=v;
+			}else{
+				Node q=query(1,1,n,l,r);
+				ll sm=0,mx=LLONG_MIN;
+				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
+				assert(q.sum==sm&&q.mx==mx);
 				checks++;
 			}
 		}
 	}
-	cout << "Tests passed! (" << checks << " checks)" << endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

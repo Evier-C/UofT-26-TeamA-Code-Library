@@ -1,4 +1,4 @@
-\section{Data structures}
+\section{数据结构}
 
 % \kactlimport{Bitset.h}
 \kactlimport{OrderStatisticTree.h}
@@ -7,86 +7,110 @@
 \kactlimport{LazySegmentTree.h}
 
 \paragraph{懒标记写法}
-换用途时只改 $T, U$, \texttt{idT}, \texttt{idU}, $f$ 和 \texttt{Seg} 里的两个函数.
-\texttt{app(x, u)}: 给整段 $x$ 打上标记 $u$, 要更新 \texttt{t[x]}, 并把 $u$ 合并进 \texttt{d[x]} (旧标记先做, $u$ 后做).
-update 覆盖整段时调用它, push 给儿子时也调用它.
-\texttt{push(x)}: 有标记时对两个儿子各 app 一次, 再把 \texttt{d[x]} 清成 \texttt{idU}. 区间加就是上面的模板.
+换用途只改: Node 的字段和合并两个儿子的 \texttt{operator+}, build 里叶子的初值, 标记数组, \texttt{addtag} 和 \texttt{pushdown}.
+\texttt{addtag(p, l, r, v)}: 给整段 $[l, r]$ 打上标记 $v$, 要立刻更新 \texttt{t[p]}, 并把 $v$ 合并进 \texttt{p} 的旧标记, 旧标记先做, $v$ 后做.
+update 命中整段时调用它, pushdown 给两个儿子时也调用它. 新加的标记数组都要在 build 里设成空标记. 区间加就是上面的模板.
 \begin{compactitem}
-\item \textbf{区间赋值, 求和/最大值}: 调用 \texttt{update(l, r, \{v, 1\})}.
+\item \textbf{区间赋值, 求和与最大值}: \texttt{update(1, 1, n, l, r, v)} 把 $a[l..r]$ 赋成 $v$.
 \begin{lstlisting}
-struct U{ll v;bool has;};
-const U idU={0,0};
-void app(int x,U u){ // 整段赋成 u.v
-	t[x].sum=u.v*t[x].len,t[x].mx=u.v;
-	d[x]=u; // 新赋值直接覆盖旧标记
+// 标记: tg[p] 为 1 表示整段待赋成 lz[p]
+ll lz[N<<2];bool tg[N<<2]; // build 里清 0
+void addtag(int p,int l,int r,ll v){ // 整段赋成 v
+	t[p].sum=v*(r-l+1),t[p].mx=v;
+	lz[p]=v,tg[p]=1; // 新赋值直接覆盖旧标记
 }
-void push(int x){
-	if(!d[x].has)return;
-	app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
+void pushdown(int p,int l,int r){
+	if(!tg[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m,lz[p]),addtag(p<<1|1,m+1,r,lz[p]);
+	tg[p]=0;
 }
 \end{lstlisting}
-\item \textbf{赋值和加混用}: 赋值 \texttt{\{v, 1, 0\}}, 加 \texttt{\{0, 0, v\}}.
+\item \textbf{赋值和加混用}: update 多一个参数 \texttt{op}, 为 1 赋值, 为 0 加.
 \begin{lstlisting}
-// 标记含义: 若 has 先赋成 s, 再加 add
-struct U{ll s;bool has;ll add;};
-const U idU={0,0,0};
-void app(int x,U u){
-	T&a=t[x];U&e=d[x];
-	if(u.has)
-		a.sum=u.s*a.len,a.mx=u.s,e={u.s,1,0};
-	a.sum+=u.add*a.len,a.mx+=u.add,e.add+=u.add;
+// 标记: 若 tg[p] 先整段赋成 sv[p], 再整段加 ad[p]
+ll sv[N<<2],ad[N<<2];bool tg[N<<2]; // build 里清 0
+void setv(int p,int l,int r,ll v){ // 整段赋成 v
+	t[p].sum=v*(r-l+1),t[p].mx=v;
+	sv[p]=v,tg[p]=1,ad[p]=0;
 }
-void push(int x){
-	if(!d[x].has&&!d[x].add)return;
-	app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
+void addv(int p,int l,int r,ll v){ // 整段加 v
+	t[p].sum+=v*(r-l+1),t[p].mx+=v;
+	ad[p]+=v;
 }
+void pushdown(int p,int l,int r){
+	int m=(l+r)>>1;
+	if(tg[p]){
+		setv(p<<1,l,m,sv[p]),setv(p<<1|1,m+1,r,sv[p]);
+		tg[p]=0;
+	}
+	if(ad[p]){
+		addv(p<<1,l,m,ad[p]),addv(p<<1|1,m+1,r,ad[p]);
+		ad[p]=0;
+	}
+}
+void update(int p,int l,int r,int x,int y,int op,ll v){
+	if(x<=l&&r<=y){
+		if(op)setv(p,l,r,v);
+		else addv(p,l,r,v);
+		return;
+	} // 其余同模板, 递归时也传 op
 \end{lstlisting}
-\item \textbf{区间乘再加, 求和取模}: 调用 \texttt{update(l, r, \{a, b\})}.
+\item \textbf{区间乘再加, 求和取模}: \texttt{update(1, 1, n, l, r, k, b)} 把 $a[l..r]$ 每个数 $v$ 变成 $kv + b$, 要求 $0 \le k, b < M$.
 \begin{lstlisting}
 const ll M=998244353;
-struct T{ll sum;int len;};struct U{ll a,b;};
-const T idT={0,0};const U idU={1,0};
-T f(T x,T y){
-	return {(x.sum+y.sum)%M,x.len+y.len};
+struct Node{ll sum;};
+Node operator+(Node x,Node y){return {(x.sum+y.sum)%M};}
+// 标记: 整段每个数先乘 mu[p] 再加 ad[p]
+ll mu[N<<2],ad[N<<2]; // build 里 mu[p]=1,ad[p]=0
+// 叶子 t[p]={a[l]%M}, 不要 mx
+void addtag(int p,int l,int r,ll k,ll b){
+	t[p].sum=(k*t[p].sum+b*(r-l+1))%M;
+	mu[p]=mu[p]*k%M,ad[p]=(ad[p]*k+b)%M;
 }
-void app(int x,U u){ // 整段每个数 v 变成 a * v + b
-	t[x].sum=(u.a*t[x].sum+u.b*t[x].len)%M;
-	d[x]={u.a*d[x].a%M,(u.a*d[x].b+u.b)%M};
+void pushdown(int p,int l,int r){
+	if(mu[p]==1&&!ad[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m,mu[p],ad[p]);
+	addtag(p<<1|1,m+1,r,mu[p],ad[p]);
+	mu[p]=1,ad[p]=0;
 }
-void push(int x){
-	if(d[x].a==1&&!d[x].b)return;
-	app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-}
+// update 的参数 v 换成 k, b, 命中整段时 addtag(p,l,r,k,b)
 \end{lstlisting}
-\item \textbf{01 序列区间取反, 数 1 的个数}: 调用 \texttt{update(l, r, \{1\})}.
+\item \textbf{01 序列区间取反, 数 1 的个数}: \texttt{update(1, 1, n, l, r)}, $a[i]$ 为 0 或 1.
 \begin{lstlisting}
-struct T{int cnt,len;};struct U{bool r;};
-const T idT={0,0};const U idU={0};
-T f(T a,T b){return {a.cnt+b.cnt,a.len+b.len};}
-void app(int x,U u){ // 整段 0 和 1 互换
-	if(u.r)t[x].cnt=t[x].len-t[x].cnt,d[x].r^=1;
+struct Node{int cnt;}; // 区间里 1 的个数
+Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
+bool rev[N<<2]; // 取反标记, build 里清 0
+// 叶子 t[p]={(int)a[l]}
+void addtag(int p,int l,int r){ // 整段 0 和 1 互换
+	t[p].cnt=(r-l+1)-t[p].cnt,rev[p]^=1;
 }
-void push(int x){
-	if(!d[x].r)return;
-	app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
+void pushdown(int p,int l,int r){
+	if(!rev[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m),addtag(p<<1|1,m+1,r);
+	rev[p]=0;
 }
+// update 去掉参数 v, 命中整段时 addtag(p,l,r)
 \end{lstlisting}
-\item \textbf{最大子段和}: 只有单点赋值 \texttt{update(p, p + 1, \{v\})}, 不需要下传.
+\item \textbf{最大子段和}: 只有单点赋值 \texttt{modify(1, 1, n, x, v)}, 不需要标记. \texttt{query(1, 1, n, l, r).best} 为 $a[l..r]$ 的最大非空子段和.
 \begin{lstlisting}
-const ll NEG=-(ll)1e18;
-struct T{ll sum,pre,suf,best;};
-struct U{ll v;};
-const T idT={0,NEG,NEG,NEG};
-const U idU={0};
-T f(T a,T b){
-	return {a.sum+b.sum,max(a.pre,a.sum+b.pre),
-	        max(b.suf,b.sum+a.suf),
-	        max({a.best,b.best,a.suf+b.pre})};
+struct Node{ll sum,pre,suf,best;}; // 前缀, 后缀, 答案
+Node operator+(Node x,Node y){
+	return {x.sum+y.sum,max(x.pre,x.sum+y.pre),
+	        max(y.suf,y.sum+x.suf),
+	        max({x.best,y.best,x.suf+y.pre})};
 }
-void app(int x,U u){ // 只会落在叶子上
-	t[x]={u.v,u.v,u.v,u.v};
+// 叶子 t[p]={a[l],a[l],a[l],a[l]}
+// 删去 lz, addtag, pushdown 及其所有调用
+void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
+	if(l==r){t[p]={v,v,v,v};return;}
+	int m=(l+r)>>1;
+	if(x<=m)modify(p<<1,l,m,x,v);
+	else modify(p<<1|1,m+1,r,x,v);
+	pushup(p);
 }
-void push(int){}
 \end{lstlisting}
 \end{compactitem}
 \kactlimport{PersistentSegmentTree.h}

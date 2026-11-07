@@ -1,22 +1,41 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/numerical/FastSubsetTransform.h"
 
-int main() {
-	rep(k,0,10) {
-		vi a(1 << k), b = a, c = a, target = a;
-		for(auto &x: a) x = rand() % 6 - 2;
-		for(auto &x: b) x = rand() % 6 - 2;
-		rep(i,0,1 << k) rep(j,0,1 << k) target[i & j] += a[i] * b[j];
-		// rep(i,0,1 << k) cout << a[i] << ' '; cout << endl;
-		// rep(i,0,1 << k) cout << b[i] << ' '; cout << endl;
-		FST(a, false);
-		FST(b, false);
-		rep(i,0,1 << k) c[i] = a[i] * b[i];
-		FST(c, true);
-		// rep(i,0,1 << k) cout << c[i] << ' '; cout << endl;
-		// rep(i,0,1 << k) cout << target[i] << ' '; cout << endl;
-		assert(c == target);
+mt19937 rng(16);
+int main(){
+	long long checks=0;
+	for(int it=0;it<3000;it++){
+		int k=rng()%9,n=1<<k;
+		vector<ll> a(n),b(n);
+		for(auto&v:a)v=(ll)(rng()%2001)-1000;
+		for(auto&v:b)v=(ll)(rng()%2001)-1000;
+		for(int op=0;op<3;op++){
+			vector<ll> want(n,0);
+			for(int i=0;i<n;i++)for(int j=0;j<n;j++){
+				int z=op==0?(i|j):op==1?(i&j):(i^j);
+				want[z]+=a[i]*b[j];
+			}
+			vector<ll> x=a,y=b;
+			void(*F)(vector<ll>&,int)=op==0?fwtOr:op==1?fwtAnd:fwtXor;
+			F(x,1);F(y,1);
+			for(int i=0;i<n;i++)x[i]*=y[i];
+			F(x,-1);
+			assert(x==want);
+			// 逆变换还原
+			vector<ll> z=a;F(z,1);F(z,-1);
+			assert(z==a);
+			checks+=2;
+		}
+		// or 正变换为子集和
+		vector<ll> s=a;fwtOr(s,1);
+		for(int m=0;m<n;m++){
+			ll t=0;
+			for(int i=0;i<n;i++)if((i&m)==i)t+=a[i];
+			assert(s[m]==t);
+		}
+		checks++;
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

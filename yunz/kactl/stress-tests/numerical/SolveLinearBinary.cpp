@@ -1,99 +1,73 @@
-#include "../utilities/template.h"
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#include "../../content/numerical/SolveLinearBinary.h"
 
-const int nmax = 5, mmax = 5, nmmax = 16;
-
-typedef bitset<5> bs;
-
-int solveLinear(vector<bs>& A, vi& b, bs& x, int m) {
-	int n = sz(A), rank = 0, br;
-	assert(m <= sz(x));
-	vi col(m); iota(all(col), 0);
-	rep(i,0,n) {
-		for (br=i; br<n; ++br) if (A[br].any()) break;
-		if (br == n) {
-			rep(j,i,n) if(b[j]) return -1;
-			break;
+mt19937 rng(11);
+int main(){
+	long long checks=0;
+	for(int it=0;it<30000;it++){
+		int n=rng()%8+1,m=rng()%10+1;
+		vector<vector<int>> A(n,vector<int>(m));
+		vector<int> b(n);
+		for(auto&r:A)for(auto&v:r)v=rng()%(rng()%3==0?4:2)==1;
+		for(int i=1;i<n;i++)if(rng()%3==0){ // 线性相关的行
+			int u=rng()%i;
+			for(int j=0;j<m;j++)A[i][j]^=A[u][j];
 		}
-		int bc = (int)A[br]._Find_next(i-1);
-		swap(A[i], A[br]);
-		swap(b[i], b[br]);
-		swap(col[i], col[bc]);
-		rep(j,0,n) if (A[j][i] != A[j][bc]) {
-			A[j].flip(i); A[j].flip(bc);
+		for(auto&v:b)v=rng()%2;
+		for(int i=1;i<=n;i++){ // 按 Usage 清空再填
+			a[i].reset();
+			for(int j=1;j<=m;j++)if(A[i-1][j-1])a[i][j]=1;
+			a[i][m+1]=b[i-1];
 		}
-		rep(j,i+1,n) if (A[j][i]) {
-			b[j] ^= b[i];
-			A[j] ^= A[i];
+		int r=gaussXor(n,m);
+		// 暴力枚举所有 x 数解的个数
+		int sol=0;
+		for(int mask=0;mask<(1<<m);mask++){
+			bool ok=true;
+			for(int i=0;i<n&&ok;i++){
+				int s=0;
+				for(int j=0;j<m;j++)if(mask>>j&1)s^=A[i][j];
+				if(s!=b[i])ok=false;
+			}
+			sol+=ok;
 		}
-		rank++;
-	}
-
-	x = bs();
-	for (int i = rank; i--;) {
-		if (!b[i]) continue;
-		x[col[i]] = 1;
-		rep(j,0,i) b[j] ^= A[j][i];
-	}
-	return rank; // (multiple solutions if rank < m)
-}
-
-template<class F>
-void rec(int i, int j, vector<bs>& A, int m, F f) {
-	if (i == sz(A)) {
-		f();
-	}
-	else if (j == m) {
-		rec(i+1, 0, A, m, f);
-	}
-	else {
-		rep(v,0,2) {
-			A[i][j] = v;
-			rec(i, j+1, A, m, f);
+		if(sol==0)assert(r==-1);
+		else{
+			assert(r>=0&&sol==(1<<(m-r)));
+			for(int i=0;i<n;i++){
+				int s=0;
+				for(int j=0;j<m;j++)s^=A[i][j]&x[j+1];
+				assert(s==b[i]);
+			}
 		}
+		checks++;
 	}
-}
-
-template<class F>
-void rec2(int i, bs& A, int m, F f) {
-	if (i == m) f();
-	else {
-		rep(v,0,2) {
-			A[i] = v;
-			rec2(i+1, A, m, f);
+	// 大规模: 构造有解的方程组, 检查解
+	for(int it=0;it<20;it++){
+		int n=rng()%900+1,m=rng()%900+1;
+		vector<int> x0(m);
+		for(auto&v:x0)v=rng()%2;
+		vector<vector<int>> A(n,vector<int>(m));
+		vector<int> b(n);
+		for(int i=1;i<=n;i++){
+			a[i].reset();
+			int s=0;
+			for(int j=1;j<=m;j++){
+				A[i-1][j-1]=rng()%2;
+				if(A[i-1][j-1])a[i][j]=1,s^=x0[j-1];
+			}
+			b[i-1]=s;a[i][m+1]=s;
 		}
+		int r=gaussXor(n,m);
+		assert(r>=0&&r<=min(n,m));
+		for(int i=0;i<n;i++){
+			int s=0;
+			for(int j=0;j<m;j++)s^=A[i][j]&x[j+1];
+			assert(s==b[i]);
+		}
+		checks++;
 	}
-}
-
-int main() {
-	int ct = 0;
-	rep(n,0,nmax+1) rep(m,0,mmax+1) {
-		int nm = n*m;
-		if (nm > nmmax) continue;
-		vector<bs> A(n, bs(m));
-		bs b, x, theX;
-		vi b2(n);
-		rec(0, 0, A, m, [&]() {
-			rec2(0, b, n, [&]() {
-				int sols = 0;
-				rec2(0, x, m, [&]() {
-					rep(i,0,n) {
-						int v = 0;
-						rep(j,0,m) v ^= A[i][j] & x[j];
-						if (v != b[i]) return;
-					}
-					sols++;
-					if (sols == 1) theX = x;
-				});
-				vector<bs> A2 = A;
-				bs x2 = x; rep(i,0,n) b2[i] = b[i];
-				int r = solveLinear(A2, b2, x2, m);
-				if (sols == 0) assert(r == -1);
-				else if (sols == 1) assert(r == m);
-				else assert(r < m);
-				if (sols == 1) assert(x2 == theX);
-				ct++;
-			});
-		});
-	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

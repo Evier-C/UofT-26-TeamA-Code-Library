@@ -1,31 +1,22 @@
 /**
- * Author: Victor Lecomte, chilli
- * Date: 2019-04-26
- * License: CC0
- * Source: https://vlecomte.github.io/cp-geo.pdf
- * Description: 若 p 在多边形内则返回 true. strict 为 true 时,
- * 边界上的点返回 false. 中间有乘积, 注意溢出.
+ * Description: 判断点 a 是否在多边形 p 内 (顺时针或逆时针, 可以是凹多边形).
+ * strict 为 true 时边界上的点返回 false. 中间有乘积, 注意溢出.
+ * Usage: vector<Point> p={Point(4,4),Point(1,2),Point(2,1)};
+ * bool in=inPolygon(p,Point(3,3),false); // 含边界
  * Time: O(n)
- * Usage:
- * vector<P> v = {P{4,4}, P{1,2}, P{2,1}};
- * bool in = inPolygon(v, P{3, 3}, false); // 含边界
- * Status: stress-tested and tested on kattis:pointinpolygon
  */
 #pragma once
 
 #include "Point.h"
 #include "OnSegment.h"
-#include "SegmentDistance.h"
 
-template<class P> // 顺时针或逆时针多边形均可
-bool inPolygon(vector<P>&p,P a,bool strict=true){
-	int cnt=0,n=sz(p);
-	rep(i,0,n){
-		P q=p[(i+1)%n];
+bool inPolygon(vector<Point>&p,Point a,bool strict=true){
+	int cnt=0,n=p.size();
+	for(int i=0;i<n;i++){
+		Point q=p[(i+1)%n];
 		if(onSegment(p[i],q,a))return !strict;
-		// 浮点数时可改用下一行
-		//if (segDist(p[i], q, a) <= eps) return !strict;
-		cnt^=((a.y<p[i].y)-(a.y<q.y))*a.cross(p[i],q)>0;
+		// 射线法: 向右的水平射线与边相交的次数
+		cnt^=((a.y<p[i].y)-(a.y<q.y))*cross(a,p[i],q)>0;
 	}
 	return cnt;
 }

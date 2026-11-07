@@ -1,46 +1,38 @@
 /**
- * Author: Bjorn Martinsson
- * Date: 2020-06-03
- * License: CC0
- * Source: own work
- * Description: 返回满足 $a^x = b \pmod m$ 的最小 $x > 0$，
- * 若不存在则返回 $-1$。modLog(a,1,m) 可用于
- * 求 $a$ 的阶。
- * Usage: ll x = modLog(a, b, m); // 无解时为 -1
- * Time: $O(\sqrt m)$
- * Status: tested for all 0 <= a,x < 500 and 0 < m < 500.
- *
- * Details: This algorithm uses the baby-step giant-step method to
- * find (i,j) such that a^(n * i) = b * a^j (mod m), where n > sqrt(m)
- * and 0 < i, j <= n. If a and m are coprime then a^j has a modular
- * inverse, which means that a^(i * n - j) = b (mod m$).
- *
- * However this particular implementation of baby-step giant-step works even
- * without assuming a and m are coprime, using the following idea:
- *
- * Assume p^x is a prime divisor of m. Then we have 3 cases
- *	 1. b is divisible by p^x
- *	 2. b is divisible only by some p^y, 0<y<x
- *	 3. b is not divisible by p
- * The important thing to note is that in case 2, modLog(a,b,m) (if
- * it exists) cannot be > sqrt(m), (technically it cannot be >= log2(m)).
- * So once all exponenents of a that are <= sqrt(m) has been checked, you
- * cannot have case 2. Case 2 is the only tricky case.
- *
- * So the modification allowing for non-coprime input involves checking all
- * exponents of a that are <= n, and then handling the non-tricky cases by
- * a simple gcd(a^n,m) == gcd(b,m) check.
+ * Description: 离散对数. bsgs 求最小的 $x \ge 0$ 使 $c \cdot a^x \equiv b \pmod m$,
+ * 要求 $\gcd(a, m) = 1$. exbsgs 求最小的 $x \ge 0$ 使 $a^x \equiv b \pmod m$,
+ * $a, m$ 任意: 不断用 $d = \gcd(a, m)$ 同除 $a^x, b, m$ (若 $d \nmid b$ 无解),
+ * 记下系数 $c = \prod (a/d)$, 直到 $a, m$ 互质, 再用 bsgs.
+ * 无解返回 $-1$. $m$ 不超过约 $10^9$ (乘法不溢出).
+ * Usage: ll x = bsgs(a, b, m); // gcd(a, m) = 1
+ * ll y = exbsgs(a, b, m); // 任意 a, m, 无解为 -1
+ * // a 的阶, 即最小的 k 使 a^k = 1, 为 bsgs(a, 1, m, a) + 1
+ * Time: O(\sqrt m)
  */
 #pragma once
 
-ll modLog(ll a,ll b,ll m){
-	ll n=(ll)sqrt(m)+1,e=1,f=1,j=1;
-	unordered_map<ll,ll>A;
-	while(j<=n&&(e=f=e*a%m)!=b%m)
-		A[e*b%m]=j++;
-	if(e==b%m)return j;
-	if(__gcd(m,e)==__gcd(m,b))
-		rep(i,2,n+2)if(A.count(e=e*f%m))
-			return n*i-A[e];
+ll bsgs(ll a,ll b,ll m,ll c=1){
+	a%=m,b%=m,c%=m;
+	if(c==b)return 0;
+	ll t=sqrtl(m)+1,at=1;
+	unordered_map<ll,ll>h; // b * a^j 对应的最大的 j
+	for(ll j=0,cur=b;j<t;j++,cur=cur*a%m)h[cur]=j,at=at*a%m;
+	// 找 c * a^(i t) = b * a^j, 则 x = i t - j
+	for(ll i=1,cur=c;i<=t;i++){
+		cur=cur*at%m;
+		if(h.count(cur))return i*t-h[cur];
+	}
 	return -1;
+}
+ll exbsgs(ll a,ll b,ll m){
+	a%=m,b%=m;
+	if(b==1%m)return 0;
+	ll k=0,c=1;
+	for(ll d;(d=__gcd(a,m))!=1;){
+		if(b%d)return -1;
+		b/=d,m/=d,k++,c=c*(a/d)%m;
+		if(c==b)return k; // x = k
+	}
+	ll x=bsgs(a,b,m,c);
+	return x<0?-1:x+k;
 }

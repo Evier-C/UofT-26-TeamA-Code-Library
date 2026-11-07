@@ -1,31 +1,15 @@
 /**
- * Author: chilli, Ramchandra Apte, Noam527, Simon Lindholm
- * Date: 2019-04-24
- * License: CC0
- * Source: https://github.com/RamchandraApte/OmniTemplate/blob/master/src/number_theory/modulo.hpp
- * Description: 计算 $a\cdot b\bmod c$（或 $a^b \bmod c$），要求 $0 \le a, b \le c \le 7.2\cdot 10^{18}$。
- * Usage: ull x = modmul(a, b, M); // a*b mod M
- * ull y = modpow(b, e, M); // b 的 e 次方 mod M
- * Time: \texttt{modmul} 为 O(1)，\texttt{modpow} 为 O(\log b)
- * Status: stress-tested, proven correct
- * Details:
- * This runs ~2x faster than the naive (__int128_t)a * b % M.
- * A proof of correctness is in doc/modmul-proof.tex. An earlier version of the proof,
- * from when the code used a * b / (long double)M, is in doc/modmul-proof.md.
- * The proof assumes that long doubles are implemented as x87 80-bit floats; if they
- * are 64-bit, as on e.g. MSVC, the implementation is only valid for
- * $0 \le a, b \le c < 2^{52} \approx 4.5 \cdot 10^{15}$.
+ * Description: 模数 $m$ 在 long long 范围内 (到约 $9 \cdot 10^{18}$) 的
+ * 乘法和快速幂, 用 \_\_int128 防止溢出.
+ * Usage: ll x = mulmod(a, b, m); // a * b mod m, 要求 a, b 在 [0, m)
+ * ll y = powmod(a, b, m); // a 的 b 次方 mod m
+ * Time: mulmod O(1), powmod O(\log b)
  */
 #pragma once
 
-typedef unsigned long long ull;
-ull modmul(ull a,ull b,ull M){
-	ll ret=a*b-M*ull(1.L/M*a*b);
-	return ret+M*(ret<0)-M*(ret>=(ll)M);
-}
-ull modpow(ull b,ull e,ull mod){
-	ull ans=1;
-	for(;e;b=modmul(b,b,mod),e/=2)
-		if(e&1)ans=modmul(ans,b,mod);
-	return ans;
+ll mulmod(ll a,ll b,ll m){return (__int128)a*b%m;}
+ll powmod(ll a,ll b,ll m){
+	ll r=1%m;a%=m;
+	for(;b;b>>=1,a=mulmod(a,a,m))if(b&1)r=mulmod(r,a,m);
+	return r;
 }

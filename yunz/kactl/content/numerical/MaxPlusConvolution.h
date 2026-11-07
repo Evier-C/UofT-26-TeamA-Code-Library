@@ -1,55 +1,30 @@
 /**
- * Author: Arnav Sastry
- * Date: 2024-10-29
- * Description: 给定数组 $a$, $b$, 其中 $b$ 是凹的,
- *   返回数组 $c_k = \max_{i+j=k}(a_i + b_j)$, 长度与 $a$ 相同.
- *   $b$ 的开头隐式插入一个 0.
- * Usage: vll c = maxPlusConv(a, b); // b 须为凹数组
- * Source: http://serjudging.vanb.org/?p=2081
- * Time: O(N \log N)
- * Status: Tested on https://codeforces.com/problemset/problem/808/E, https://open.kattis.com/problems/balatro/
+ * Description: $(\max,+)$ 卷积 $c_k = \max_{i+j=k} (a_i + b_j)$, 其中 $b$ 是凹的
+ * ($b_{j+1}-b_j$ 不增), $a$ 任意. 下标从 0 开始, 结果长度 $|a|+|b|-1$.
+ * $b$ 凹时最优 $i$ 关于 $k$ 单调不降, 用分治 (决策单调性) 求解.
+ * 求 $\min$ 卷积时要求 $b$ 是凸的: 全部取负即可.
+ * Usage: vector<ll> c=maxPlus(a,b); // b 须为凹, a, b 非空
+ * Time: O((|a|+|b|) \log (|a|+|b|))
  */
-using vll=vector<ll>;
-vll maxPlusConv(const vll&a,const vll&b){
-  if(b.empty())return a;
-  using Seg=array<ll,3>;
-  auto eval=[&](Seg&seg,ll x){
-    ll offset=x-seg[0];
-    assert(0<=seg[1]+offset&&seg[1]+offset<sz(b));
-    return b[seg[1]+offset]+seg[2];
-  };
-  auto endIndex=[&](Seg&seg){
-    return seg[0]+sz(b)-seg[1];
-  };
-  vector<Seg>stk;
-  rep(i,0,sz(a)){
-    Seg seg{i+1,0,a[i]};
-    while(!stk.empty()){
-      ll idx=stk.back()[0];
-      if(idx<seg[0]||eval(stk.back(),idx)>eval(seg,idx))
-        break;
-      stk.pop_back();
-    }
-    if(!stk.empty()&&endIndex(stk.back())>seg[0]
-        &&eval(stk.back(),seg[0])>eval(seg,seg[0])){
-      ll lo=seg[0];
-      ll hi=min(endIndex(stk.back()),endIndex(seg));
-      while(lo+1<hi){
-        ll mid=midpoint(lo,hi);
-        if(eval(stk.back(),mid)>eval(seg,mid))lo=mid;
-        else hi=mid;
-      }
-      seg[1]=hi-seg[0];
-      seg[0]=hi;
-    }
-    stk.push_back(seg);
-  }
-  vll ans=a;
-  auto it=stk.begin();
-  rep(i,1,sz(ans)){
-    while(next(it)!=stk.end()&&(*next(it))[0]<=i)
-      ++it;
-    ans[i]=max(ans[i],eval(*it,i));
-  }
-  return ans;
+#pragma once
+
+vector<ll>va,vb,vc;
+// 求 c[l..r], 已知最优的 i 在 [optl, optr] 中
+void mpdc(int l,int r,int optl,int optr){
+	if(l>r)return;
+	int mid=(l+r)/2,best=-1;
+	int lo=max(optl,mid-(int)vb.size()+1);
+	int hi=min({optr,mid,(int)va.size()-1});
+	for(int i=lo;i<=hi;i++){ // 取最左的最优 i
+		ll v=va[i]+vb[mid-i];
+		if(best==-1||v>vc[mid])vc[mid]=v,best=i;
+	}
+	mpdc(l,mid-1,optl,best);
+	mpdc(mid+1,r,best,optr);
+}
+vector<ll>maxPlus(const vector<ll>&a,const vector<ll>&b){
+	va=a;vb=b;
+	vc.assign(a.size()+b.size()-1,0);
+	mpdc(0,(int)vc.size()-1,0,(int)a.size()-1);
+	return vc;
 }

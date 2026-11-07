@@ -1,110 +1,91 @@
-#include "../utilities/template.h"
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+#include "../../content/numerical/SolveLinear.h"
 
-const int mod = 3;
-const int nmax = 4, mmax = 4, nmmax = 10;
-
-const int lut[9] = {-4,-2,-3,-1,-100,1,3,2,4};
-
-int modinv(int x) {
-	assert(x);
-	return x;
-	// return lut[x+4];
+mt19937 rng(10);
+const ll P=1000000007;
+ll pw(ll b,ll e){ll r=1;for(b%=P;e;e>>=1,b=b*b%P)if(e&1)r=r*b%P;return r;}
+// 模大素数求秩 (元素很小, 子式不会是 P 的倍数, 所以等于有理数域上的秩)
+int rankMod(vector<vector<ll>> m){
+	int n=m.size(),k=n?m[0].size():0,r=0;
+	for(auto&row:m)for(auto&v:row)v=(v%P+P)%P;
+	for(int c=0;c<k&&r<n;c++){
+		int p=-1;
+		for(int i=r;i<n;i++)if(m[i][c]){p=i;break;}
+		if(p<0)continue;
+		swap(m[p],m[r]);
+		ll iv=pw(m[r][c],P-2);
+		for(int i=0;i<n;i++)if(i!=r&&m[i][c]){
+			ll t=m[i][c]*iv%P;
+			for(int j=0;j<k;j++)m[i][j]=(m[i][j]-t*m[r][j]%P+P)%P;
+		}
+		r++;
+	}
+	return r;
 }
-
-typedef vector<int> vd;
-
-int solveLinear(vector<vd>& A, vd& b, vd& x) {
-	int n = sz(A), m = sz(x), rank = 0, br, bc;
-	if (n) assert(sz(A[0]) == m);
-	vi col(m); iota(all(col), 0);
-
-	rep(i,0,n) {
-		int v, bv = -1;
-		rep(r,i,n) rep(c,i,m)
-			if ((v = A[r][c])) {
-				br = r, bc = c, bv = v;
-				goto found;
+int main(){
+	long long checks=0;
+	int cnt[3]={0,0,0};
+	for(int it=0;it<30000;it++){
+		int n=rng()%6+1,m=rng()%6+1;
+		vector<vector<ll>> A(n,vector<ll>(m)),Ab(n,vector<ll>(m+1));
+		vector<ll> b(n);
+		for(auto&r:A)for(auto&v:r)v=(int)(rng()%7)-3;
+		// 让一些行是其他行的线性组合
+		for(int i=0;i<n;i++)if(i>0&&rng()%3==0){
+			int u=rng()%i,w=rng()%i,cu=(int)(rng()%3)-1,cw=(int)(rng()%3)-1;
+			for(int j=0;j<m;j++)A[i][j]=cu*A[u][j]+cw*A[w][j];
+		}
+		vector<ll> x0(m);
+		for(auto&v:x0)v=(int)(rng()%7)-3;
+		for(int i=0;i<n;i++){
+			b[i]=0;
+			for(int j=0;j<m;j++)b[i]+=A[i][j]*x0[j];
+			if(rng()%4==0)b[i]+=(int)(rng()%3)-1; // 可能无解
+		}
+		for(int i=0;i<n;i++){
+			for(int j=0;j<m;j++)Ab[i][j]=A[i][j];
+			Ab[i][m]=b[i];
+		}
+		int rA=rankMod(A),rAb=rankMod(Ab);
+		for(int i=1;i<=n;i++){
+			for(int j=1;j<=m;j++)a[i][j]=A[i-1][j-1];
+			a[i][m+1]=b[i-1];
+		}
+		int r=gauss(n,m);
+		if(rAb>rA){
+			assert(r==-1);cnt[0]++;
+		}else{
+			assert(r==rA);
+			if(r<m)cnt[1]++;else cnt[2]++;
+			for(int i=0;i<n;i++){
+				double s=0;
+				for(int j=0;j<m;j++)s+=A[i][j]*x[j+1];
+				assert(fabs(s-b[i])<1e-7);
 			}
-		rep(j,i,n) if (b[j]) return -1;
-		break;
-found:
-		swap(A[i], A[br]);
-		swap(b[i], b[br]);
-		swap(col[i], col[bc]);
-		rep(j,0,n) swap(A[j][i], A[j][bc]);
-		bv = modinv(A[i][i]);
-		rep(j,i+1,n) {
-			int fac = A[j][i] * bv % mod;
-			b[j] = (b[j] - fac * b[i]) % mod;
-			rep(k,i+1,m) A[j][k] = (A[j][k] - fac*A[i][k]) % mod;
 		}
-		rank++;
+		checks++;
 	}
-
-	x.assign(m, 0);
-	for (int i = rank; i--;) {
-		b[i] = ((b[i] * modinv(A[i][i]) % mod) + mod) % mod;
-		x[col[i]] = b[i];
-		rep(j,0,i)
-			b[j] = (b[j] - A[j][i] * b[i]);
-	}
-	return rank;
-}
-
-template<class F>
-void rec(int i, int j, vector<vd>& A, F f) {
-	if (i == sz(A)) {
-		f();
-	}
-	else if (j == sz(A[i])) {
-		rec(i+1, 0, A, f);
-	}
-	else {
-		rep(v,0,mod) {
-			A[i][j] = v;
-			rec(i, j+1, A, f);
+	assert(cnt[0]>1000&&cnt[1]>1000&&cnt[2]>1000);
+	// 大规模随机 (几乎必有唯一解)
+	for(int it=0;it<20;it++){
+		int n=rng()%300+1;
+		vector<vector<double>> A(n,vector<double>(n));
+		vector<double> b(n);
+		for(auto&r:A)for(auto&v:r)v=(rng()%20001)/1000.0-10;
+		for(auto&v:b)v=(rng()%20001)/1000.0-10;
+		for(int i=1;i<=n;i++){
+			for(int j=1;j<=n;j++)a[i][j]=A[i-1][j-1];
+			a[i][n+1]=b[i-1];
 		}
-	}
-}
-
-template<class F>
-void rec2(int i, vd& A, F f) {
-	if (i == sz(A)) f();
-	else {
-		rep(v,0,mod) {
-			A[i] = v;
-			rec2(i+1, A, f);
+		assert(gauss(n,n)==n);
+		for(int i=0;i<n;i++){
+			double s=0;
+			for(int j=0;j<n;j++)s+=A[i][j]*x[j+1];
+			assert(fabs(s-b[i])<1e-6);
 		}
+		checks++;
 	}
-}
-
-int main() {
-	rep(n,0,nmax+1) rep(m,0,mmax+1) {
-		int nm = n*m;
-		if (nm > nmmax) continue;
-		vector<vd> A(n, vd(m));
-		vd b(n), x(m), theX(m);
-		rec(0, 0, A, [&]() {
-			rec2(0, b, [&]() {
-				int sols = 0;
-				rec2(0, x, [&]() {
-					rep(i,0,n) {
-						int v = 0;
-						rep(j,0,m) v += A[i][j] * x[j];
-						if (v % mod != b[i]) return;
-					}
-					sols++;
-					if (sols == 1) theX = x;
-				});
-				vector<vd> A2 = A;
-				vd x2 = x, b2 = b;
-				int r = solveLinear(A2, b2, x2);
-				if (sols == 0) assert(r == -1);
-				else if (sols == 1) assert(r == m);
-				else assert(r < m);
-				if (sols == 1) assert(x2 == theX);
-			});
-		});
-	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

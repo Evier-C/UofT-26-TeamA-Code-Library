@@ -1,24 +1,18 @@
 /**
- * Author: Ulf Lundstrom
- * Date: 2009-04-08
- * License: CC0
- * Source:
- * Description: 返回多边形的重心 (质心).
- * Usage:
- * 	P c = polygonCenter(v);
+ * Description: 返回多边形 (面积非 0) 的重心 (质心). 要求 T 为 double.
+ * Usage: vector<Point> v; // 顶点 v[0..n-1]
+ * Point c=polygonCenter(v);
  * Time: O(n)
- * Status: Tested
  */
 #pragma once
 
 #include "Point.h"
 
-typedef Point<double>P;
-P polygonCenter(const vector<P>&v){
-	P res(0,0);double A=0;
-	for(int i=0,j=sz(v)-1;i<sz(v);j=i++){
-		res=res+(v[i]+v[j])*v[j].cross(v[i]);
-		A+=v[j].cross(v[i]);
+Point polygonCenter(vector<Point>&v){
+	Point res(0,0);double A=0;
+	for(int i=0,j=v.size()-1;i<(int)v.size();j=i++){
+		res=res+(v[i]+v[j])*cross(v[j],v[i]);
+		A+=cross(v[j],v[i]);
 	}
 	return res/A/3;
 }

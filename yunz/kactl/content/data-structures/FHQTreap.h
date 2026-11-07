@@ -1,88 +1,109 @@
 /**
- * Description: FHQ treap (split/merge, 无旋转). 节点 0 表示空.
- * 两种用法共用 split/merge: 按值有序的 multiset, 或按位置的序列
- * (支持懒标记翻转和区间和, 下面的 b 即 [l, r) 段). 不要把翻转和按值操作混用.
- * Usage: Treap T; T.insert(v); T.erase(v); T.rank(v); T.kth(k);
- * prev(v) = T.kth(T.rank(v) - 1), next(v) = T.kth(T.rank(v + 1));
- * T.rt = T.merge(T.rt, T.nn(v)); // 加到序列末尾
- * int a, b, c; T.split(T.rt, l, a, b); T.split(b, r - l, b, c);
- * T.t[b].rev ^= 1; T.t[b].sum; T.rt = T.merge(T.merge(a, b), c);
+ * Description: FHQ treap (split/merge, 无旋转), 节点 0 表示空. 两种用法:
+ * (1) 按值有序的可重集合: insert, erase, getrank, kth, pre, nxt;
+ * (2) 按位置的序列: 按大小 split, 区间翻转, 区间和.
+ * 两种用法不要混在同一棵树上. sum 和 rev 只给序列用.
+ * kth, pre, nxt 要保证答案存在. N 为插入总次数, 删掉的节点不回收.
+ * Usage: tot = root = 0; // 多组数据清空
+ * insert(v); erase(v); getrank(v); kth(k); pre(v); nxt(v);
+ * // 建序列: 依次加到末尾
+ * for (int i = 1; i <= n; i++)
+ *   root = merge(root, newnode(a[i]));
+ * reverse(l, r); rangeSum(l, r); // 位置从 1 开始
+ * vector<ll> o; dfs(root, o); // 中序遍历得到当前序列
  * Time: 每次操作期望 O(\log N)
  */
 #pragma once
 
-struct Treap{
-	struct N{int l,r,s;unsigned p;ll v,sum;bool rev;};
-	vector<N>t{{0,0,0,0,0,0,0}};
-	mt19937 rng{12345};
-	int rt=0;
-	int nn(ll v){ // 新建节点
-		t.push_back({0,0,1,(unsigned)rng(),v,v,0});
-		return sz(t)-1;
+const int N=2e5+5; // 插入总次数
+int ls[N],rs[N],siz[N],tot,root;
+unsigned rnd[N];ll val[N],sum[N];bool rev[N];
+mt19937 rng(12345);
+int newnode(ll v){
+	int p=++tot;
+	ls[p]=rs[p]=0,siz[p]=1,rev[p]=0;
+	rnd[p]=rng(),val[p]=sum[p]=v;
+	return p;
+}
+void pushup(int p){
+	siz[p]=siz[ls[p]]+siz[rs[p]]+1;
+	sum[p]=sum[ls[p]]+sum[rs[p]]+val[p];
+}
+void pushdown(int p){ // 下传翻转标记
+	if(!rev[p])return;
+	swap(ls[p],rs[p]);
+	if(ls[p])rev[ls[p]]^=1;
+	if(rs[p])rev[rs[p]]^=1;
+	rev[p]=0;
+}
+void splitv(int p,ll v,int&x,int&y){ // 值不超过 v 的给 x
+	if(!p){x=y=0;return;}
+	pushdown(p);
+	if(val[p]<=v)x=p,splitv(rs[p],v,rs[p],y);
+	else y=p,splitv(ls[p],v,x,ls[p]);
+	pushup(p);
+}
+void split(int p,int k,int&x,int&y){ // 前 k 个给 x
+	if(!p){x=y=0;return;}
+	pushdown(p);
+	if(siz[ls[p]]<k)x=p,split(rs[p],k-siz[ls[p]]-1,rs[p],y);
+	else y=p,split(ls[p],k,x,ls[p]);
+	pushup(p);
+}
+int merge(int x,int y){ // x 的元素都在 y 前面
+	if(!x||!y)return x|y;
+	if(rnd[x]<rnd[y]){
+		pushdown(x),rs[x]=merge(rs[x],y),pushup(x);
+		return x;
 	}
-	void pull(int x){
-		N&n=t[x];
-		n.s=t[n.l].s+t[n.r].s+1;
-		n.sum=t[n.l].sum+t[n.r].sum+n.v;
+	pushdown(y),ls[y]=merge(x,ls[y]),pushup(y);
+	return y;
+}
+// ---- 用法 1: 按值的可重集合 ----
+void insert(ll v){
+	int x,y;
+	splitv(root,v,x,y);
+	root=merge(merge(x,newnode(v)),y);
+}
+void erase(ll v){ // 删一个 v, 没有则不变
+	int x,y,z;
+	splitv(root,v,x,z),splitv(x,v-1,x,y);
+	y=merge(ls[y],rs[y]);
+	root=merge(merge(x,y),z);
+}
+int getrank(ll v){ // 严格小于 v 的个数 + 1
+	int x,y;
+	splitv(root,v-1,x,y);
+	int r=siz[x]+1;
+	root=merge(x,y);
+	return r;
+}
+ll kth(int k){ // 第 k 小, k 从 1 开始
+	int p=root;
+	while(1){
+		if(k<=siz[ls[p]])p=ls[p];
+		else if(k==siz[ls[p]]+1)return val[p];
+		else k-=siz[ls[p]]+1,p=rs[p];
 	}
-	void push(int x){ // 下传翻转标记
-		if(!t[x].rev)return;
-		swap(t[x].l,t[x].r);
-		t[t[x].l].rev^=1,t[t[x].r].rev^=1,t[x].rev=0;
-	}
-	void split(int x,int k,int&a,int&b){ // 前 k 个给 a
-		if(!x){a=b=0;return;}
-		push(x);
-		int ls=t[t[x].l].s;
-		if(ls<k)split(t[x].r,k-ls-1,t[x].r,b),a=x;
-		else split(t[x].l,k,a,t[x].l),b=x;
-		pull(x);
-	}
-	void splitv(int x,ll v,int&a,int&b){ // 值 < v 的给 a
-		if(!x){a=b=0;return;}
-		push(x);
-		if(t[x].v<v)splitv(t[x].r,v,t[x].r,b),a=x;
-		else splitv(t[x].l,v,a,t[x].l),b=x;
-		pull(x);
-	}
-	int merge(int a,int b){ // a 的元素都在 b 前面
-		if(!a||!b)return a^b;
-		if(t[a].p>t[b].p){
-			push(a),t[a].r=merge(t[a].r,b),pull(a);
-			return a;
-		}
-		push(b),t[b].l=merge(a,t[b].l),pull(b);
-		return b;
-	}
-	void insert(ll v){
-		int n=nn(v),a,b;
-		splitv(rt,v,a,b);
-		rt=merge(merge(a,n),b);
-	}
-	void erase(ll v){ // 删除一个 v
-		int a,b,c,d;
-		splitv(rt,v,a,b),split(b,1,c,d);
-		rt=merge(a,c&&t[c].v==v?d:merge(c,d));
-	}
-	int rank(ll v){ // 严格小于 v 的个数
-		int a,b;
-		splitv(rt,v,a,b);
-		int r=t[a].s;
-		rt=merge(a,b);
-		return r;
-	}
-	ll kth(int k){ // 第 k 小 (k 从 0 开始)
-		for(int x=rt;;){
-			push(x);
-			int ls=t[t[x].l].s;
-			if(k==ls)return t[x].v;
-			if(k<ls)x=t[x].l;
-			else k-=ls+1,x=t[x].r;
-		}
-	}
-	void walk(int x,vector<ll>&o){ // 中序遍历
-		if(!x)return;
-		push(x),walk(t[x].l,o);
-		o.push_back(t[x].v),walk(t[x].r,o);
-	}
-};
+}
+ll pre(ll v){return kth(getrank(v)-1);} // 小于 v 的最大值
+ll nxt(ll v){return kth(getrank(v+1));} // 大于 v 的最小值
+// ---- 用法 2: 序列, 位置从 1 开始 ----
+void reverse(int l,int r){
+	int x,y,z;
+	split(root,r,x,z),split(x,l-1,x,y);
+	rev[y]^=1;
+	root=merge(merge(x,y),z);
+}
+ll rangeSum(int l,int r){
+	int x,y,z;
+	split(root,r,x,z),split(x,l-1,x,y);
+	ll s=sum[y];
+	root=merge(merge(x,y),z);
+	return s;
+}
+void dfs(int p,vector<ll>&o){ // 中序遍历
+	if(!p)return;
+	pushdown(p),dfs(ls[p],o);
+	o.push_back(val[p]),dfs(rs[p],o);
+}

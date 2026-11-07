@@ -1,35 +1,39 @@
 /**
- * Author: Simon Lindholm
- * License: CC0
- * Description: 在一组互不相交的区间中添加或删除区间。
- * 添加时会与集合中所有重叠的区间合并。区间均为左闭右开 $[L, R)$。
- * Usage: set<pii> is; auto it = addInterval(is, L, R);
- * removeInterval(is, L, R); // it 指向合并后的区间
- * Time: O(\log N)
- * Status: stress-tested
+ * Description: 用 set 维护若干互不相交的整数闭区间 $[l, r]$, 相交或相邻的区间
+ * 会自动合并. add 加入 $[l, r]$, del 删掉 $[l, r]$ 内所有的点
+ * (可能把一个区间切成两半). tot 为被覆盖的点数.
+ * Usage: add(1, 5); add(7, 9); add(6, 6); // st = {[1, 9]}
+ * del(3, 4); // st = {[1, 2], [5, 9]}, tot = 7
+ * auto it = getIt(x); // 包含 x 的区间, 不存在时为 st.end()
+ * // 多组数据: st.clear(), tot = 0
+ * Time: 均摊 O(\log N)
  */
 #pragma once
 
-set<pii>::iterator addInterval(set<pii>&is,int L,int R){
-	if(L==R)return is.end();
-	auto it=is.lower_bound({L,R}),before=it;
-	while(it!=is.end()&&it->first<=R){
-		R=max(R,it->second);
-		before=it=is.erase(it);
+set<pair<int,int>>st;
+ll tot; // 被覆盖的点数
+void add(int l,int r){
+	auto it=st.lower_bound({l,INT_MIN});
+	if(it!=st.begin()&&prev(it)->second>=l-1)it--;
+	while(it!=st.end()&&it->first<=r+1){
+		l=min(l,it->first),r=max(r,it->second);
+		tot-=it->second-it->first+1;
+		it=st.erase(it);
 	}
-	if(it!=is.begin()&&(--it)->second>=L){
-		L=min(L,it->first);
-		R=max(R,it->second);
-		is.erase(it);
-	}
-	return is.insert(before,{L,R});
+	st.insert({l,r}),tot+=r-l+1;
 }
-
-void removeInterval(set<pii>&is,int L,int R){
-	if(L==R)return;
-	auto it=addInterval(is,L,R);
-	auto r2=it->second;
-	if(it->first==L)is.erase(it);
-	else(int&)it->second=L;
-	if(R!=r2)is.emplace(R,r2);
+void del(int l,int r){
+	auto it=st.lower_bound({l,INT_MIN});
+	if(it!=st.begin()&&prev(it)->second>=l)it--;
+	while(it!=st.end()&&it->first<=r){
+		auto[L,R]=*it;
+		it=st.erase(it),tot-=R-L+1;
+		if(L<l)st.insert({L,l-1}),tot+=l-L;
+		if(R>r)st.insert({r+1,R}),tot+=R-r;
+	}
+}
+set<pair<int,int>>::iterator getIt(int x){
+	auto it=st.upper_bound({x,INT_MAX});
+	if(it==st.begin()||prev(it)->second<x)return st.end();
+	return prev(it);
 }

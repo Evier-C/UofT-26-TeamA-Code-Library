@@ -1,35 +1,36 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/data-structures/FenwickTree2d.h"
 
-int main() {
-	rep(it,0,1000000) {
-		FT2 ft(12);
-		vector<tuple<int, int, int>> upd;
-		int c = rand() % 20;
-		rep(i,0,c) {
-			upd.emplace_back(rand() % 12, rand() % 12, rand() % 10 - 5);
-		}
+mt19937 rng(5);
+int rnd(int lo,int hi){return lo+(int)(rng()%(unsigned)(hi-lo+1));}
 
-		vector<vi> grid(12, vi(12)), sumto(13, vi(13));
-		for(auto &pa: upd)
-			ft.fakeUpdate(get<0>(pa), get<1>(pa));
-		ft.init();
-		for(auto &pa: upd) {
-			grid[get<0>(pa)][get<1>(pa)] += get<2>(pa);
-			ft.update(get<0>(pa), get<1>(pa), get<2>(pa));
-		}
-
-		rep(i,0,13) {
-			rep(j,0,13) {
-				ll v = ft.query(i, j);
-				if (i == 0 || j == 0) assert(v == 0);
-				else {
-					sumto[i][j] = grid[i-1][j-1] + sumto[i-1][j] + sumto[i][j-1] - sumto[i-1][j-1];
-					assert(v == sumto[i][j]);
+int main(){
+	long long checks=0;
+	for(int it=0;it<1500;it++){
+		bool big=it>=1495;
+		n=big?rnd(500,1000):rnd(1,12);
+		m=big?rnd(500,1000):rnd(1,12);
+		for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)c[i][j]=0; // clear
+		vector<vector<ll>>a(n+1,vector<ll>(m+1));
+		for(int s=0;s<(big?3000:200);s++){
+			if(rng()%2){
+				int x=rnd(1,n),y=rnd(1,m);ll v=rnd(-1000000,1000000);
+				add(x,y,v);a[x][y]+=v;
+			}else{
+				int x1=rnd(1,n),x2=rnd(x1,n),y1=rnd(1,m),y2=rnd(y1,m);
+				if(big)x2=min(n,x1+rnd(0,20)),y2=min(m,y1+rnd(0,20));
+				ll e=0;
+				for(int i=x1;i<=x2;i++)for(int j=y1;j<=y2;j++)e+=a[i][j];
+				assert(query(x1,y1,x2,y2)==e);checks++;
+				if(!big&&rng()%4==0){
+					e=0;
+					for(int i=1;i<=x2;i++)for(int j=1;j<=y2;j++)e+=a[i][j];
+					assert(ask(x2,y2)==e),checks++;
 				}
 			}
 		}
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

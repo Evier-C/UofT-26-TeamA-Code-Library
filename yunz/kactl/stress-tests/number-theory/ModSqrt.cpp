@@ -1,23 +1,38 @@
-#include "../utilities/template.h"
-
-ll modpow(ll a, ll e, ll mod) {
-	if (e == 0) return 1;
-	ll x = modpow(a * a % mod, e >> 1, mod);
-	return e & 1 ? x * a % mod : x;
-}
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/number-theory/ModSqrt.h"
 
-int main() {
-	rep(p,2,10000) {
-		rep(i,2,p) if (p % i == 0) goto next;
-		rep(a,0,p) {
-			if (p != 2 && modpow(a, (p-1)/2, p) == p-1) continue;
-			ll x = sqrt(a, p);
-			assert(0 <= x && x < p);
-			assert(x * x % p == a);
+bool isP(ll n){
+	if(n<2)return 0;
+	for(ll i=2;i*i<=n;i++)if(n%i==0)return 0;
+	return 1;
+}
+int main(){
+	mt19937_64 rng(5);
+	ll checks=0;
+	for(ll p=2;p<2000;p++)if(isP(p)){
+		vector<int>has(p,0);
+		for(ll x=0;x<p;x++)has[x*x%p]=1;
+		for(ll n=-3;n<p+3;n++){
+			ll nm=(n%p+p)%p,x=cipolla(n,p);
+			if(!has[nm])assert(x==-1);
+			else assert(x>=0&&x<=p-x&&x*x%p==nm);
+			checks++;
 		}
-next:;
 	}
-	cout<<"Tests passed!"<<endl;
+	vector<ll>big={1000000007,998244353,(1LL<<61)-1,
+		1000000000000000003LL,9223372036854775783LL};
+	for(ll p:big)for(int it=0;it<3000;it++){
+		ll r=rng()%p,n=(__int128)r*r%p;
+		ll x=cipolla(n,p);
+		assert(x==min(r,p-r));checks++;
+		ll m=rng()%p;
+		bool qr=m==0||pw(m,(p-1)/2,p)==1;
+		x=cipolla(m,p);
+		if(!qr)assert(x==-1);
+		else assert(x>=0&&(__int128)x*x%p==m);
+		checks++;
+	}
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

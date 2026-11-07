@@ -1,15 +1,15 @@
 /**
- * Author: Simon Lindholm
- * Date: 2016-07-24
- * License: CC0
- * Source: Russian page
- * Description: 预处理模逆元。要求 LIM $\le$ mod 且 mod 为质数。
- * Usage: // 下面的代码需放在 main 等函数内
- * inv[i]; // 1 到 LIM-1 中 i 模 mod 的逆元
- * Status: Works
+ * Description: 线性求 $1..n$ 模质数 $p$ 的逆元, 要求 $n < p$.
+ * 原理: $p = \lfloor p/i \rfloor \cdot i + (p \bmod i)$.
+ * 单个数的逆元用快速幂 $a^{p-2}$ 或 exgcd.
+ * Usage: initInv(n, p); // 之后 inv[i] 为 i 的逆元, 1 到 n
+ * Time: O(N)
  */
 #pragma once
 
-// const ll mod = 1000000007, LIM = 200000; ///include-line
-ll*inv=new ll[LIM]-1;inv[1]=1;
-rep(i,2,LIM)inv[i]=mod-(mod/i)*inv[mod%i]%mod;
+const int N=1e6+5;
+ll inv[N];
+void initInv(int n,ll p){
+	inv[1]=1;
+	for(int i=2;i<=n;i++)inv[i]=(p-p/i)*inv[p%i]%p;
+}

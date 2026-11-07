@@ -1,51 +1,32 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/various/LIS.h"
 
-template<class I> vi lisWeak(const vector<I>& S) {
-	if (S.empty()) return {};
-	vi prev(sz(S));
-	typedef pair<I, int> p;
-	vector<p> res;
-	rep(i,0,sz(S)) {
-		// 0 -> i for longest non-decreasing subsequence
-		auto it = lower_bound(all(res), p{S[i], i});
-		if (it == res.end()) res.emplace_back(), it = res.end()-1;
-		*it = {S[i], i};
-		prev[i] = it == res.begin() ? 0 : (it-1)->second;
-	}
-	int L = sz(res), cur = res.back().second;
-	vi ans(L);
-	while (L--) ans[L] = cur, cur = prev[cur];
-	return ans;
-}
-
-int main() {
-	rep(weak,0,2) {
-		auto lt = [weak](int a, int b) { return weak ? a <= b : a < b; };
-		rep(it,0,1000000) {
-			int n = rand() % 7;
-			vi v(n);
-			for(auto &x: v) x = rand() % 4;
-			vi inds = weak ? lisWeak(v) : lis(v);
-			rep(i,0,sz(inds)-1) {
-				assert(lt(v[inds[i]], v[inds[i+1]]));
-			}
-			rep(bi,0,(1 << n)) {
-				int si = (int)bitset<32>(bi).count();
-				if (si <= sz(inds)) continue;
-				int prev = INT_MIN;
-				rep(i,0,n) if (bi & (1 << i)) {
-					if (!lt(prev, v[i])) goto next;
-					prev = v[i];
-				}
-				cout << "exists lis of size " << si << " but found only " << sz(inds) << endl;
-				for(auto &x: v) cout << x << ' ';
-				cout << endl;
-				abort();
-	next:;
-			}
+int main(){
+	mt19937_64 rng(14);
+	ll checks=0;
+	for(int it=0;it<20000;it++){ // 多组数据, 不清空
+		int n=rng()%(it<10000?12:300),V=rng()%(n+5)+1;
+		for(int i=1;i<=n;i++)a[i]=(int)(rng()%V)-V/2;
+		vector<int>dp(n+1,0);int best=0;
+		for(int i=1;i<=n;i++){
+			dp[i]=1;
+			for(int j=1;j<i;j++)if(a[j]<a[i])dp[i]=max(dp[i],dp[j]+1);
+			best=max(best,dp[i]);
 		}
+		vector<int>id=lis(n);
+		assert((int)id.size()==best);
+		for(int i=0;i<(int)id.size();i++){
+			assert(id[i]>=1&&id[i]<=n);
+			if(i)assert(id[i-1]<id[i]&&a[id[i-1]]<a[id[i]]);
+		}
+		checks++;
 	}
-	cout << "Tests passed!" << endl;
+	int n=200000; // 大数据: 严格上升
+	for(int i=1;i<=n;i++)a[i]=i*2;
+	assert((int)lis(n).size()==n);
+	for(int i=1;i<=n;i++)a[i]=n-i;
+	assert((int)lis(n).size()==1);
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

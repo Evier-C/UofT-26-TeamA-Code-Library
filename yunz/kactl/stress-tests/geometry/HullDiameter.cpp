@@ -1,23 +1,21 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/geometry/ConvexHull.h"
 #include "../../content/geometry/HullDiameter.h"
 
-int main() {
-	srand(2);
-	rep(it,0,1000000) {
-		int N = (rand() % 10) + 1;
-		vector<Point<ll>> ps;
-		rep(i,0,N) {
-			ps.emplace_back(rand() % 11 - 5, rand() % 11 - 5);
-		}
-		ll r1 = 0;
-		rep(i,0,N) rep(j,0,i) {
-			r1 = max(r1, (ps[i] - ps[j]).dist2());
-		}
-		auto pa = hullDiameter(convexHull(ps));
-		ll r2 = ps.empty() ? 0LL : (pa[0] - pa[1]).dist2();
-		assert(r1 == r2);
+mt19937 rng(18);
+int main(){
+	ll checks=0;
+	for(int it=0;it<1000000;it++){
+		int N=it%100==0?rng()%300+1:rng()%10+1,G=it%2?11:2001;
+		vector<Point>ps;
+		for(int i=0;i<N;i++)ps.emplace_back((int)(rng()%G)-G/2,(int)(rng()%G)-G/2);
+		T r1=0;
+		for(int i=0;i<N;i++)for(int j=0;j<i;j++)r1=max(r1,len2(ps[i]-ps[j]));
+		vector<Point>h=convexHull(ps);
+		assert(hullDiameter(h)==r1);
+		checks++;
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

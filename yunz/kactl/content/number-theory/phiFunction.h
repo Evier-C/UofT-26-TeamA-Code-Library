@@ -1,28 +1,26 @@
 /**
- * Author: Håkan Terelius
- * Date: 2009-09-25
- * License: CC0
- * Source: http://en.wikipedia.org/wiki/Euler's_totient_function
- * Description: \emph{欧拉 $\phi$} 函数定义为 $\phi(n):=\#$（$\leq n$ 且与 $n$ 互质的正整数）。
- * $\phi(1)=1$；$p$ 为质数 $\Rightarrow \phi(p^k)=(p-1)p^{k-1}$；$m,n$ 互质 $\Rightarrow \phi(mn)=\phi(m)\phi(n)$。
- * 若 $n=p_1^{k_1}p_2^{k_2} ... p_r^{k_r}$，则 $\phi(n) = (p_1-1)p_1^{k_1-1}...(p_r-1)p_r^{k_r-1}$。
- * $\phi(n)=n \cdot \prod_{p|n}(1-1/p)$。
+ * Description: \emph{欧拉函数} $\varphi(n)$ 为 $1..n$ 中与 $n$ 互质的数的个数.
+ * $n = p_1^{k_1} \cdots p_r^{k_r}$ 时 $\varphi(n) = n \prod_{p|n}(1-1/p)$;
+ * $m, n$ 互质时 $\varphi(mn)=\varphi(m)\varphi(n)$.
+ * $\sum_{d|n} \varphi(d) = n$, $\sum_{1\leq k \leq n, \gcd(k,n)=1} k = n \varphi(n)/2$ ($n>1$).
  *
- * $\sum_{d|n} \phi(d) = n$，$\sum_{1\leq k \leq n, \gcd(k,n)=1} k = n \phi(n)/2, n>1$
+ * \textbf{欧拉定理}: $a,n$ 互质 $\Rightarrow a^{\varphi(n)} \equiv 1 \pmod{n}$.
+ * \textbf{扩展欧拉定理}: $b \ge \varphi(n)$ 时 $a^b \equiv a^{b \bmod \varphi(n) + \varphi(n)} \pmod n$.
+ * \textbf{费马小定理}: $p$ 为质数 $\Rightarrow a^{p} \equiv a \pmod{p}$.
  *
- * \textbf{欧拉定理}：$a,n$ 互质 $\Rightarrow a^{\phi(n)} \equiv 1 \pmod{n}$。
- *
- * \textbf{费马小定理}：$p$ 为质数 $\Rightarrow a^{p-1} \equiv 1 \pmod{p}$ $\forall a$。
- * Usage: calculatePhi(); // 之后 phi[i] 即 i 的欧拉函数 (i < LIM)
- * Status: Tested
+ * 下面的 getPhi 用试除法求单个 $\varphi(n)$; 要求 $1..n$ 所有的
+ * $\varphi$ 用 FastEratosthenes 的线性筛.
+ * Usage: ll f = getPhi(n); // n 至少为 1
+ * Time: O(\sqrt n)
  */
 #pragma once
 
-const int LIM=5000000;
-int phi[LIM];
-
-void calculatePhi(){
-	rep(i,0,LIM)phi[i]=i&1?i:i/2;
-	for(int i=3;i<LIM;i+=2)if(phi[i]==i)
-		for(int j=i;j<LIM;j+=i)phi[j]-=phi[j]/i;
+ll getPhi(ll n){
+	ll r=n;
+	for(ll i=2;i*i<=n;i++)if(n%i==0){
+		r=r/i*(i-1);
+		while(n%i==0)n/=i;
+	}
+	if(n>1)r=r/n*(n-1);
+	return r;
 }

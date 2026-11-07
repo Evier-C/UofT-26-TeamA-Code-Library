@@ -1,20 +1,13 @@
 /**
- * Author: Noam527
- * Date: 2019-04-24
- * License: CC0
- * Source: folklore
- * Description: 快速幂，计算 $b^e \bmod \texttt{mod}$。
- * Usage: ll r = modpow(b, e); // b 的 e 次方模 mod
- * Time: O(\log e)
- * Status: tested
+ * Description: 快速幂, 求 $a^b \bmod p$. 要求 $p^2$ 不超过 long long,
+ * 即 $p$ 不超过约 $3 \cdot 10^9$; 更大的模数用 ModMulLL 的 powmod.
+ * Usage: ll r = qpow(a, b, p); // a 可以为负, b 至少为 0
+ * Time: O(\log b)
  */
 #pragma once
 
-const ll mod=1000000007; // 设为 const 更快
-
-ll modpow(ll b,ll e){
-	ll ans=1;
-	for(;e;b=b*b%mod,e/=2)
-		if(e&1)ans=ans*b%mod;
-	return ans;
+ll qpow(ll a,ll b,ll p){
+	ll r=1%p;a%=p;if(a<0)a+=p;
+	for(;b;b>>=1,a=a*a%p)if(b&1)r=r*a%p;
+	return r;
 }

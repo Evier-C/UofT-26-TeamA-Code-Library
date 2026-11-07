@@ -1,26 +1,22 @@
 /**
- * Author: Ulf Lundstrom
- * Date: 2009-04-17
- * License: CC0
- * Source: Numeriska algoritmer med matlab, Gerd Eriksson, NADA, KTH
- * Description: 在区间 $[a,b]$ 上求使函数 $f$ 取最小值的自变量, 要求 $f$ 在该区间上单峰,
- * 即只有一个局部极小值且没有局部极大值. 结果的最大误差为 $eps$. 稍改代码即可同样
- * 用于求最大值. 离散版本见 Various 章的 TernarySearch.h.
- * Usage:
-	double func(double x) { return 4+x+.3*x*x; }
-	double xmin = gss(-1000,1000,func); // 最小值点
+ * Description: 黄金分割搜索: 在 $[a,b]$ 上求单峰函数 $f$ 的最小值点
+ * (只有一个局部极小值, 没有局部极大值), 误差约 eps. 求最大值把
+ * $f_1 < f_2$ 改成 $f_1 > f_2$. 每次只算一次 $f$, 比三分快.
+ * 离散版本见 Various 章 TernarySearch.h.
+ * Usage: double f(double x){return 4+x+.3*x*x;} // 自己写 f
+ * double xm=gss(-1000,1000); // xm 约为 -5/3
  * Time: O(\log((b-a) / \epsilon))
- * Status: tested
  */
 #pragma once
 
-/// r 必须足够精确, 否则不一定能保持 a < x1 < x2 < b.
-double gss(double a,double b,double(*f)(double)){
-	double r=(sqrt(5)-1)/2,eps=1e-7;
+double f(double x); // 要最小化的函数, 在别处自己实现
+double gss(double a,double b){
+	// r 要足够精确, 才能保证 a < x1 < x2 < b
+	double r=(sqrt(5.0)-1)/2,eps=1e-7;
 	double x1=b-r*(b-a),x2=a+r*(b-a);
 	double f1=f(x1),f2=f(x2);
 	while(b-a>eps)
-		if(f1<f2){ // 求最大值则改为 >
+		if(f1<f2){ // 求最大值改为 f1 > f2
 			b=x2;x2=x1;f2=f1;
 			x1=b-r*(b-a);f1=f(x1);
 		}else{

@@ -1,13 +1,30 @@
 /**
- * Author: Simon Lindholm
- * License: CC0
- * Source: http://codeforces.com/blog/entry/8219
- * Description: 区间 DP $a[i][j] = \min_{i < k < j}(a[i][k] + a[k][j]) + f(i, j)$ 中，若（最小的）最优 $k$ 随 $i$ 和 $j$ 都单调不减，
- *  则可按区间长度递增的顺序求解，且求 $a[i][j]$ 时只需在 $p[i][j-1]$ 与 $p[i+1][j]$ 之间搜索 $k = p[i][j]$。
- *  这称为 Knuth DP。充分条件为：对所有 $a \le b \le c \le d$，有 $f(b,c) \le f(a,d)$ 且 $f(a,c) + f(b,d) \le f(a,d) + f(b,c)$。
- *  另可考虑：LineContainer（数据结构一章）、单调队列、三分搜索。
- * Usage: rep(len,2,n+1) rep(i,0,n-len+1) { int j = i+len;
- *  rep(k, max(i+1, p[i][j-1]), min(j-1, p[i+1][j]) + 1)
- *   用 k 更新 a[i][j] 和 p[i][j]; } // 初始 p[i][i+1] = i
+ * Description: 区间 DP 的 Knuth 优化 (四边形不等式).
+ * $f[l][r] = \min_{l \le k < r} (f[l][k] + f[k+1][r]) + w(l, r)$.
+ * 若对 $a \le b \le c \le d$ 有 $w(a,c) + w(b,d) \le w(a,d) + w(b,c)$ 且
+ * $w(b,c) \le w(a,d)$, 则最优分割点 $opt[l][r-1] \le opt[l][r] \le opt[l+1][r]$,
+ * 只在这个范围里枚举 $k$, 总复杂度 $O(n^2)$. 例子是石子合并, $w$ 为区间和.
+ * Usage: // 读入 n, s[i] = s[i-1] + a[i]; 按题目改 w
+ * ll ans = knuth(n); // f[1][n]
  * Time: O(N^2)
+ * Memory: N = 3005 时约 110MB
  */
+#pragma once
+
+const int N=3005;
+ll f[N][N],s[N];
+int opt[N][N]; // f[l][r] 的最优分割点
+ll w(int l,int r){return s[r]-s[l-1];} // 按题目改
+ll knuth(int n){
+	for(int i=1;i<=n;i++)f[i][i]=0,opt[i][i]=i;
+	for(int len=2;len<=n;len++)
+		for(int l=1,r=len;r<=n;l++,r++){
+			f[l][r]=LLONG_MAX;
+			int R=min(r-1,opt[l+1][r]);
+			for(int k=opt[l][r-1];k<=R;k++){
+				ll v=f[l][k]+f[k+1][r]+w(l,r);
+				if(v<f[l][r])f[l][r]=v,opt[l][r]=k;
+			}
+		}
+	return f[1][n];
+}

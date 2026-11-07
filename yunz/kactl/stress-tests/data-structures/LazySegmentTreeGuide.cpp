@@ -1,348 +1,358 @@
-// Checks the default LazySegmentTree and every code block in the lazy-tag guide
-// (data-structures/chapter.tex) against brute force. Seg is copied from LazySegmentTree.h.
-#include "../utilities/template.h"
-namespace assign {
-struct T { ll sum, mx; int len; };
-struct U{ll v;bool has;};
-const U idU={0,0};
-const T idT = {0, LLONG_MIN, 0};
-T f(T a, T b) {
-	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
+// Checks the default LazySegmentTree.h and every code block of the lazy-tag guide
+// in content/data-structures/chapter.tex against brute force. Each variant is the
+// template with that block's changes applied (blocks copied verbatim, marked below).
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+namespace V0{
+#include "../../content/data-structures/LazySegmentTree.h"
 }
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
-	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){ // 整段赋成 u.v
-		t[x].sum=u.v*t[x].len,t[x].mx=u.v;
-		d[x]=u; // 新赋值直接覆盖旧标记
-	}
-	void push(int x){
-		if(!d[x].has)return;
-		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-	}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
+namespace V1{
+const int N=2e5+5;
+ll a[N];
+struct Node{ll sum,mx;};
+Node t[N<<2];
+Node operator+(Node x,Node y){
+	return {x.sum+y.sum,max(x.mx,y.mx)};
 }
-
-namespace assignadd {
-struct T { ll sum, mx; int len; };
-// 标记含义: 若 has 先赋成 s, 再加 add
-struct U{ll s;bool has;ll add;};
-const U idU={0,0,0};
-const T idT = {0, LLONG_MIN, 0};
-T f(T a, T b) {
-	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
+void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+// ---- guide block 1 (copied verbatim) ----
+// 标记: tg[p] 为 1 表示整段待赋成 lz[p]
+ll lz[N<<2];bool tg[N<<2]; // build 里清 0
+void addtag(int p,int l,int r,ll v){ // 整段赋成 v
+	t[p].sum=v*(r-l+1),t[p].mx=v;
+	lz[p]=v,tg[p]=1; // 新赋值直接覆盖旧标记
 }
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
-	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){
-		T&a=t[x];U&e=d[x];
-		if(u.has)
-			a.sum=u.s*a.len,a.mx=u.s,e={u.s,1,0};
-		a.sum+=u.add*a.len,a.mx+=u.add,e.add+=u.add;
-	}
-	void push(int x){
-		if(!d[x].has&&!d[x].add)return;
-		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-	}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
+void pushdown(int p,int l,int r){
+	if(!tg[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m,lz[p]),addtag(p<<1|1,m+1,r,lz[p]);
+	tg[p]=0;
 }
-
-namespace affine {
-
+// ---- end of block ----
+void build(int p,int l,int r){
+	lz[p]=0,tg[p]=0;
+	if(l==r){t[p]={a[l],a[l]};return;}
+	int m=(l+r)>>1;
+	build(p<<1,l,m),build(p<<1|1,m+1,r);
+	pushup(p);
+}
+void update(int p,int l,int r,int x,int y,ll v){
+	if(x<=l&&r<=y){addtag(p,l,r,v);return;}
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(x<=m)update(p<<1,l,m,x,y,v);
+	if(y>m)update(p<<1|1,m+1,r,x,y,v);
+	pushup(p);
+}
+Node query(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y)return t[p];
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(y<=m)return query(p<<1,l,m,x,y);
+	if(x>m)return query(p<<1|1,m+1,r,x,y);
+	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+}
+}
+namespace V2{
+const int N=2e5+5;
+ll a[N];
+struct Node{ll sum,mx;};
+Node t[N<<2];
+Node operator+(Node x,Node y){
+	return {x.sum+y.sum,max(x.mx,y.mx)};
+}
+void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+// ---- guide block 2 (copied verbatim) ----
+// 标记: 若 tg[p] 先整段赋成 sv[p], 再整段加 ad[p]
+ll sv[N<<2],ad[N<<2];bool tg[N<<2]; // build 里清 0
+void setv(int p,int l,int r,ll v){ // 整段赋成 v
+	t[p].sum=v*(r-l+1),t[p].mx=v;
+	sv[p]=v,tg[p]=1,ad[p]=0;
+}
+void addv(int p,int l,int r,ll v){ // 整段加 v
+	t[p].sum+=v*(r-l+1),t[p].mx+=v;
+	ad[p]+=v;
+}
+void pushdown(int p,int l,int r){
+	int m=(l+r)>>1;
+	if(tg[p]){
+		setv(p<<1,l,m,sv[p]),setv(p<<1|1,m+1,r,sv[p]);
+		tg[p]=0;
+	}
+	if(ad[p]){
+		addv(p<<1,l,m,ad[p]),addv(p<<1|1,m+1,r,ad[p]);
+		ad[p]=0;
+	}
+}
+void update(int p,int l,int r,int x,int y,int op,ll v){
+	if(x<=l&&r<=y){
+		if(op)setv(p,l,r,v);
+		else addv(p,l,r,v);
+		return;
+	} // 其余同模板, 递归时也传 op
+// ---- end of block ----
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(x<=m)update(p<<1,l,m,x,y,op,v);
+	if(y>m)update(p<<1|1,m+1,r,x,y,op,v);
+	pushup(p);
+}
+void build(int p,int l,int r){
+	sv[p]=ad[p]=0,tg[p]=0;
+	if(l==r){t[p]={a[l],a[l]};return;}
+	int m=(l+r)>>1;
+	build(p<<1,l,m),build(p<<1|1,m+1,r);
+	pushup(p);
+}
+Node query(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y)return t[p];
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(y<=m)return query(p<<1,l,m,x,y);
+	if(x>m)return query(p<<1|1,m+1,r,x,y);
+	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+}
+}
+namespace V3{
+const int N=2e5+5;
+ll a[N];
+// ---- guide block 3 (copied verbatim) ----
 const ll M=998244353;
-struct T{ll sum;int len;};struct U{ll a,b;};
-const T idT={0,0};const U idU={1,0};
-T f(T x,T y){
-	return {(x.sum+y.sum)%M,x.len+y.len};
+struct Node{ll sum;};
+Node operator+(Node x,Node y){return {(x.sum+y.sum)%M};}
+// 标记: 整段每个数先乘 mu[p] 再加 ad[p]
+Node t[N<<2];
+void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+ll mu[N<<2],ad[N<<2]; // build 里 mu[p]=1,ad[p]=0
+// 叶子 t[p]={a[l]%M}, 不要 mx
+void addtag(int p,int l,int r,ll k,ll b){
+	t[p].sum=(k*t[p].sum+b*(r-l+1))%M;
+	mu[p]=mu[p]*k%M,ad[p]=(ad[p]*k+b)%M;
+}
+void pushdown(int p,int l,int r){
+	if(mu[p]==1&&!ad[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m,mu[p],ad[p]);
+	addtag(p<<1|1,m+1,r,mu[p],ad[p]);
+	mu[p]=1,ad[p]=0;
+}
+// update 的参数 v 换成 k, b, 命中整段时 addtag(p,l,r,k,b)
+// ---- end of block ----
+void build(int p,int l,int r){
+	mu[p]=1,ad[p]=0;
+	if(l==r){t[p]={a[l]%M};return;}
+	int m=(l+r)>>1;
+	build(p<<1,l,m),build(p<<1|1,m+1,r);
+	pushup(p);
+}
+void update(int p,int l,int r,int x,int y,ll k,ll b){
+	if(x<=l&&r<=y){addtag(p,l,r,k,b);return;}
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(x<=m)update(p<<1,l,m,x,y,k,b);
+	if(y>m)update(p<<1|1,m+1,r,x,y,k,b);
+	pushup(p);
+}
+Node query(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y)return t[p];
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(y<=m)return query(p<<1,l,m,x,y);
+	if(x>m)return query(p<<1|1,m+1,r,x,y);
+	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+}
+}
+namespace V4{
+const int N=2e5+5;
+ll a[N];
+// ---- guide block 4 (copied verbatim) ----
+struct Node{int cnt;}; // 区间里 1 的个数
+Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
+Node t[N<<2];
+void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+bool rev[N<<2]; // 取反标记, build 里清 0
+// 叶子 t[p]={(int)a[l]}
+void addtag(int p,int l,int r){ // 整段 0 和 1 互换
+	t[p].cnt=(r-l+1)-t[p].cnt,rev[p]^=1;
+}
+void pushdown(int p,int l,int r){
+	if(!rev[p])return;
+	int m=(l+r)>>1;
+	addtag(p<<1,l,m),addtag(p<<1|1,m+1,r);
+	rev[p]=0;
+}
+// update 去掉参数 v, 命中整段时 addtag(p,l,r)
+// ---- end of block ----
+void build(int p,int l,int r){
+	rev[p]=0;
+	if(l==r){t[p]={(int)a[l]};return;}
+	int m=(l+r)>>1;
+	build(p<<1,l,m),build(p<<1|1,m+1,r);
+	pushup(p);
+}
+void update(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y){addtag(p,l,r);return;}
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(x<=m)update(p<<1,l,m,x,y);
+	if(y>m)update(p<<1|1,m+1,r,x,y);
+	pushup(p);
+}
+Node query(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y)return t[p];
+	pushdown(p,l,r);
+	int m=(l+r)>>1;
+	if(y<=m)return query(p<<1,l,m,x,y);
+	if(x>m)return query(p<<1|1,m+1,r,x,y);
+	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+}
+}
+namespace V5{
+const int N=2e5+5;
+ll a[N];
+// ---- guide block 5 (copied verbatim) ----
+struct Node{ll sum,pre,suf,best;}; // 前缀, 后缀, 答案
+Node operator+(Node x,Node y){
+	return {x.sum+y.sum,max(x.pre,x.sum+y.pre),
+	        max(y.suf,y.sum+x.suf),
+	        max({x.best,y.best,x.suf+y.pre})};
+}
+// 叶子 t[p]={a[l],a[l],a[l],a[l]}
+// 删去 lz, addtag, pushdown 及其所有调用
+Node t[N<<2];
+void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
+	if(l==r){t[p]={v,v,v,v};return;}
+	int m=(l+r)>>1;
+	if(x<=m)modify(p<<1,l,m,x,v);
+	else modify(p<<1|1,m+1,r,x,v);
+	pushup(p);
+}
+// ---- end of block ----
+void build(int p,int l,int r){
+	// no tags
+	if(l==r){t[p]={a[l],a[l],a[l],a[l]};return;}
+	int m=(l+r)>>1;
+	build(p<<1,l,m),build(p<<1|1,m+1,r);
+	pushup(p);
+}
+Node query(int p,int l,int r,int x,int y){
+	if(x<=l&&r<=y)return t[p];
+	int m=(l+r)>>1;
+	if(y<=m)return query(p<<1,l,m,x,y);
+	if(x>m)return query(p<<1|1,m+1,r,x,y);
+	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+}
 }
 
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
-	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){ // 整段每个数 v 变成 a * v + b
-		t[x].sum=(u.a*t[x].sum+u.b*t[x].len)%M;
-		d[x]={u.a*d[x].a%M,(u.a*d[x].b+u.b)%M};
-	}
-	void push(int x){
-		if(d[x].a==1&&!d[x].b)return;
-		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-	}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
-}
+mt19937 rng(7);
+int rnd(int lo,int hi){return lo+(int)(rng()%(unsigned)(hi-lo+1));}
+long long checks=0;
+const ll MOD=998244353;
 
-namespace flip {
-
-struct T{int cnt,len;};struct U{bool r;};
-const T idT={0,0};const U idU={0};
-T f(T a,T b){return {a.cnt+b.cnt,a.len+b.len};}
-
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
+int main(){
+	for(int it=0;it<1500;it++){
+		bool big=it>=1490;
+		int n=big?rnd(1000,200000):rnd(1,40),steps=big?3000:200;
+		auto rg=[&](int&l,int&r){
+			l=rnd(1,n),r=rnd(l,n);
+			if(big&&rng()%100)r=min(n,l+rnd(0,30));
+		};
+		vector<ll>b(n+1);
+		// V0: default range add
+		for(int i=1;i<=n;i++)b[i]=V0::a[i]=rnd(-1000,1000);
+		V0::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			int l,r;rg(l,r);
+			if(rng()%2){
+				ll v=rnd(-1000,1000);V0::update(1,1,n,l,r,v);
+				for(int i=l;i<=r;i++)b[i]+=v;
+			}else{
+				V0::Node q=V0::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
+				assert(q.sum==sm&&q.mx==mx);checks++;
+			}
+		}
+		// V1: range assign
+		for(int i=1;i<=n;i++)b[i]=V1::a[i]=rnd(-1000,1000);
+		V1::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			int l,r;rg(l,r);
+			if(rng()%2){
+				ll v=rnd(-1000,1000);V1::update(1,1,n,l,r,v);
+				for(int i=l;i<=r;i++)b[i]=v;
+			}else{
+				V1::Node q=V1::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
+				assert(q.sum==sm&&q.mx==mx);checks++;
+			}
+		}
+		// V2: assign + add
+		for(int i=1;i<=n;i++)b[i]=V2::a[i]=rnd(-1000,1000);
+		V2::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			int l,r;rg(l,r);
+			int c=rng()%3;
+			if(c<2){
+				ll v=rnd(-1000,1000);V2::update(1,1,n,l,r,c,v);
+				for(int i=l;i<=r;i++)b[i]=c?v:b[i]+v;
+			}else{
+				V2::Node q=V2::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
+				assert(q.sum==sm&&q.mx==mx);checks++;
+			}
+		}
+		// V3: multiply then add, mod
+		for(int i=1;i<=n;i++)b[i]=V3::a[i]=rng()%MOD;
+		V3::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			int l,r;rg(l,r);
+			if(rng()%2){
+				ll k=rng()%MOD,bb=rng()%MOD;
+				if(rng()%4==0)k=rnd(0,2);
+				if(rng()%4==0)bb=0;
+				V3::update(1,1,n,l,r,k,bb);
+				for(int i=l;i<=r;i++)b[i]=(k*b[i]+bb)%MOD;
+			}else{
+				ll sm=0;
+				for(int i=l;i<=r;i++)sm=(sm+b[i])%MOD;
+				assert(V3::query(1,1,n,l,r).sum==sm);checks++;
+			}
+		}
+		// V4: 01 flip
+		for(int i=1;i<=n;i++)b[i]=V4::a[i]=rnd(0,1);
+		V4::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			int l,r;rg(l,r);
+			if(rng()%2){
+				V4::update(1,1,n,l,r);
+				for(int i=l;i<=r;i++)b[i]^=1;
+			}else{
+				ll c=0;
+				for(int i=l;i<=r;i++)c+=b[i];
+				assert(V4::query(1,1,n,l,r).cnt==c);checks++;
+			}
+		}
+		// V5: max subarray sum, point assign
+		for(int i=1;i<=n;i++)b[i]=V5::a[i]=rnd(-1000,1000);
+		V5::build(1,1,n);
+		for(int s=0;s<steps;s++){
+			if(rng()%2){
+				int x=rnd(1,n);ll v=rnd(-1000,1000);
+				V5::modify(1,1,n,x,v);b[x]=v;
+			}else{
+				int l,r;rg(l,r);
+				ll best=LLONG_MIN,cur=0;
+				for(int i=l;i<=r;i++){
+					cur=max(cur+b[i],b[i]);best=max(best,cur);
+				}
+				V5::Node q=V5::query(1,1,n,l,r);
+				assert(q.best==best);checks++;
+				ll sm=0;for(int i=l;i<=r;i++)sm+=b[i];
+				assert(q.sum==sm);
+			}
+		}
 	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){ // 整段 0 和 1 互换
-		if(u.r)t[x].cnt=t[x].len-t[x].cnt,d[x].r^=1;
-	}
-	void push(int x){
-		if(!d[x].r)return;
-		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-	}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
-}
-
-namespace maxsub {
-
-const ll NEG=-(ll)1e18;
-struct T{ll sum,pre,suf,best;};
-struct U{ll v;};
-const T idT={0,NEG,NEG,NEG};
-const U idU={0};
-T f(T a,T b){
-	return {a.sum+b.sum,max(a.pre,a.sum+b.pre),
-	        max(b.suf,b.sum+a.suf),
-	        max({a.best,b.best,a.suf+b.pre})};
-}
-
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
-	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){ // 只会落在叶子上
-		t[x]={u.v,u.v,u.v,u.v};
-	}
-	void push(int){}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
-}
-
-namespace def {
-
-
-struct T{ll sum,mx;int len;}; // 节点信息
-struct U{ll add;}; // 懒标记
-const T idT={0,LLONG_MIN,0};
-const U idU={0};
-T f(T a,T b){
-	return {a.sum+b.sum,max(a.mx,b.mx),a.len+b.len};
-}
-
-struct Seg{
-	int n;vector<T>t;vector<U>d;
-	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
-		build(1,0,n,a);
-	}
-	void build(int x,int l,int r,const vector<T>&a){
-		if(r-l==1){t[x]=a[l];return;}
-		int m=(l+r)/2;
-		build(2*x,l,m,a),build(2*x+1,m,r,a);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	void app(int x,U u){ // 整段 x 打上标记 u
-		t[x].sum+=u.add*t[x].len,t[x].mx+=u.add;
-		d[x].add+=u.add;
-	}
-	void push(int x){ // 有标记才下传给两个儿子
-		if(!d[x].add)return;
-		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
-	}
-	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
-	void upd(int L,int R,U u,int x,int l,int r){
-		if(R<=l||r<=L)return;
-		if(L<=l&&r<=R)return app(x,u);
-		push(x);
-		int m=(l+r)/2;
-		upd(L,R,u,2*x,l,m);
-		upd(L,R,u,2*x+1,m,r);
-		t[x]=f(t[2*x],t[2*x+1]);
-	}
-	T query(int L,int R){return qry(L,R,1,0,n);}
-	T qry(int L,int R,int x,int l,int r){
-		if(R<=l||r<=L)return idT;
-		if(L<=l&&r<=R)return t[x];
-		push(x);
-		int m=(l+r)/2;
-		return f(qry(L,R,2*x,l,m),
-		         qry(L,R,2*x+1,m,r));
-	}
-};
-}
-
-
-mt19937 rng(11);
-int rnd(int lo, int hi) { return lo + (int)(rng() % (unsigned)(hi - lo + 1)); }
-long long checks = 0;
-void lr(int n, int& l, int& r) { l = rnd(0, n - 1); r = rnd(l + 1, n); }
-template<class S, class TT> void chk(S& s, int l, int r, vector<ll>& a, TT) {}
-int main() {
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<ll> a(n); vector<def::T> in(n);
-		rep(i, 0, n) a[i] = rnd(-50, 50), in[i] = {a[i], a[i], 1}; def::Seg s(in);
-		rep(st, 0, 100) { int l, r; lr(n, l, r);
-			if (rng() % 2) { ll v = rnd(-50, 50); s.update(l, r, {v}); rep(i, l, r) a[i] += v; }
-			else { auto q = s.query(l, r); ll sm = 0, mx = LLONG_MIN; rep(i, l, r) sm += a[i], mx = max(mx, a[i]);
-				assert(q.sum == sm && q.mx == mx && q.len == r - l); checks++; } } }
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<ll> a(n); vector<assign::T> in(n);
-		rep(i, 0, n) a[i] = rnd(-50, 50), in[i] = {a[i], a[i], 1}; assign::Seg s(in);
-		rep(st, 0, 100) { int l, r; lr(n, l, r);
-			if (rng() % 2) { ll v = rnd(-50, 50); s.update(l, r, {v, 1}); rep(i, l, r) a[i] = v; }
-			else { auto q = s.query(l, r); ll sm = 0, mx = LLONG_MIN; rep(i, l, r) sm += a[i], mx = max(mx, a[i]);
-				assert(q.sum == sm && q.mx == mx); checks++; } } }
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<ll> a(n); vector<assignadd::T> in(n);
-		rep(i, 0, n) a[i] = rnd(-50, 50), in[i] = {a[i], a[i], 1}; assignadd::Seg s(in);
-		rep(st, 0, 100) { int l, r; lr(n, l, r); int op = rnd(0, 2);
-			if (op == 0) { ll v = rnd(-50, 50); s.update(l, r, {v, 1, 0}); rep(i, l, r) a[i] = v; }
-			else if (op == 1) { ll v = rnd(-50, 50); s.update(l, r, {0, 0, v}); rep(i, l, r) a[i] += v; }
-			else { auto q = s.query(l, r); ll sm = 0, mx = LLONG_MIN; rep(i, l, r) sm += a[i], mx = max(mx, a[i]);
-				assert(q.sum == sm && q.mx == mx); checks++; } } }
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<ll> a(n); vector<affine::T> in(n);
-		rep(i, 0, n) a[i] = rnd(0, 1000000), in[i] = {a[i], 1}; affine::Seg s(in);
-		rep(st, 0, 100) { int l, r; lr(n, l, r);
-			if (rng() % 2) { ll x = rnd(0, 998244352), y = rnd(0, 998244352); s.update(l, r, {x, y});
-				rep(i, l, r) a[i] = (x * a[i] + y) % affine::M; }
-			else { ll sm = 0; rep(i, l, r) sm = (sm + a[i]) % affine::M; assert(s.query(l, r).sum == sm); checks++; } } }
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<int> a(n); vector<flip::T> in(n);
-		rep(i, 0, n) a[i] = rnd(0, 1), in[i] = {a[i], 1}; flip::Seg s(in);
-		rep(st, 0, 100) { int l, r; lr(n, l, r);
-			if (rng() % 2) { s.update(l, r, {1}); rep(i, l, r) a[i] ^= 1; }
-			else { int c = 0; rep(i, l, r) c += a[i]; assert(s.query(l, r).cnt == c); checks++; } } }
-	rep(it, 0, 1500) { int n = rnd(1, 40); vector<ll> a(n); vector<maxsub::T> in(n);
-		rep(i, 0, n) a[i] = rnd(-50, 50), in[i] = {a[i], a[i], a[i], a[i]}; maxsub::Seg s(in);
-		rep(st, 0, 100) {
-			if (rng() % 2) { int p = rnd(0, n - 1); ll v = rnd(-50, 50); s.update(p, p + 1, {v}); a[p] = v; }
-			else { int l, r; lr(n, l, r); ll best = LLONG_MIN;
-				rep(i, l, r) { ll c = 0; rep(j, i, r) c += a[j], best = max(best, c); }
-				assert(s.query(l, r).best == best); checks++; } } }
-	cout << "Template + all 5 guide blocks passed (" << checks << " checks)" << endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

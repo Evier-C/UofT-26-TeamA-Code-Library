@@ -1,38 +1,41 @@
 /**
- * Author: Lucian Bicsi
- * Date: 2017-10-31
- * License: CC0
- * Source: Wikipedia
- * Description: 由数列的前 $2n$ 项恢复出任意 $n$ 阶线性递推关系 (此处在模素数 \texttt{mod} 下计算).
- * 返回 $C$, 满足 $s[i] = \sum_j C[j] s[i-j-1]$.
- * 常用于暴力算出前若干项后猜线性递推式.
- * 理论上适用于任意域, 但用浮点数时不保证数值稳定.
- * 输出长度 $\le n$.
- * Usage: berlekampMassey({0, 1, 1, 3, 5, 11}) // 得 {1, 2}
- * Time: O(N^2)
- * Status: bruteforce-tested mod 5 for n <= 5 and all s
+ * Description: Berlekamp-Massey: 由数列前 $2n$ 项求出最短的线性递推式
+ * (模素数 MOD). 返回 $C$ (下标从 0 开始), 满足 $s_i = \sum_j C_j s_{i-j-1}$.
+ * 常用于暴力算出前若干项后猜递推式, 再配合 LinearRecurrence 求第 $k$ 项.
+ * 输入须在 $[0, MOD)$ 内.
+ * Usage: vector<ll> C=BM({0,1,1,3,5,11}); // C={1,2}
+ * // 即 s[i]=s[i-1]+2*s[i-2]
+ * Time: O(n^2)
  */
 #pragma once
 
-#include "../number-theory/ModPow.h"
-
-vector<ll>berlekampMassey(vector<ll>s){
-	int n=sz(s),L=0,m=0;
+const ll MOD=998244353; // 素数模, 可改
+ll qpow(ll a,ll b){
+	ll r=1;
+	for(a%=MOD;b;b>>=1,a=a*a%MOD)
+		if(b&1)r=r*a%MOD;
+	return r;
+}
+vector<ll>BM(vector<ll>s){
+	int n=s.size(),L=0,m=0;
+	if(n==0)return {};
 	vector<ll>C(n),B(n),T;
 	C[0]=B[0]=1;
-
 	ll b=1;
-	rep(i,0,n){++m;
-		ll d=s[i]%mod;
-		rep(j,1,L+1)d=(d+C[j]*s[i-j])%mod;
+	for(int i=0;i<n;i++){
+		m++;
+		ll d=s[i]%MOD; // 当前递推式的偏差
+		for(int j=1;j<=L;j++)d=(d+C[j]*s[i-j])%MOD;
 		if(!d)continue;
-		T=C;ll coef=d*modpow(b,mod-2)%mod;
-		rep(j,m,n)C[j]=(C[j]-coef*B[j-m])%mod;
+		T=C;
+		ll coef=d*qpow(b,MOD-2)%MOD;
+		for(int j=m;j<n;j++)
+			C[j]=(C[j]+MOD-coef*B[j-m]%MOD)%MOD;
 		if(2*L>i)continue;
 		L=i+1-L;B=T;b=d;m=0;
 	}
-
-	C.resize(L+1);C.erase(C.begin());
-	for(ll&x:C)x=(mod-x)%mod;
+	C.resize(L+1);
+	C.erase(C.begin());
+	for(auto&x:C)x=(MOD-x)%MOD;
 	return C;
 }

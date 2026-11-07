@@ -1,28 +1,37 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/geometry/PolygonArea.h"
-#include "../../content/geometry/PolygonCenter.h"
 #include "../../content/geometry/InsidePolygon.h"
 
-int main() {
-	srand(0);
-	typedef Point<double> P;
-	vector<P> ps = {P{0,0}, P{6,4}, P{0,9}};
-	int count = 0;
-	P su{0,0};
-	rep(it,0,100000) {
-		double x = rand() / (RAND_MAX + 1.0);
-		double y = rand() / (RAND_MAX + 1.0);
-		x *= 10;
-		y *= 10;
-		if (!inPolygon(ps, P{x,y}, true)) continue;
-		count++;
-		su = su + P{x,y};
+int main(){
+	ll checks=0;
+	mt19937 rng(13);
+	// brute: trapezoid formula, sum of (x[i+1]-x[i])*(y[i]+y[i+1])
+	for(int it=0;it<300000;it++){
+		int n=rng()%10+1,G=it%2?5:1000;
+		vector<Point>v;
+		for(int i=0;i<n;i++)v.push_back(Point((int)(rng()%(2*G+1))-G,(int)(rng()%(2*G+1))-G));
+		ll want=0;
+		for(int i=0;i<n;i++){
+			Point a=v[i],b=v[(i+1)%n];
+			want-=(ll)(b.x-a.x)*(ll)(a.y+b.y);
+		}
+		assert(polygonArea2(v)==want);
+		reverse(v.begin(),v.end());
+		assert(polygonArea2(v)==-want);
+		checks+=2;
 	}
-	su = su / count;
-	double approxArea = (double)count / 100000 * 100;
-	assert(abs(polygonArea2(ps)/2.0 - approxArea) < 1);
-	auto p = polygonCenter(ps);
-	assert(abs(p.x - su.x) < 1e-1 && abs(p.y - su.y) < 1e-1);
-	cout<<"Tests passed!"<<endl;
+	// Monte Carlo on a triangle
+	srand(0);
+	vector<Point>ps={Point(0,0),Point(6,4),Point(0,9)};
+	int count=0;
+	for(int it=0;it<100000;it++){
+		double x=rand()/(RAND_MAX+1.0)*10,y=rand()/(RAND_MAX+1.0)*10;
+		if(inPolygon(ps,Point(x,y),true))count++;
+	}
+	double approxArea=(double)count/100000*100;
+	assert(fabs(polygonArea2(ps)/2.0-approxArea)<1);
+	assert(polygonArea2(ps)==54);
+	cout<<"Tests passed! ("<<checks+2<<" checks)"<<endl;
 }

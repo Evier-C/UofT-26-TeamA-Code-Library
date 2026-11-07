@@ -1,83 +1,80 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/data-structures/FHQTreap.h"
 
-int main() {
-	mt19937 rng(3);
-	auto rnd = [&](int lo, int hi) { return lo + (int)(rng() % (unsigned)(hi - lo + 1)); };
-	long long checks = 0;
+mt19937 rng2(3);
+int rd(int lo,int hi){return lo+(int)(rng2()%(unsigned)(hi-lo+1));}
 
-	rep(it, 0, 2000) {
-		Treap T;
-		multiset<ll> ms;
-		int V = rnd(1, 30);
-		rep(step, 0, 200) {
-			int op = rnd(0, 5);
-			ll v = rnd(-V, V);
-			if (op <= 1) T.insert(v), ms.insert(v);
-			else if (op == 2) {
-				T.erase(v);
-				auto f = ms.find(v);
-				if (f != ms.end()) ms.erase(f);
-			} else if (op == 3) {
-				assert(T.rank(v) == (int)distance(ms.begin(), ms.lower_bound(v)));
-			} else if (op == 4 && !ms.empty()) {
-				int k = rnd(0, sz(ms) - 1);
-				assert(T.kth(k) == *next(ms.begin(), k));
-			} else if (!ms.empty()) {
-				auto lb = ms.lower_bound(v);
-				if (lb != ms.begin()) assert(T.kth(T.rank(v) - 1) == *prev(lb));
-				auto ub = ms.upper_bound(v);
-				if (ub != ms.end()) assert(T.kth(T.rank(v + 1)) == *ub);
+int main(){
+	long long checks=0;
+	// mode 1: ordered multiset
+	for(int it=0;it<2000;it++){
+		tot=root=0;
+		multiset<ll>ms;
+		int V=rd(1,30);
+		for(int s=0;s<200;s++){
+			int op=rd(0,5);
+			ll v=rd(-V,V);
+			if(op<=1)insert(v),ms.insert(v);
+			else if(op==2){
+				erase(v);
+				auto f=ms.find(v);
+				if(f!=ms.end())ms.erase(f);
+			}else if(op==3){
+				assert(getrank(v)==(int)distance(ms.begin(),ms.lower_bound(v))+1);
+			}else if(op==4&&!ms.empty()){
+				int k=rd(1,(int)ms.size());
+				assert(kth(k)==*next(ms.begin(),k-1));
+			}else if(!ms.empty()){
+				auto lb=ms.lower_bound(v);
+				if(lb!=ms.begin())assert(pre(v)==*prev(lb));
+				auto ub=ms.upper_bound(v);
+				if(ub!=ms.end())assert(nxt(v)==*ub);
 			}
-			assert(T.t[T.rt].s == sz(ms));
+			assert(siz[root]==(int)ms.size());
 			checks++;
 		}
-		vector<ll> o;
-		T.walk(T.rt, o);
-		assert(o == vector<ll>(all(ms)));
+		vector<ll>o;
+		dfs(root,o);
+		assert(o==vector<ll>(ms.begin(),ms.end()));
 	}
-
-	rep(it, 0, 2000) {
-		Treap T;
-		vector<ll> a;
-		rep(step, 0, 150) {
-			int op = rnd(0, 3);
-			if (op == 0 || a.empty()) {
-				ll v = rnd(-1000, 1000);
-				T.rt = T.merge(T.rt, T.nn(v));
-				a.push_back(v);
-			} else {
-				int l = rnd(0, sz(a)), r = rnd(0, sz(a));
-				if (l > r) swap(l, r);
-				int x, y, z;
-				T.split(T.rt, l, x, y);
-				T.split(y, r - l, y, z);
-				assert(T.t[y].s == r - l);
-				if (op == 1) {
-					T.t[y].rev ^= 1;
-					reverse(a.begin() + l, a.begin() + r);
-				} else {
-					assert(T.t[y].sum == accumulate(a.begin() + l, a.begin() + r, 0LL));
-				}
-				T.rt = T.merge(T.merge(x, y), z);
+	// mode 2: sequence
+	for(int it=0;it<2000;it++){
+		tot=root=0;
+		int n=rd(1,30);
+		vector<ll>a(n+1);
+		for(int i=1;i<=n;i++)a[i]=rd(-1000,1000),root=merge(root,newnode(a[i]));
+		for(int s=0;s<150;s++){
+			int l=rd(1,n),r=rd(l,n);
+			if(rng2()%2){
+				reverse(l,r);
+				std::reverse(a.begin()+l,a.begin()+r+1);
+			}else{
+				ll e=0;
+				for(int i=l;i<=r;i++)e+=a[i];
+				assert(rangeSum(l,r)==e);
 			}
 			checks++;
 		}
-		vector<ll> o;
-		T.walk(T.rt, o);
-		assert(o == a);
+		vector<ll>o;
+		dfs(root,o);
+		assert(o==vector<ll>(a.begin()+1,a.end()));
 	}
-
-	{
-		Treap T;
-		int n = 500000;
-		rep(i, 0, n) T.insert(rnd(0, 1000000000));
-		int depth = 0;
-		function<int(int)> dep = [&](int x) { return x ? 1 + max(dep(T.t[x].l), dep(T.t[x].r)) : 0; };
-		depth = dep(T.rt);
-		assert(depth < 100);
-		cout << "depth with " << n << " nodes: " << depth << endl;
+	// large
+	tot=root=0;
+	multiset<ll>ms;
+	for(int i=0;i<200000;i++){
+		ll v=rd(0,1000000000);
+		insert(v),ms.insert(v);
 	}
-	cout << "Tests passed! (" << checks << " checks)" << endl;
+	for(int q=0;q<1000;q++){
+		int k=rd(1,200000);
+		assert(kth(k)==*next(ms.begin(),k-1));checks++;
+		if(q%100==0){
+			ll v=rd(0,1000000000);
+			assert(getrank(v)==(int)distance(ms.begin(),ms.lower_bound(v))+1);
+		}
+	}
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

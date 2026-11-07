@@ -1,40 +1,30 @@
 /**
- * Author: Jakob Kogler, chilli, pajenegod
- * Date: 2020-04-12
- * License: CC0
- * Description: 质数筛，生成所有小于 LIM 的质数。
- * Usage: vi pr = eratosthenes(); // 同时填好 isPrime
- * Time: LIM=1e9 时 $\approx$ 1.5s
- * Status: Stress-tested
- * Details: Despite its n log log n complexity, segmented sieve is still faster
- * than other options, including bitset sieves and linear sieves. This is
- * primarily due to its low memory usage, which reduces cache misses. This
- * implementation skips even numbers.
- *
- * Benchmark can be found here: https://ideone.com/e7TbX4
- *
- * The line `for (int i=idx; i<S+L; idx = (i += p))` is done on purpose for performance reasons.
- * Se https://github.com/kth-competitive-programming/kactl/pull/166#discussion_r408354338
+ * Description: 线性筛 (欧拉筛), 一次求出 $[1, n]$ 内的质数, 欧拉函数 $\varphi$
+ * 和莫比乌斯函数 $\mu$. 每个合数只被它的最小质因子筛掉一次.
+ * 积性函数都可以这样筛: 分 $i \bmod p = 0$ 和不等于 0 两种情况.
+ * Usage: sieve(n); // n < N, 只调用一次
+ * pri[1..cnt] 为质数, vis[x] = 0 且 x 至少为 2 时 x 是质数
+ * phi[x], mu[x] 对 1 到 n 有效
+ * Time: O(N)
+ * Memory: N = 1e7 时约 130MB, 不需要的数组可以删掉
  */
 #pragma once
 
-const int LIM=1e6;
-bitset<LIM>isPrime;
-vi eratosthenes(){
-	const int S=(int)round(sqrt(LIM)),R=LIM/2;
-	vi pr={2},sieve(S+1);pr.reserve(int(LIM/log(LIM)*1.1));
-	vector<pii>cp;
-	for(int i=3;i<=S;i+=2)if(!sieve[i]){
-		cp.push_back({i,i*i/2});
-		for(int j=i*i;j<=S;j+=2*i)sieve[j]=1;
+const int N=1e7+5;
+int pri[N],cnt,phi[N],mu[N];
+bool vis[N];
+void sieve(int n){
+	phi[1]=mu[1]=1;
+	for(int i=2;i<=n;i++){
+		if(!vis[i])pri[++cnt]=i,phi[i]=i-1,mu[i]=-1;
+		for(int j=1;j<=cnt&&(ll)i*pri[j]<=n;j++){
+			int x=i*pri[j];
+			vis[x]=1;
+			if(i%pri[j]==0){ // pri[j] 是 i 的最小质因子
+				phi[x]=phi[i]*pri[j],mu[x]=0;
+				break;
+			}
+			phi[x]=phi[i]*(pri[j]-1),mu[x]=-mu[i];
+		}
 	}
-	for(int L=1;L<=R;L+=S){
-		array<bool,S>block{};
-		for(auto&[p,idx]:cp)
-			for(int i=idx;i<S+L;idx=(i+=p))block[i-L]=1;
-		rep(i,0,min(S,R-L))
-			if(!block[i])pr.push_back((L+i)*2+1);
-	}
-	for(int i:pr)isPrime[i]=1;
-	return pr;
 }

@@ -1,27 +1,23 @@
 /**
- * Author: Oleksandr Bacherikov, chilli
- * Date: 2019-05-05
- * License: Boost Software License
- * Source: https://codeforces.com/blog/entry/48868
- * Description: 返回凸包 (逆时针, 无重复点和共线点) 上距离最远的两点.
- * Usage:
- * 	array<P, 2> d = hullDiameter(hull);
- * 	ll D2 = (d[0]-d[1]).dist2(); // 直径的平方
- * Status: stress-tested, tested on kattis:roberthood
+ * Description: 旋转卡壳求凸包直径 (最远点对), 返回距离的平方.
+ * 输入为逆时针凸包 (无重复点和共线点, 如 convexHull 的结果).
+ * Usage: vector<Point> h=convexHull(pts);
+ * T d2=hullDiameter(h); // 直径为 sqrt(d2)
  * Time: O(n)
  */
 #pragma once
+
 #include "Point.h"
 
-typedef Point<ll>P;
-array<P,2>hullDiameter(vector<P>S){
-	int n=sz(S),j=n<2?0:1;
-	pair<ll,array<P,2>>res({0,{S[0],S[0]}});
-	rep(i,0,j)
-		for(;;j=(j+1)%n){
-			res=max(res,{(S[i]-S[j]).dist2(),{S[i],S[j]}});
-			if((S[(j+1)%n]-S[j]).cross(S[i+1]-S[i])>=0)
-				break;
-		}
-	return res.second;
+T hullDiameter(vector<Point>&h){
+	int n=h.size();
+	if(n<=2)return n==2?len2(h[0]-h[1]):0;
+	T res=0;
+	for(int i=0,j=1;i<n;i++){
+		Point a=h[i],b=h[(i+1)%n];
+		// h[j+1] 离边 ab 更远时移动 j
+		while(sgn(cross(b-a,h[(j+1)%n]-h[j]))>0)j=(j+1)%n;
+		res=max(res,max(len2(a-h[j]),len2(b-h[j])));
+	}
+	return res;
 }

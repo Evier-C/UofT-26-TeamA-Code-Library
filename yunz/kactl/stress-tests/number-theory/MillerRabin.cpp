@@ -1,78 +1,44 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/number-theory/MillerRabin.h"
-namespace sieve {
-#include "../../content/number-theory/FastEratosthenes.h"
+
+bool slowPrime(ll n){
+	if(n<2)return 0;
+	for(ll i=2;i*i<=n;i++)if(n%i==0)return 0;
+	return 1;
 }
-
-ull A[] = {2, 325, 9375, 28178, 450775, 9780504, 1795265022};
-int afactors[] = {2, 3, 5, 13, 19, 73, 193, 407521, 299210837};
-
-const ull MR_LIM = 1ULL << 62;
-
-// Accurate for arbitrary 64-bit numbers
-ull int128_mod_mul(ull a, ull b, ull m) { return (ull)((__uint128_t)a * b % m); }
-ull int128_mod_pow(ull b, ull e, ull mod) {
-	ull ans = 1;
-	for (; e; b = int128_mod_mul(b, b, mod), e /= 2)
-		if (e & 1) ans = int128_mod_mul(ans, b, mod);
-	return ans;
-}
-bool oldIsPrime(ull p) {
-	if (p == 2) return true;
-	if (p == 1 || p % 2 == 0) return false;
-	ull s = p - 1;
-	while (s % 2 == 0) s /= 2;
-	rep(i,0,15) {
-		ull a = rand() % (p - 1) + 1, tmp = s;
-		ull mod = int128_mod_pow(a, tmp, p);
-		while (tmp != p - 1 && mod != 1 && mod != p - 1) {
-			mod = int128_mod_mul(mod, mod, p);
-			tmp *= 2;
-		}
-		if (mod != p - 1 && tmp % 2 == 0) return false;
+int main(){
+	mt19937_64 rng(6);
+	ll checks=0;
+	int L=2000000;
+	vector<bool>comp(L+1);
+	comp[0]=comp[1]=1;
+	for(int i=2;i<=L;i++)if(!comp[i])
+		for(ll j=(ll)i*i;j<=L;j+=i)comp[j]=1;
+	for(int i=-10;i<=L;i++)
+		assert(isPrime(i)==(i>=0&&!comp[i])),checks++;
+	for(int it=0;it<3000;it++){
+		ll n=rng()%1000000000000LL;
+		assert(isPrime(n)==slowPrime(n));checks++;
 	}
-	return true;
-}
-
-void rec(ull div, ll num, int ind, int factors) {
-	if (ind == sizeof(afactors)/sizeof(*afactors)) {
-		if (factors == 1) assert(isPrime(div));
-		if (factors > 1) assert(!isPrime(div));
-		return;
+	// 已知的大质数和强伪素数
+	for(ll p:{1000000007LL,998244353LL,(1LL<<61)-1,
+		1000000000000000003LL,9223372036854775783LL})
+		assert(isPrime(p)),checks++;
+	for(ll c:{3215031751LL,3825123056546413051LL,
+		(1LL<<61)-3,561LL,41041LL,825265LL,9223372036854775807LL})
+		if(c>0&&c<1000000000000LL)assert(isPrime(c)==slowPrime(c)),checks++;
+	assert(!isPrime(3215031751LL)&&!isPrime(3825123056546413051LL));
+	assert(!isPrime(9223372036854775807LL)); // 7 * ...
+	// 两个大质数的乘积
+	vector<ll>ps;
+	while(ps.size()<200){
+		ll x=rng()%2000000000+1000000000;
+		if(slowPrime(x))ps.push_back(x);
 	}
-	for (;;) {
-		rec(div, num, ind+1, factors);
-		div *= afactors[ind];
-		if (num % div != 0) break;
-		factors++;
-	}
-}
-
-const int MAXPR = 1e6;
-int main() {
-	auto prs = sieve::eratosthenes();
-	vector<bool> isprime(MAXPR);
-	for (auto i: prs) isprime[i] = true;
-	for(auto &a: A) rec(1, a, 0, 0);
-
-	rep(n,0,MAXPR) {
-		if (isPrime(n) != isprime[n]) {
-			cout << "fails for " << n << endl;
-			return 1;
-		}
-	}
-
-	ull n = 1;
-	rep(i,0,1000000) {
-		n ^= (ull)rand();
-		n *= 1237618231ULL;
-		if (n < MR_LIM && oldIsPrime(n) != isPrime(n)) {
-			cout << "differs from old for " << n << endl;
-			cout << "old says " << oldIsPrime(n) << endl;
-			cout << "new says " << isPrime(n) << endl;
-			assert(false);
-		}
-	}
-	cout << "Tests passed!" << endl;
+	for(int i=0;i<200;i++)for(int j=i;j<200;j++)
+		if((__int128)ps[i]*ps[j]<=LLONG_MAX)
+			assert(!isPrime(ps[i]*ps[j])),checks++;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

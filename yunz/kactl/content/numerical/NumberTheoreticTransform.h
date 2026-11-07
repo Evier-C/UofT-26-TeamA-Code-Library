@@ -1,60 +1,53 @@
 /**
- * Author: chilli
- * Date: 2019-04-16
- * License: CC0
- * Source: based on KACTL's FFT
- * Description: ntt(a) 对所有 $k$ 计算 $\hat f(k) = \sum_x a[x] g^{xk}$, 其中 $g=\text{root}^{(mod-1)/N}$.
- * N 必须是 2 的幂.
- * 用于模形如 $2^a b+1$ 的特定素数下的卷积,
- * 要求卷积结果长度不超过 $2^a$. 任意模数见 FFTMod.
-   \texttt{conv(a, b) = c}, 其中 $c[x] = \sum a[i]b[x-i]$.
-   手动卷积: 对输入做 NTT, 逐点相乘,
-   除以 n, reverse(start+1, end), 再 NTT 回来.
- * 输入须在 [0, mod) 内.
- * Usage: vl c = conv(a, b); // 模 998244353 卷积
- * Time: O(N \log N)
- * Status: stress-tested
+ * Description: NTT 多项式乘法, 模 $998244353 = 119 \cdot 2^{23} + 1$, 原根 $g = 3$.
+ * 系数下标从 0 开始, 输入须在 $[0, MOD)$ 内, 结果长度 $|a|+|b|-1 \le 2^{23}$.
+ * ntt(f, 1) 正变换, ntt(f, -1) 逆变换 (已乘 $1/n$), $f$ 长度为 2 的幂.
+ * 其他 NTT 模数 (原根都是 3): 469762049, 167772161, 1004535809.
+ * 任意模数用 FFTMod.
+ * Usage: vector<ll> a={1,2}, b={1,3};
+ * vector<ll> c=nttConv(a,b); // c={1,5,6}
+ * Time: O(n \log n)
  */
 #pragma once
 
-
-const ll mod=(119<<23)+1,root=62; // = 998244353
-ll modpow(ll b,ll e){
+const ll MOD=998244353,G=3;
+ll qpow(ll a,ll b){
 	ll r=1;
-	for(;e;b=b*b%mod,e/=2)if(e&1)r=r*b%mod;
+	for(a%=MOD;b;b>>=1,a=a*a%MOD)
+		if(b&1)r=r*a%MOD;
 	return r;
 }
-// p < 2^30 时还可用 5 << 25, 7 << 26, 479 << 21
-// 以及 483 << 21 (root 相同), 后两个大于 10^9
-typedef vector<ll>vl;
-void ntt(vl&a){
-	int n=sz(a),L=31-__builtin_clz(n);
-	static vl rt(2,1);
-	for(static int k=2,s=2;k<n;k*=2,s++){
-		rt.resize(n);
-		ll z[]={1,modpow(root,mod>>s)};
-		rep(i,k,2*k)rt[i]=rt[i/2]*z[i&1]%mod;
+void ntt(vector<ll>&f,int t){ // t=1 正变换, t=-1 逆变换
+	int n=f.size();
+	for(int i=1,j=0;i<n;i++){ // 位逆序置换
+		for(int k=n>>1;(j^=k)<k;k>>=1);
+		if(i<j)swap(f[i],f[j]);
 	}
-	vi rev(n);
-	rep(i,0,n)rev[i]=(rev[i/2]|(i&1)<<L)/2;
-	rep(i,0,n)if(i<rev[i])swap(a[i],a[rev[i]]);
-	for(int k=1;k<n;k*=2)
-		for(int i=0;i<n;i+=2*k)rep(j,0,k){
-			ll z=rt[j+k]*a[i+j+k]%mod,&ai=a[i+j];
-			a[i+j+k]=ai-z+(z>ai?mod:0);
-			ai+=(ai+z>=mod?z-mod:z);
+	for(int len=1;len<n;len<<=1){
+		ll wn=qpow(G,(MOD-1)/(len<<1));
+		if(t==-1)wn=qpow(wn,MOD-2);
+		for(int i=0;i<n;i+=len<<1){
+			ll w=1;
+			for(int j=0;j<len;j++,w=w*wn%MOD){
+				ll u=f[i+j],v=w*f[i+j+len]%MOD;
+				f[i+j]=(u+v)%MOD;
+				f[i+j+len]=(u-v+MOD)%MOD;
+			}
 		}
+	}
+	if(t==-1){
+		ll inv=qpow(n,MOD-2);
+		for(auto&v:f)v=v*inv%MOD;
+	}
 }
-vl conv(const vl&a,const vl&b){
+vector<ll>nttConv(vector<ll>a,vector<ll>b){
 	if(a.empty()||b.empty())return {};
-	int s=sz(a)+sz(b)-1,B=32-__builtin_clz(s),
-	    n=1<<B;
-	int inv=modpow(n,mod-2);
-	vl L(a),R(b),out(n);
-	L.resize(n),R.resize(n);
-	ntt(L),ntt(R);
-	rep(i,0,n)
-		out[-i&(n-1)]=(ll)L[i]*R[i]%mod*inv%mod;
-	ntt(out);
-	return {out.begin(),out.begin()+s};
+	int m=a.size()+b.size()-1,n=1;
+	while(n<m)n<<=1;
+	a.resize(n);b.resize(n);
+	ntt(a,1);ntt(b,1);
+	for(int i=0;i<n;i++)a[i]=a[i]*b[i]%MOD;
+	ntt(a,-1);
+	a.resize(m);
+	return a;
 }

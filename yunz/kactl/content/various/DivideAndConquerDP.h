@@ -1,31 +1,33 @@
 /**
- * Author: Simon Lindholm
- * License: CC0
- * Source: Codeforces
- * Description: 给定 $a[i] = \min_{lo(i) \le k < hi(i)}(f(i, k))$，其中（最小的）
- * 最优 $k$ 随 $i$ 单调不减，对 $i = L..R-1$ 求出 $a[i]$。
- * Usage: 按需改写 lo, hi, f, store; DP().solve(L, R);
- * // 每个 i 求出最优 k 后调用 store(i, k, a[i])
- * Time: O((N + (hi-lo)) \log N)
- * Status: tested on http://codeforces.com/contest/321/problem/E
+ * Description: 分治优化 DP. 把 $1..n$ 分成 $m$ 段 (每段非空), 段 $[l, r]$ 的代价为 $w(l, r)$:
+ * $f_j[i] = \min_{k < i} f_{j-1}[k] + w(k+1, i)$. 若最优的 $k$ 随 $i$ 单调不减
+ * ($w$ 满足四边形不等式时成立), 先求中点 $mid$ 的最优 $k$, 左半边的 $k$
+ * 不超过它, 右半边不小于它. g 为上一层, f 为当前层.
+ * Usage: // 读入 n, a[i], 按题目改 w
+ * ll ans = solveDP(n, m); // 分成 m 段的最小代价, m 不超过 n
+ * Time: O(m N \log N)
  */
 #pragma once
 
-struct DP{ // 按需修改
-	int lo(int ind){return 0;}
-	int hi(int ind){return ind;}
-	ll f(int ind,int k){return dp[ind][k];}
-	void store(int ind,int k,ll v){res[ind]=pii(k,v);}
-
-	void rec(int L,int R,int LO,int HI){
-		if(L>=R)return;
-		int mid=(L+R)>>1;
-		pair<ll,int>best(LLONG_MAX,LO);
-		rep(k,max(LO,lo(mid)),min(HI,hi(mid)))
-			best=min(best,make_pair(f(mid,k),k));
-		store(mid,best.second,best.first);
-		rec(L,mid,LO,best.second+1);
-		rec(mid+1,R,best.second,HI);
+const int N=1e5+5;
+ll f[N],g[N],s[N];
+ll w(int l,int r){ll x=s[r]-s[l-1];return x*x;} // 按题目改
+// 求 f[l..r], 它们的最优 k 在 [kl, kr] 内
+void dc(int l,int r,int kl,int kr){
+	if(l>r)return;
+	int mid=(l+r)/2,best=kl;
+	f[mid]=LLONG_MAX;
+	for(int k=kl;k<=min(mid-1,kr);k++){
+		ll v=g[k]+w(k+1,mid);
+		if(v<f[mid])f[mid]=v,best=k;
 	}
-	void solve(int L,int R){rec(L,R,INT_MIN,INT_MAX);}
-};
+	dc(l,mid-1,kl,best),dc(mid+1,r,best,kr);
+}
+ll solveDP(int n,int m){
+	for(int i=1;i<=n;i++)g[i]=w(1,i); // 第 1 层
+	for(int j=2;j<=m;j++){
+		dc(j,n,j-1,n-1);
+		for(int i=j;i<=n;i++)g[i]=f[i];
+	}
+	return g[n];
+}

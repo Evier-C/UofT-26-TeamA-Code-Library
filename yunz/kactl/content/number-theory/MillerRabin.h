@@ -1,27 +1,29 @@
 /**
- * Author: chilli, c1729, Simon Lindholm
- * Date: 2019-03-28
- * License: CC0
- * Source: Wikipedia, https://miller-rabin.appspot.com/
- * Description: 确定性 Miller-Rabin 素性测试。
- * 保证对不超过 $7 \cdot 10^{18}$ 的数正确；更大的数请用 Python，并随机扩充 A。
- * Usage: bool p = isPrime(n); // n 为 ull
- * Time: $a^b \mod c$ 复杂度的 7 倍。
- * Status: Stress-tested
+ * Description: 确定性 Miller-Rabin 素性测试, 用前 12 个质数作底,
+ * 对 long long 范围内所有数都正确. 乘法用 \_\_int128.
+ * Usage: bool p = isPrime(n); // n 为 long long
+ * Time: 约 12 次快速幂, O(12 \log n)
  */
 #pragma once
 
-#include "ModMulLL.h"
-
-bool isPrime(ull n){
-	if(n<2||n%6%4!=1)return (n|1)==3;
-	ull A[]={2,325,9375,28178,450775,9780504,1795265022},
-	    s=__builtin_ctzll(n-1),d=n>>s;
-	for(ull a:A){ // ^ 末尾 0 的个数
-		ull p=modpow(a%n,d,n),i=s;
-		while(p!=1&&p!=n-1&&a%n&&i--)
-			p=modmul(p,p,n);
-		if(p!=n-1&&i!=s)return 0;
+ll mulmod(ll a,ll b,ll m){return (__int128)a*b%m;}
+ll powmod(ll a,ll b,ll m){
+	ll r=1%m;a%=m;
+	for(;b;b>>=1,a=mulmod(a,a,m))if(b&1)r=mulmod(r,a,m);
+	return r;
+}
+bool isPrime(ll n){
+	if(n<3||n%2==0)return n==2;
+	ll d=n-1;int s=0;
+	while(d%2==0)d/=2,s++; // n - 1 = d * 2^s
+	for(ll a:{2,3,5,7,11,13,17,19,23,29,31,37}){
+		if(n==a)return 1;
+		ll x=powmod(a,d,n);
+		if(x==1||x==n-1)continue;
+		bool ok=0;
+		for(int i=1;i<s&&!ok;i++)
+			x=mulmod(x,x,n),ok=x==n-1;
+		if(!ok)return 0;
 	}
 	return 1;
 }

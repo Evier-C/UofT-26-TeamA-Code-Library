@@ -20,13 +20,12 @@ vi eratosthenes(int LIM) {
 	return pr;
 }
 }
-#include "../../content/number-theory/FastEratosthenes.h"
 #include "../../content/number-theory/Eratosthenes.h"
 
 
 int main() {
-	vi pr1 = eratosthenesSieve(LIM);
-	vi pr2 = eratosthenes();
+	vi pr1 = eratosthenesSieve(1000000);
+	vi pr2 = dynamic::eratosthenes(1000000);
 	assert(pr1 == pr2);
 
 	for (int lim=121; lim<1000; lim++) {

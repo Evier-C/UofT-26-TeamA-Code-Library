@@ -1,23 +1,16 @@
 /**
- * Author: Ulf Lundstrom
- * Date: 2009-03-21
- * License: CC0
- * Source: tinyKACTL
  * Description: 返回多边形有向面积的两倍.
- *  顶点按顺时针给出时面积为负. T 为 int 时注意溢出!
- * Usage:
- * 	vector<Point<ll>> v = {...}; // 多边形顶点
- * 	ll a2 = polygonArea2(v); // 有向面积的 2 倍
- * Status: Stress-tested and tested on kattis:polygonarea
+ * 顶点按逆时针给出时为正, 顺时针为负. T 为 ll 时结果精确.
+ * Usage: vector<Point> v; // 顶点 v[0..n-1]
+ * T a2=polygonArea2(v); // 面积为 fabs(a2)/2
+ * Time: O(n)
  */
 #pragma once
 
 #include "Point.h"
 
-template<class T>
-T polygonArea2(vector<Point<T>>&v){
-	assert(!v.empty()); // 或返回 0
-	T a=v.back().cross(v[0]);
-	rep(i,0,sz(v)-1)a+=v[i].cross(v[i+1]);
+T polygonArea2(vector<Point>&v){
+	int n=v.size();T a=0;
+	for(int i=0;i<n;i++)a+=cross(v[i],v[(i+1)%n]);
 	return a;
 }

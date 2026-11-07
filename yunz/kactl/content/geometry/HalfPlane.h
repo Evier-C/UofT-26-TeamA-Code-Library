@@ -1,52 +1,43 @@
 /**
- * Author: chilli
- * Date: 2019-05-05
- * License: CC0
- * Source: https://github.com/zimpha/algorithmic-library/blob/master/computational-geometry/polygon.cc
- * Description: 求一组半平面的交. 输入的每条有向直线表示它左侧的半平面.
- * 输出为表示交集的凸多边形, 其中的点可能重复或共线.
- * 若 eps 大于 sqrt(2) 乘以直线求交误差, 不会严重出错. 若保证不会有 3 个半平面交于同一点,
- * 则 eps 取更多值时也很可能正确.
+ * Description: 半平面交 (极角排序 + 双端队列). 每条有向直线 $s \to e$ 表示它左侧的半平面.
+ * 返回交集凸多边形的顶点 (逆时针); 交集为空或面积为 0 时返回空 (面积很小时也可能返回退化的多边形).
+ * 要求交集有界: 不确定时先加入一个大矩形的 4 条边. 要求 T 为 double.
+ * Usage: vector<Line> L; // L[0..n-1]
+ * L.push_back({Point(0,0),Point(1,0)}); // 保留 x 轴上方
+ * vector<Point> poly=halfPlane(L);
  * Time: O(n \log n)
- * Status: fuzz-tested, submitted on https://maps19.kattis.com/problems/marshlandrescues
- * Usage:
- * 	vector<Line> vs; vs.push_back({P(0,0), P(1,0)}); // 取左侧
- * 	vector<P> poly = halfPlaneIntersection(vs); // 可能为空
  */
 #pragma once
 
 #include "Point.h"
-#include "sideOf.h"
-#include "lineIntersection.h"
 
-typedef Point<double>P;
-typedef array<P,2>Line;
-#define sp(a) a[0], a[1]
-#define ang(a) (a[1] - a[0]).angle()
-
-int angDiff(Line a,Line b){return sgn(ang(a)-ang(b));}
-bool cmp(Line a,Line b){
-	int s=angDiff(a,b);
-	return (s?s:sideOf(sp(a),b[0]))<0;
+struct Line{Point s,e;}; // 有向直线 s 到 e
+double ang(Line l){return angle(l.e-l.s);}
+bool cmpLine(Line a,Line b){ // 按极角排序, 相同时靠左的在前
+	if(sgn(ang(a)-ang(b)))return ang(a)<ang(b);
+	return sgn(cross(a.s,a.e,b.s))<0;
 }
-vector<P>halfPlaneIntersection(vector<Line>vs){
-	const double EPS=sqrt(2)*1e-8;
-	sort(all(vs),cmp);
-	vector<Line>deq(sz(vs)+5);
-	vector<P>ans(sz(vs)+5);
-	deq[0]=vs[0];
-	int ah=0,at=0,n=sz(vs);
-	rep(i,1,n+1){
-		if(i==n)vs.push_back(deq[ah]);
-		if(angDiff(vs[i],vs[i-1])==0)continue;
-		while(ah<at&&sideOf(sp(vs[i]),ans[at-1],EPS)<0)
-			at--;
-		while(i!=n&&ah<at&&sideOf(sp(vs[i]),ans[ah],EPS)<0)
-			ah++;
-		auto res=lineInter(sp(vs[i]),sp(deq[at]));
-		if(res.first!=1)continue;
-		ans[at++]=res.second,deq[at]=vs[i];
+bool onRight(Line l,Point p){return sgn(cross(l.s,l.e,p))<=0;}
+Point inter(Line a,Line b){ // 两直线交点, 要求不平行
+	Point u=a.e-a.s,v=b.e-b.s;
+	return a.s+u*(cross(v,b.s-a.s)/cross(v,u));
+}
+vector<Point>halfPlane(vector<Line>L){
+	sort(L.begin(),L.end(),cmpLine);
+	int n=L.size(),h=0,t=-1;
+	vector<Line>q(n);vector<Point>p(n); // 队列 q[h..t]
+	for(int i=0;i<n;i++){
+		// 同向的只留第一条, 即最靠左的
+		if(i&&!sgn(ang(L[i])-ang(L[i-1])))continue;
+		while(h<t&&onRight(L[i],p[t-1]))t--;
+		while(h<t&&onRight(L[i],p[h]))h++;
+		if(h<=t&&!sgn(cross(L[i].e-L[i].s,q[t].e-q[t].s)))
+			return {}; // 与队尾反向平行, 交集为空
+		q[++t]=L[i];
+		if(h<t)p[t-1]=inter(q[t-1],q[t]);
 	}
-	if(at-ah<=2)return {};
-	return {ans.begin()+ah,ans.begin()+at};
+	while(h<t&&onRight(q[h],p[t-1]))t--;
+	if(t-h<2)return {};
+	p[t]=inter(q[t],q[h]);
+	return vector<Point>(p.begin()+h,p.begin()+t+1);
 }

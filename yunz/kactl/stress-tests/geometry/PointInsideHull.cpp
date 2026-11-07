@@ -1,26 +1,42 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/geometry/ConvexHull.h"
-namespace ignore {
-	#include "../../content/geometry/SegmentDistance.h"
-}
 #include "../../content/geometry/PointInsideHull.h"
 #include "../../content/geometry/InsidePolygon.h"
 
-int main() {
-	rep(it,0,100000) {
-		int N = rand() % 15;
-		vector<P> ps;
-		rep(i,0,N) ps.emplace_back(rand() % 20 - 10, rand() % 20 - 10);
-		vector<P> ps2 = convexHull(ps);
-		if (ps2.empty()) continue;
-		rep(it2,0,20) {
-			int x = rand() % 22 - 11;
-			int y = rand() % 22 - 11;
-			P p{x,y};
-			assert(inPolygon(ps2, p, true) == (inHull(ps2, p, true)));
-			assert(inPolygon(ps2, p, false) == (inHull(ps2, p, false)));
+mt19937 rng(19);
+// brute: 1 strictly inside, 2 on boundary, 0 outside
+int brute(vector<Point>&h,Point p){
+	int m=h.size();
+	if(m==1)return h[0]==p?2:0;
+	if(m==2)return onSegment(h[0],h[1],p)?2:0;
+	bool bd=false;
+	for(int i=0;i<m;i++){
+		T c=cross(h[i],h[(i+1)%m],p);
+		if(c<0)return 0;
+		if(c==0)bd=true;
+	}
+	return bd?2:1;
+}
+int main(){
+	ll checks=0;
+	for(int it=0;it<200000;it++){
+		int N=rng()%15+1,G=it%2?20:6;
+		vector<Point>ps;
+		for(int i=0;i<N;i++)ps.emplace_back((int)(rng()%G)-G/2,(int)(rng()%G)-G/2);
+		vector<Point>h=convexHull(ps);
+		for(int k=0;k<20;k++){
+			Point p((int)(rng()%(G+2))-G/2-1,(int)(rng()%(G+2))-G/2-1);
+			int b=brute(h,p);
+			assert(inHull(h,p,true)==(b==1));
+			assert(inHull(h,p,false)==(b>=1));
+			if(h.size()>=3){
+				assert(inPolygon(h,p,true)==inHull(h,p,true));
+				assert(inPolygon(h,p,false)==inHull(h,p,false));
+			}
+			checks+=2;
 		}
 	}
-	cout<<"Tests passed!"<<endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

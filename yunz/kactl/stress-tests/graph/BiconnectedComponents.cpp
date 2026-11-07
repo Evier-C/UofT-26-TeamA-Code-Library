@@ -35,6 +35,17 @@ bool biconn(int mask){ // induced subgraph on mask is a block?
 	return true;
 }
 
+// number of connected components of adjacency list graph on nodes 1..k
+int forestComps(vector<int>*adj,int k,vector<int>&lab){
+	lab.assign(k+1,0);int c=0;
+	for(int s=1;s<=k;s++)if(!lab[s]){
+		c++;vector<int> st={s};lab[s]=c;
+		while(!st.empty()){int u=st.back();st.pop_back();
+			for(int v:adj[u])if(!lab[v])lab[v]=c,st.push_back(v);}
+	}
+	return c;
+}
+
 int main(){
 	long long checks=0;
 	for(int it=0;it<6000;it++){
@@ -95,6 +106,57 @@ int main(){
 			}
 			assert(exp==got);checks++;
 		}
+		// round-square tree
+		{
+			buildRS(n);
+			int K=n+vc;long long de=0;
+			for(int i=1;i<=K;i++)de+=T[i].size();
+			assert(de%2==0);
+			long long ed=de/2,sum=0;
+			for(int i=1;i<=vc;i++)sum+=vb[i].size();
+			assert(ed==sum);
+			vector<int> rl;
+			int rc=forestComps(T,K,rl);
+			assert(ed==K-rc); // forest
+			for(int i=1;i<=vc;i++){
+				auto a=T[n+i],b=vb[i];
+				sort(a.begin(),a.end());sort(b.begin(),b.end());
+				assert(a==b);
+				for(int x:a)assert(x>=1&&x<=n);
+			}
+			for(int x=1;x<=n;x++)for(int y:T[x])assert(y>n&&y<=K);
+			for(int u=1;u<=n;u++)for(int v=1;v<=n;v++)
+				assert((lab[u]==lab[v])==(rl[u]==rl[v])),checks++;
+			for(int x=1;x<=n;x++){
+				bool isolated=true;
+				for(auto[a,b]:E)if((a==x)!=(b==x))isolated=false;
+				if(isolated)assert(T[x].size()==1&&!cut[x]);
+				else assert(cut[x]==(T[x].size()>=2));
+				checks++;
+			}
+		}
+		// bridge tree
+		{
+			buildBT(n);
+			long long de=0;
+			multiset<pair<int,int>> ge,ee;
+			for(int i=1;i<=ec;i++)for(int j:E2[i]){
+				assert(j>=1&&j<=ec&&j!=i);de++;ge.insert({i,j});
+			}
+			int nb=0;
+			for(int i=1;i<=m;i++)if(bri[i]){
+				nb++;auto[a,b]=E[i-1];
+				ee.insert({eb[a],eb[b]});ee.insert({eb[b],eb[a]});
+			}
+			assert(ge==ee&&de==2*nb);
+			vector<int> bl;
+			int bc=forestComps(E2,ec,bl);
+			assert(nb==ec-bc); // forest
+			// same component of graph iff same component of bridge tree
+			for(int u=1;u<=n;u++)for(int v=1;v<=n;v++)
+				assert((lab[u]==lab[v])==(bl[eb[u]]==bl[eb[v]]));
+			checks++;
+		}
 	}
 	// large: path graph + extra, just run for crashes and sanity
 	{
@@ -104,6 +166,10 @@ int main(){
 		assert(vc==n-1&&ec==n);
 		for(int i=1;i<=m;i++)assert(bri[i]);
 		for(int i=1;i<=n;i++)assert(cut[i]==(i!=1&&i!=n));
+		buildRS(n);buildBT(n);
+		for(int i=1;i<=n;i++)assert((int)T[i].size()==((i!=1&&i!=n)?2:1));
+		long long de=0;for(int i=1;i<=ec;i++)de+=E2[i].size();
+		assert(de==2*(n-1));
 		checks++;
 	}
 	cout<<"checks "<<checks<<endl;

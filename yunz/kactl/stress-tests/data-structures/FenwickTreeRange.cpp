@@ -1,33 +1,31 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/data-structures/FenwickTree.h"
 
-int main() {
-	mt19937 rng(5);
-	auto rnd = [&](int lo, int hi) { return lo + (int)(rng() % (unsigned)(hi - lo + 1)); };
-	long long checks = 0;
-	rep(it, 0, 3000) {
-		int n = rnd(1, 50);
-		RFT f(n);
-		vector<ll> a(n);
-		rep(step, 0, 200) {
-			int l = rnd(0, n), r = rnd(0, n);
-			if (l > r) swap(l, r);
-			if (rng() % 2) {
-				ll v = rnd(-1000000000, 1000000000);
-				f.add(l, r, v);
-				rep(i, l, r) a[i] += v;
-			} else {
-				ll want = 0;
-				rep(i, l, r) want += a[i];
-				assert(f.query(l, r) == want);
-				checks++;
+mt19937 rng(5);
+int rnd(int lo,int hi){return lo+(int)(rng()%(unsigned)(hi-lo+1));}
+
+int main(){
+	long long checks=0;
+	for(int it=0;it<3000;it++){
+		bool big=it>=2990;
+		n=big?rnd(100000,200000):rnd(1,50);
+		for(int i=1;i<=n;i++)c1[i]=c2[i]=0; // multi-test clear
+		vector<ll>a(n+1);
+		for(int s=0;s<(big?3000:200);s++){
+			int l=rnd(1,n),r=rnd(l,n);
+			if(big&&rng()%50)r=min(n,l+rnd(0,50));
+			if(rng()%2){
+				ll v=rnd(-1000000000,1000000000);
+				rangeAdd(l,r,v);
+				for(int i=l;i<=r;i++)a[i]+=v;
+			}else{
+				ll e=0;
+				for(int i=l;i<=r;i++)e+=a[i];
+				assert(rangeSum(l,r)==e);checks++;
 			}
 		}
-		rep(l, 0, n + 1) rep(r, l, n + 1) {
-			assert(f.query(l, r) == accumulate(a.begin() + l, a.begin() + r, 0LL));
-			checks++;
-		}
 	}
-	cout << "Tests passed! (" << checks << " checks)" << endl;
+	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;
 }

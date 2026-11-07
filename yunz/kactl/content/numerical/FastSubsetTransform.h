@@ -1,51 +1,35 @@
 /**
- * Author: Lucian Bicsi
- * Date: 2015-06-25
- * License: GNU Free Documentation License 1.2
- * Source: csacademy
- * Description: 变换到一组基, 使得形如
- * $\displaystyle c[z] = \sum\nolimits_{z = x \oplus y} a[x] \cdot b[y]$ 的卷积可快速计算,
- * 其中 $\oplus$ 为 AND, OR, XOR 之一 (默认 XOR, 其余换用注释中的行). $a$ 的长度必须是 2 的幂.
- * point\_add / point\_eval 在变换后的数组上对原数组单点加 / 单点求值.
- * Usage: vl c = conv(a, b); // a, b 等长, 长度为 2 的幂
- * FST(a, 0); point_add(a, i, v); ll x = point_eval(a, i);
- * Time: O(N \log N), 单点操作 O(N)
- * Status: stress-tested
+ * Description: 快速沃尔什变换 (FWT), 求位运算卷积
+ * $c_k = \sum_{i \oplus j = k} a_i b_j$, $\oplus$ 为 or, and, xor.
+ * 下标从 0 开始, 长度 $n$ 须为 2 的幂 (不足补 0). $t=1$ 正变换,
+ * $t=-1$ 逆变换. 取模时 xor 逆变换的 /2 改成乘 2 的逆元.
+ * or 正变换即子集和 $\hat a_k = \sum_{i \subseteq k} a_i$; and 为超集和.
+ * Usage: fwtXor(a,1); fwtXor(b,1); // a, b 等长
+ * for(int i=0;i<n;i++) a[i]*=b[i];
+ * fwtXor(a,-1); // a 即为 xor 卷积, or, and 同理
+ * Time: O(n \log n)
  */
 #pragma once
 
-using vl=vector<ll>;
-void FST(vl&a,bool inv){
-    for(int n=sz(a),step=1;step<n;step*=2){
-        for(int i=0;i<n;i+=2*step)rep(j,i,i+step){
-            ll&u=a[j],&v=a[j+step];tie(u,v)=
-                // inv ? pair(v - u, u) : pair(v, u + v); // AND /// include-line
-                // inv ? pair(v, u - v) : pair(u + v, u); // OR /// include-line
-                pair(u+v,u-v); // XOR
-        }
-    }
-    if(inv)for(ll&x:a)x/=sz(a); // XOR
+void fwtOr(vector<ll>&a,int t){
+	int n=a.size();
+	for(int len=1;len<n;len<<=1)
+		for(int i=0;i<n;i+=len<<1)
+			for(int j=i;j<i+len;j++)a[j+len]+=t*a[j];
 }
-vl conv(vl a,vl b){
-    FST(a,0);FST(b,0);
-    rep(i,0,sz(a))a[i]*=b[i];
-    FST(a,1);return a;
+void fwtAnd(vector<ll>&a,int t){
+	int n=a.size();
+	for(int len=1;len<n;len<<=1)
+		for(int i=0;i<n;i+=len<<1)
+			for(int j=i;j<i+len;j++)a[j]+=t*a[j+len];
 }
-int psgn(int x){return __builtin_popcount(x)&1?-1:1;}
-// 原数组 a[i] += val, 此处 a 已变换
-void point_add(vl&a,int i,ll val){
-    rep(j,0,sz(a))
-        // a[j] += val * ((i|j) == sz(a)-1); // AND /// include-line
-        // a[j] += val * ((i&j) == 0); // OR /// include-line
-        a[j]+=val*psgn(i&j); // XOR
-}
-// 返回原数组 a[i], 此处 a 已变换
-ll point_eval(const vl&a,int i){
-    ll res=0;
-    rep(j,0,sz(a))
-        // res += a[j] * ((i&j) == 0) * psgn(sz(a)-1-(i|j)); // AND /// include-line
-        // res += a[j] * ((i|j) == sz(a)-1) * psgn(i&j); // OR /// include-line
-        res+=a[j]*psgn(i&j); // XOR
-    res/=sz(a); // XOR
-    return res;
+void fwtXor(vector<ll>&a,int t){
+	int n=a.size();
+	for(int len=1;len<n;len<<=1)
+		for(int i=0;i<n;i+=len<<1)
+			for(int j=i;j<i+len;j++){
+				ll u=a[j],v=a[j+len];
+				a[j]=u+v;a[j+len]=u-v;
+				if(t==-1)a[j]/=2,a[j+len]/=2;
+			}
 }

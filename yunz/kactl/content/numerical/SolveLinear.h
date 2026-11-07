@@ -1,51 +1,40 @@
 /**
- * Author: Per Austrin, Simon Lindholm
- * Date: 2004-02-08
- * License: CC0
- * Description: 求解 $A * x = b$. 若有多解, 返回任意一个.
- *  返回秩, 无解返回 -1. $A$ 与 $b$ 的数据会被破坏.
- * Usage: vector<vd> A(n, vd(m)); vd b(n), x(m); // x 须预设长度 m
- * int r = solveLinear(A, b, x); // 无解返回 -1
- * Time: O(n^2 m)
- * Status: tested on kattis:equationsolver, and bruteforce-tested mod 3 and 5 for n,m <= 3
+ * Description: 高斯-约旦消元解实系数线性方程组 ($n$ 个方程, $m$ 个未知数).
+ * 下标从 1 开始: $a[i][1..m]$ 为第 $i$ 个方程的系数, $a[i][m+1]$ 为常数项.
+ * 无解返回 -1; 否则返回秩 $r$, $x[1..m]$ 为一组解 ($r < m$ 时有无穷多解,
+ * 自由元取 0, 且 pos[1..r] 为各主元所在列). $a$ 会被破坏.
+ * Usage: // 填好 a[1..n][1..m+1], 多组数据重新填即可
+ * int r=gauss(n,m);
+ * if(r==-1) puts("No Solution");
+ * else if(r<m) puts("Infinite"); // 仍可用 x[1..m]
+ * else ... // 唯一解 x[1..m]
+ * Time: O(nm \cdot \min(n,m))
  */
 #pragma once
 
-typedef vector<double>vd;
-const double eps=1e-12;
-
-int solveLinear(vector<vd>&A,vd&b,vd&x){
-	int n=sz(A),m=sz(x),rank=0,br,bc;
-	if(n)assert(sz(A[0])==m);
-	vi col(m);iota(all(col),0);
-
-	rep(i,0,n){
-		double v,bv=0;
-		rep(r,i,n)rep(c,i,m)
-			if((v=fabs(A[r][c]))>bv)
-				br=r,bc=c,bv=v;
-		if(bv<=eps){
-			rep(j,i,n)if(fabs(b[j])>eps)return -1;
-			break;
-		}
-		swap(A[i],A[br]);
-		swap(b[i],b[br]);
-		swap(col[i],col[bc]);
-		rep(j,0,n)swap(A[j][i],A[j][bc]);
-		bv=1/A[i][i];
-		rep(j,i+1,n){
-			double fac=A[j][i]*bv;
-			b[j]-=fac*b[i];
-			rep(k,i+1,m)A[j][k]-=fac*A[i][k];
-		}
-		rank++;
+const int N=505; // 方程数, 未知数上限
+const double eps=1e-9;
+double a[N][N],x[N];
+int pos[N];
+int gauss(int n,int m){
+	int r=1; // 当前行
+	for(int c=1;c<=m&&r<=n;c++){
+		int p=r; // 选第 c 列绝对值最大的主元
+		for(int i=r+1;i<=n;i++)
+			if(fabs(a[i][c])>fabs(a[p][c]))p=i;
+		if(fabs(a[p][c])<eps)continue; // 自由元
+		swap(a[p],a[r]);
+		for(int i=1;i<=n;i++)
+			if(i!=r&&a[i][c]!=0){
+				double t=a[i][c]/a[r][c];
+				for(int j=c;j<=m+1;j++)a[i][j]-=t*a[r][j];
+			}
+		pos[r++]=c;
 	}
-
-	x.assign(m,0);
-	for(int i=rank;i--;){
-		b[i]/=A[i][i];
-		x[col[i]]=b[i];
-		rep(j,0,i)b[j]-=A[j][i]*b[i];
-	}
-	return rank; // rank < m 时有多解
+	r--; // 秩
+	for(int i=r+1;i<=n;i++)
+		if(fabs(a[i][m+1])>eps)return -1; // 0 = 非 0
+	for(int j=1;j<=m;j++)x[j]=0;
+	for(int i=1;i<=r;i++)x[pos[i]]=a[i][m+1]/a[i][pos[i]];
+	return r;
 }

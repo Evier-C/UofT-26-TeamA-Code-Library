@@ -1,14 +1,14 @@
 /**
- * Author: folklore
- * Date: 2025-11-06
- * License: CC0
- * Source: https://codeforces.com/blog/entry/61587
- * Description:
- * 高质量的均匀整数随机数生成器。
- * Usage: int x = urand(a, b); // [a, b] 内的均匀随机整数
- * Time: 生成 1e8 个数约 400ms。
- * Status: untested
+ * Description: 随机数. mt19937\_64 用时间做种子 (防 hack), 不要用 rand().
+ * Usage: ll x = rnd(1, 100); // [1, 100] 内均匀随机整数
+ * shuffle(a + 1, a + n + 1, rng); // 随机打乱 a[1..n]
+ * double y = uniform_real_distribution<double>(0, 1)(rng);
+ * Time: O(1)
  */
-// 64 位整数可用 mt19937_64
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-int urand(int a,int b){return uniform_int_distribution<int>(a,b)(rng);}
+#pragma once
+
+mt19937_64 rng(chrono::steady_clock::now()
+	.time_since_epoch().count());
+ll rnd(ll l,ll r){ // [l, r] 内均匀随机
+	return uniform_int_distribution<ll>(l,r)(rng);
+}

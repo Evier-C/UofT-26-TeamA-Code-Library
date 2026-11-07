@@ -1,27 +1,25 @@
 /**
- * Author: Johan Sannemo
- * License: CC0
- * Description: 求最长严格上升子序列，返回其各元素的下标。
- * Usage: vi idx = lis(S); // S 为 vector, 返回递增的下标序列
- * Time: $O(N \log N)$
- * Status: Tested on kattis:longincsubseq, stress-tested
+ * Description: 最长严格上升子序列, 返回一个最长的子序列的下标 (递增).
+ * d[k] 为长度 k 的上升子序列的最小结尾, pos[k] 为它的下标, pre 记前驱.
+ * 最长不降子序列: 把 lower\_bound 改成 upper\_bound.
+ * Usage: // 读入 n 和 a[1..n]
+ * vector<int> id = lis(n); // 值为 a[id[i]]
+ * // 多组数据不用清空
+ * Time: O(N \log N)
  */
 #pragma once
 
-template<class I>vi lis(const vector<I>&S){
-	if(S.empty())return {};
-	vi prev(sz(S));
-	typedef pair<I,int>p;
-	vector<p>res;
-	rep(i,0,sz(S)){
-		// 求最长不降子序列时把 0 改为 i
-		auto it=lower_bound(all(res),p{S[i],0});
-		if(it==res.end())res.emplace_back(),it=res.end()-1;
-		*it={S[i],i};
-		prev[i]=it==res.begin()?0:(it-1)->second;
+const int N=2e5+5;
+int a[N],d[N],pos[N],pre[N]; // a 的类型可以改成 ll, d 也要改
+vector<int>lis(int n){
+	int len=0;
+	for(int i=1;i<=n;i++){
+		int k=lower_bound(d+1,d+len+1,a[i])-d;
+		d[k]=a[i],pos[k]=i,pre[i]=pos[k-1];
+		len=max(len,k);
 	}
-	int L=sz(res),cur=res.back().second;
-	vi ans(L);
-	while(L--)ans[L]=cur,cur=prev[cur];
-	return ans;
+	vector<int>res;
+	for(int i=pos[len];i;i=pre[i])res.push_back(i);
+	reverse(res.begin(),res.end());
+	return res;
 }
