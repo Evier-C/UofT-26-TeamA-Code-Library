@@ -39,10 +39,10 @@ Val*parseExpression(string&s){
             ops.pop_back();
             auto b=vals.back();vals.pop_back();
             if(c=='_'){ // 一元运算
-                vals.pb(&(arr[last++]=Val(c,b,0)));
+                vals.push_back(&(arr[last++]=Val(c,b,0)));
             }else{ // 二元运算
                 auto a=vals.back();vals.pop_back();
-                vals.pb(&(arr[last++]=Val(c,a,b)));
+                vals.push_back(&(arr[last++]=Val(c,a,b)));
             }
         }
     };
@@ -52,12 +52,12 @@ Val*parseExpression(string&s){
         else if(c==')')depth--;
         else if('0'<=c&&c<='9'){
             if(pdigit)vals.back()->v=10*vals.back()->v+c-'0';
-            else vals.pb(&(arr[last++]=Val(c-'0')));
+            else vals.push_back(&(arr[last++]=Val(c-'0')));
         }else{
             // 一元运算
             if(c=='-'&&!pdigit
                 &&!(i>=1&&s[i-1]==')'))c='_';
-            clear(prec(c,i));ops.pb({prec(c,i),c});
+            clear(prec(c,i));ops.push_back({prec(c,i),c});
         }
     }
     clear({-1});

@@ -25,15 +25,15 @@ struct func_graph{
         int u=i;
         for(;!vis[u];u=a[u])vis[u]=1;
         if(vis[u]==1)
-          for(cycles.pb({});vis[u]==1;u=a[u]){
+          for(cycles.push_back({});vis[u]==1;u=a[u]){
             root_of[u]={sz(cycles)-1,
                           sz(cycles.back())};
-            cycles.back().pb(u);
+            cycles.back().push_back(u);
             vis[u]=2;
           }
         for(int v=i;vis[v]==1;v=a[v]){
           root_of[v]=root_of[u];
-          childs[a[v]].pb(v);
+          childs[a[v]].push_back(v);
           vis[v]=2;
         }
       }

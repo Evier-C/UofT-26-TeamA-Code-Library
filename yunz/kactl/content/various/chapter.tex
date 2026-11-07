@@ -2,13 +2,13 @@
 
 \subsection{Intervals}
 	\kactlimport{IntervalContainer.h}
-	\kactlimport{IntervalCover.h}
-	\kactlimport{ConstantIntervals.h}
+	% \kactlimport{IntervalCover.h}
+	% \kactlimport{ConstantIntervals.h}
 
 \subsection{Misc. algorithms}
 	\kactlimport{TernarySearch.h}
 	\kactlimport{LIS.h}
-	\kactlimport{FastKnapsack.h}
+	% \kactlimport{FastKnapsack.h}
 
 \subsection{Dynamic programming}
 	\kactlimport{KnuthDP.h}
@@ -25,19 +25,27 @@
 \subsection{Optimization tricks}
 	\verb@__builtin_ia32_ldmxcsr(40896);@ disables denormals (which make floats 20x slower near their minimum value).
 	\subsubsection{Bit hacks}
-		\begin{itemize}
-			\item \verb@x & -x@ is the least bit in \texttt{x}.
-			\item \verb@for (int x = m; x; ) { --x &= m; ... }@ loops over all subset masks of \texttt{m} (except \texttt{m} itself).
-			\item \verb@c = x&-x, r = x+c; (((r^x) >> 2)/c) | r@ is the next number after \texttt{x} with the same number of bits set.
-			\item \verb@rep(b,0,K) rep(i,0,(1 << K))@ \\ \verb@  if (i & 1 << b) D[i] += D[i^(1 << b)];@ computes all sums of subsets.
+			\begin{itemize}
+			\item \verb@x&-x@ 是 \texttt{x} 的最低位的 1.
+			\item \verb@c=x&-x,r=x+c;(((r^x)>>2)/c)|r@ 是比 \texttt{x} 大且 1 的个数相同的下一个数.
+			\item 子集和 (SOS DP): \verb@for(int b=0;b<K;b++)for(int i=0;i<(1<<K);i++)@ \\ \verb@  if(i>>b&1)D[i]+=D[i^(1<<b)];@
+			\item 枚举所有集合的所有子集, 总共 $3^n$ 次:
 		\end{itemize}
+\begin{lstlisting}
+for(int s=0;s<(1<<n);s++) // 每个集合 s
+	for(int t=s;;t=(t-1)&s){ // s 的每个子集 t, 含空集
+		// 处理 (s, t)
+		if(!t)break;
+	}
+// 只要非空子集: for(int t=s;t;t=(t-1)&s)
+\end{lstlisting}
 	\subsubsection{Pragmas for bitset (put before bits/stdc++.h)}
 		\begin{itemize}
 			\item \lstinline{#pragma GCC optimize("O3,unroll-loops")}
 			\item \lstinline{#include <bits/allocator.h>}
 			\item \lstinline{#pragma GCC target("avx2,bmi,bmi2,popcnt,lzcnt")}
 		\end{itemize}
-	\kactlimport{FastMod.h}
+	% \kactlimport{FastMod.h}
 	% \kactlimport{FastInput.h}
 	% \kactlimport{BumpAllocator.h}
 	% \kactlimport{SmallPtr.h}
@@ -46,4 +54,4 @@
 	% \kactlimport{SIMD.h}
 	\kactlimport{UniformRandom.h}
 	\kactlimport[-l sh]{StressTest.sh}
-	\kactlimport{ExpressionTree.h}
+	% \kactlimport{ExpressionTree.h}

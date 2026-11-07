@@ -14,7 +14,7 @@
  */
 #pragma once
 
-#include "UnionFindRollback.h"
+#include "../data-structures/UnionFindRollback.h"
 
 struct DynConn{
     int T; // DynConn(T) 的时间范围为 [0..T]

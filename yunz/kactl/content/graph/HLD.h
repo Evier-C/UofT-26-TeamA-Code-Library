@@ -6,7 +6,8 @@
  * Description: 树链剖分: 把树分解为点不相交的重链和轻边, 使任意叶子到根的路径上
  * 至多有 log(n) 条轻边. 输入邻接表 (若邻接表中没有指向父亲的边, 注释掉 dfsSz
  * 中的 (*) 行), 初值数组 $v$ 和根. VALS\_EDGES 为真表示值存在边上而不是点上.
- * Usage: HLD<false> h(adj, vals, root); h.modifyPath(u, v, val);
+ * Usage: vector<T> vals(n, {x, x, 1}); HLD<false> h(adj, vals, root);
+ * h.modifyPath(u, v, {d}); // 路径上每个点加 d
  * T x = h.queryPath(u, v), y = h.querySubtree(v);
  * Time: O((\log N)^2)
  * Status: tested on https://cses.fi/problemset/result/16580118/
@@ -19,12 +20,14 @@ template<bool VALS_EDGES>struct HLD{
     int N,tim=0;
     vector<vi>adj;
     vi par,siz,rt,pos,tail;
-    lztree tree;
+    Seg tree=Seg(vector<T>(1,idT));
     HLD(vector<vi>&adj,vector<T>v,int root)
         :N(sz(adj)),adj(adj),par(N,-1),siz(N,1),
-          rt(N,root),pos(N),tail(N,-1),tree(N){
+          rt(N,root),pos(N),tail(N,-1){
         dfsSz(root);dfsHld(root);
-        rep(i,root,sz(v))tree.set(pos[i],v[i]); // 初始化值
+        vector<T>a(N,idT);
+        rep(i,0,N)a[pos[i]]=v[i]; // 按 dfs 序放初值
+        tree=Seg(a);
     }
 	void dfsSz(int v){
 		for(int&u:adj[v]){
@@ -53,7 +56,7 @@ template<bool VALS_EDGES>struct HLD{
 		op(pos[u]+VALS_EDGES,pos[v]+1);
 	}
     T get(int u){ // 单点修改类似
-        return tree.get(pos[u]);
+        return tree.query(pos[u],pos[u]+1);
     }
 	void modifyPath(int u,int v,U val){
 		process(u,v,[&](int l,int r){tree.update(l,r,val);});

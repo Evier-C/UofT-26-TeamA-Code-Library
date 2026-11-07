@@ -13,12 +13,12 @@ auto fdivSplit=[](int n){
     vector<pii>segs;
     for(int q,r,l=1;l<=n;l=r+1){
         q=n/l,r=n/q;
-        segs.pb({l,r});
+        segs.push_back({l,r});
     }
     return segs;
 };
 auto cdivSplit=[](int n){
     auto segs=fdivSplit(n-1);
-    segs.pb({n,n});
+    segs.push_back({n,n});
     return segs;
 };

@@ -17,9 +17,13 @@
  */
 #pragma once
 
-#include "../number-theory/ModPow.h"
 
 const ll mod=(119<<23)+1,root=62; // = 998244353
+ll modpow(ll b,ll e){
+	ll r=1;
+	for(;e;b=b*b%mod,e/=2)if(e&1)r=r*b%mod;
+	return r;
+}
 // p < 2^30 时还可用 5 << 25, 7 << 26, 479 << 21
 // 以及 483 << 21 (root 相同), 后两个大于 10^9
 typedef vector<ll>vl;

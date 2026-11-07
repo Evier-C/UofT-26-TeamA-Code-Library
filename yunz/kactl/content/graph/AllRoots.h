@@ -29,17 +29,17 @@ struct AllRoots{
   vector<vector<T>>suf;vector<T>res;
   AllRoots(vector<pii>&el):n(sz(el)+1),adj(n),suf(n),res(n){
     for(int ei=-1;auto[a,b]:el){ei++;
-      adj[a].pb({b,ei});
-      adj[b].pb({a,ei});
+      adj[a].push_back({b,ei});
+      adj[b].push_back({a,ei});
     }
-    for(auto&s:suf)s.pb(base); // 点的初始值
+    for(auto&s:suf)s.push_back(base); // 点的初始值
   }
   T down(int x,int p=-1){
     for(auto&c:adj[x])
-      if(c.F==p)swap(c,adj[x][0]);
+      if(c.first==p)swap(c,adj[x][0]);
     for(int i=sz(adj[x])-1;i>-(p<0);--i)
-      suf[x].pb(down(adj[x][i].F,x)+suf[x].back());
-    return (p==-1?T{}:suf[x].back().promote(x,adj[x][0].S));
+      suf[x].push_back(down(adj[x][i].first,x)+suf[x].back());
+    return (p==-1?T{}:suf[x].back().promote(x,adj[x][0].second));
   }
   void up(int x,int p=-1){
     rep(i,p!=-1,sz(adj[x])){
