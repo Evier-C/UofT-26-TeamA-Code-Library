@@ -1,86 +1,52 @@
 /**
- * Author: Simon Lindholm
- * Date: 2015-02-18
- * License: CC0
- * Source: marian's (TC) code
- * Description: AC 自动机 (Aho-Corasick), 用于多模式串匹配. 起始节点下标为 0.
- * 默认字母表为大写字母, 按需修改 alpha 和 first.
- * find(word) 对每个位置返回在该处结尾的最长模式串的下标, 没有则为 -1.
- * findAll($-$, word) 对每个位置找出从该处开始的所有模式串 (短的在前;
- * 若无重复模式串, 总数至多 $N \sqrt N$).
- * 允许重复模式串, 不允许空串. 要求从每个位置开始的最长模式串, 就把输入全部反转.
- * 字母表很大时, 把每个符号拆成若干块, 并用哨兵位标记符号边界.
- * Usage: AhoCorasick ac(pat); // pat 为 vector<string>
- * vi r = ac.find(word); vector<vi> res = ac.findAll(pat, word);
- * Time: 构建 $O(26N)$, 其中 $N =$ 模式串总长. find(x) 为 $O(N)$,
- * 其中 N = x 的长度. findAll 为 $O(NM)$.
- * Status: stress-tested
+ * Description: AC 自动机. 根为 0, 字符集为小写字母.
+ * build 用 BFS 求 fail, 并把缺失的转移补成 tr[fail[u]][c] (Trie 图).
+ * query 统计文本中每个模式串的出现次数: 先在每个经过的节点 cnt++,
+ * 再按 BFS 逆序沿 fail 树累加, 节点 v 的 cnt 即以 v 为后缀的出现次数.
+ * 允许重复模式串, 不允许空串.
+ * Usage: init(); // 多组数据先清空
+ * // 第 i 个模式串 p[i][1..len[i]]
+ * for(int i=1;i<=k;i++)insert(p[i],len[i],i);
+ * build();query(t,m); // 第 i 个模式串出现次数: cnt[pos[i]]
+ * // 换一个文本再 query 前, 先把 cnt[0..tot] 清 0
+ * Time: 构建 O(26L), L 为模式串总长; 查询 O(m+L)
  */
 #pragma once
 
-struct AhoCorasick{
-	enum{alpha=26,first='A'}; // 按需修改!
-	struct Node{
-		// (nmatches 可选)
-		int back,next[alpha],start=-1,end=-1,nmatches=0;
-		Node(int v){memset(next,v,sizeof(next));}
-	};
-	vector<Node>N;
-	vi backp;
-	void insert(string&s,int j){
-		assert(!s.empty());
-		int n=0;
-		for(char c:s){
-			int&m=N[n].next[c-first];
-			if(m==-1){n=m=sz(N);N.emplace_back(-1);}
-			else n=m;
-		}
-		if(N[n].end==-1)N[n].start=j;
-		backp.push_back(N[n].end);
-		N[n].end=j;
-		N[n].nmatches++;
+const int N=1e6+5; // 模式串总长上限
+int tr[N][26],fail[N],cnt[N],q[N],tot;
+int pos[N]; // pos[i]: 第 i 个模式串结尾的节点
+void init(){
+	for(int i=0;i<=tot;i++)
+		memset(tr[i],0,sizeof tr[i]),fail[i]=cnt[i]=0;
+	tot=0;
+}
+void insert(char*s,int n,int id){
+	int u=0;
+	for(int i=1;i<=n;i++){
+		int c=s[i]-'a';
+		if(!tr[u][c])tr[u][c]=++tot;
+		u=tr[u][c];
 	}
-	AhoCorasick(vector<string>&pat):N(1,-1){
-		rep(i,0,sz(pat))insert(pat[i],i);
-		N[0].back=sz(N);
-		N.emplace_back(0);
-
-		queue<int>q;
-		for(q.push(0);!q.empty();q.pop()){
-			int n=q.front(),prev=N[n].back;
-			rep(i,0,alpha){
-				int&ed=N[n].next[i],y=N[prev].next[i];
-				if(ed==-1)ed=y;
-				else{
-					N[ed].back=y;
-					(N[ed].end==-1?N[ed].end:backp[N[ed].start])
-						=N[y].end;
-					N[ed].nmatches+=N[y].nmatches;
-					q.push(ed);
-				}
-			}
+	pos[id]=u;
+}
+void build(){
+	int hd=1,tl=0;
+	for(int c=0;c<26;c++)if(tr[0][c])q[++tl]=tr[0][c];
+	while(hd<=tl){
+		int u=q[hd++];
+		for(int c=0;c<26;c++){
+			int&v=tr[u][c];
+			if(v)fail[v]=tr[fail[u]][c],q[++tl]=v;
+			else v=tr[fail[u]][c];
 		}
 	}
-	vi find(string word){
-		int n=0;
-		vi res; // ll count = 0;
-		for(char c:word){
-			n=N[n].next[c-first];
-			res.push_back(N[n].end);
-			// count += N[n].nmatches;
-		}
-		return res;
+}
+void query(char*t,int m){
+	for(int i=1,u=0;i<=m;i++){
+		u=tr[u][t[i]-'a'];
+		cnt[u]++;
 	}
-	vector<vi>findAll(vector<string>&pat,string word){
-		vi r=find(word);
-		vector<vi>res(sz(word));
-		rep(i,0,sz(word)){
-			int ind=r[i];
-			while(ind!=-1){
-				res[i-sz(pat[ind])+1].push_back(ind);
-				ind=backp[ind];
-			}
-		}
-		return res;
-	}
-};
+	// q[1..tot] 为 BFS 序, 逆序累加到 fail
+	for(int i=tot;i>=1;i--)cnt[fail[q[i]]]+=cnt[q[i]];
+}

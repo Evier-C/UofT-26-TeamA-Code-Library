@@ -1,41 +1,34 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/strings/Zfunc.h"
 
-template <class F> void gen(string &s, int at, int alpha, F f) {
-	if (at == sz(s))
-		f();
-	else {
-		rep(i, 0, alpha) {
-			s[at] = (char)('a' + i);
-			gen(s, at + 1, alpha, f);
-		}
+mt19937 rng(2);
+char s[N],t[N];
+ll checks=0;
+int lcp(char*a,int n,char*b,int m){
+	int k=0;
+	while(k<n&&k<m&&a[k]==b[k])k++;
+	return k;
+}
+void test(int n,int m,int al){
+	for(int i=1;i<=n;i++)s[i]='a'+rng()%al;
+	for(int i=1;i<=m;i++)t[i]='a'+rng()%al;
+	s[n+1]=t[m+1]=0;
+	getz(s,n);
+	for(int i=1;i<=n;i++){
+		assert(z[i]==lcp(s+i,n-i+1,s+1,n));checks++;
+	}
+	getz(t,m);exkmp(s,n,t,m);
+	for(int i=1;i<=n;i++){
+		assert(ext[i]==lcp(s+i,n-i+1,t+1,m));checks++;
 	}
 }
-
-void test(const string &s) {
-	int n = sz(s);
-	vi found = Z(s);
-	vi expected(n, 0);
-	rep(i, 1, n) { // exclude index 0 (!)
-		int j = 0;
-		while (i + j < n && s[i + j] == s[j])
-			j++;
-		expected[i] = j;
-	}
-	assert(found == expected);
-}
-
-signed main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0);
-	rep(n, 0, 13) {
-		string s(n, 'x');
-		gen(s, 0, 3, [&]() { test(s); });
-	}
-	rep(n, 0, 11) {
-		string s(n, 'x');
-		gen(s, 0, 4, [&]() { test(s); });
-	}
+int main(){
+	for(int it=0;it<200000;it++)
+		test(1+rng()%15,1+rng()%10,1+rng()%3);
+	for(int it=0;it<100;it++)
+		test(1000+rng()%3000,1+rng()%3000,1+rng()%2);
+	cout<<checks<<" checks"<<endl;
 	cout<<"Tests passed!"<<endl;
 }

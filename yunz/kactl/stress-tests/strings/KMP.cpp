@@ -1,48 +1,35 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/strings/KMP.h"
 
-template<class F>
-void gen(string& s, int at, int alpha, F f) {
-	if (at == sz(s)) f();
-	else {
-		rep(i,0,alpha) {
-			s[at] = (char)('a' + i);
-			gen(s, at+1, alpha, f);
-		}
+mt19937 rng(1);
+char s[N],t[N];
+ll checks=0;
+void test(int n,int m,int al){
+	for(int i=1;i<=n;i++)s[i]='a'+rng()%al;
+	for(int i=1;i<=m;i++)t[i]='a'+rng()%al;
+	s[n+1]=t[m+1]=0;
+	vector<int> occ=kmp(s,n,t,m);
+	// nxt 暴力
+	if(m<=60)for(int i=1;i<=m;i++){
+		int best=0;
+		for(int L=1;L<i;L++)
+			if(!memcmp(t+1,t+i-L+1,L))best=L;
+		assert(nxt[i]==best);checks++;
 	}
+	vector<int> bf;
+	for(int i=1;i+m-1<=n;i++)
+		if(!memcmp(s+i,t+1,m))bf.push_back(i);
+	assert(occ==bf);checks++;
 }
-
-void test(const string& s) {
-	vi p = pi(s);
-	rep(i,0,sz(s)) {
-		int maxlen = -1;
-		rep(len,0,i+1) {
-			rep(j,0,len) {
-				if (s[j] != s[i+1 - len + j]) goto fail;
-			}
-			maxlen = len;
-fail:;
-		}
-		assert(maxlen == p[i]);
+int main(){
+	for(int it=0;it<200000;it++){
+		int al=1+rng()%3;
+		test(rng()%15,1+rng()%6,al);
 	}
-}
-
-int main() {
-	// string str; cin >> str; for(auto &x: pi(str)) cout << x; cout << endl;
-	// test ~3^12 strings
-	rep(n,0,13) {
-		string s(n, 'x');
-		gen(s, 0, 3, [&]() {
-			test(s);
-		});
-	}
-	// then ~4^10 strings
-	rep(n,0,11) {
-		string s(n, 'x');
-		gen(s, 0, 4, [&]() {
-			test(s);
-		});
-	}
+	for(int it=0;it<200;it++)test(1000+rng()%5000,1+rng()%10,1+rng()%2);
+	test(1000000,3,1);
+	cout<<checks<<" checks"<<endl;
 	cout<<"Tests passed!"<<endl;
 }
