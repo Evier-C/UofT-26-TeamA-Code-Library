@@ -3,6 +3,7 @@
 \ProvidesPackage{kactlpkg}
 
 \usepackage[utf8]{inputenc}             % Encoding UTF-8
+\usepackage{CJKutf8}                    % Chinese in comments
 \usepackage{listings}                   % Source code listings
 \usepackage{framed}                     % Source code listings
 \usepackage[a4paper,landscape,hmargin={0.5cm,0.5cm},vmargin={1.0cm,0.4cm}]{geometry}
@@ -171,7 +172,7 @@
 \lstset{commentstyle=\normalfont\itshape}
 \lstset{literate={^}{\caret}{1} {~}{\tilde}{1} {\{}{\nicelbrace}{1} {\}}{\nicerbrace}{1}}
 \lstset{emptylines=*1}
-\lstset{inputencoding=utf8}
+\lstset{extendedchars=false}
 \lstset{aboveskip=3pt}
 \lstset{belowskip=2pt}
 
