@@ -34,8 +34,8 @@ ll qry(int l,int r){return query(1,1,segn,l,r);}
 
 mt19937 rng(41);
 int R(int a,int b){return rng()%(b-a+1)+a;}
-ll a[N],b[N],val[N];
-int par[N],dp[N];
+ll a[SN],b[SN],val[SN];
+int par[SN],dp[SN];
 
 int main(){
 	long long checks=0;
@@ -43,23 +43,22 @@ int main(){
 		bool big=it>=395;
 		int n=big?R(5000,5000):R(1,40),rt=R(1,n);
 		segn=n;
-		for(int i=1;i<=n;i++)g[i].clear(),son[i]=0;
-		tim=0;
+		H.init(n);
 		vector<int> perm(n+1);iota(perm.begin(),perm.end(),0);
 		shuffle(perm.begin()+1,perm.end(),rng);
 		for(int i=2;i<=n;i++){
 			int p=it%3==0?i-1:R(1,i-1);
-			g[perm[i]].push_back(perm[p]),g[perm[p]].push_back(perm[i]);
+			H.g[perm[i]].push_back(perm[p]),H.g[perm[p]].push_back(perm[i]);
 		}
 		for(int i=1;i<=n;i++)a[i]=val[i]=R(-1000,1000);
-		dfs1(rt,0);dfs2(rt,rt);
-		for(int i=1;i<=n;i++)b[i]=a[rnk[i]];
+		H.dfs1(rt,0);H.dfs2(rt,rt);
+		for(int i=1;i<=n;i++)b[i]=a[H.rnk[i]];
 		build(1,1,n,b);
 		// brute parent/depth
 		{
 			vector<int> st={rt};par[rt]=0;dp[rt]=0;vector<int> vis(n+1);vis[rt]=1;
 			while(!st.empty()){int u=st.back();st.pop_back();
-				for(int v:g[u])if(!vis[v])vis[v]=1,par[v]=u,dp[v]=dp[u]+1,st.push_back(v);}
+				for(int v:H.g[u])if(!vis[v])vis[v]=1,par[v]=u,dp[v]=dp[u]+1,st.push_back(v);}
 		}
 		auto blca=[&](int x,int y){while(x!=y){if(dp[x]<dp[y])swap(x,y);x=par[x];}return x;};
 		auto inSub=[&](int y,int x){while(y&&y!=x)y=par[y];return y==x;};
@@ -67,9 +66,9 @@ int main(){
 		for(int q=0;q<Q;q++){
 			int op=R(0,4),x=R(1,n),y=R(1,n);ll v=R(-100,100);
 			if(op==0){
-				assert(lca(x,y)==blca(x,y));
+				assert(H.lca(x,y)==blca(x,y));
 			}else if(op==1){
-				updPath(x,y,v);
+				H.updPath(x,y,v);
 				int l=blca(x,y);
 				for(int z=x;z!=l;z=par[z])val[z]+=v;
 				for(int z=y;z!=l;z=par[z])val[z]+=v;
@@ -78,14 +77,14 @@ int main(){
 				int l=blca(x,y);ll s=val[l];
 				for(int z=x;z!=l;z=par[z])s+=val[z];
 				for(int z=y;z!=l;z=par[z])s+=val[z];
-				assert(qryPath(x,y)==s);
+				assert(H.qryPath(x,y)==s);
 			}else if(op==3){
-				updSub(x,v);
+				H.updSub(x,v);
 				for(int z=1;z<=n;z++)if(inSub(z,x))val[z]+=v;
 				if(big)q+=50;
 			}else{
 				ll s=0;for(int z=1;z<=n;z++)if(inSub(z,x))s+=val[z];
-				assert(qrySub(x)==s);
+				assert(H.qrySub(x)==s);
 				if(big)q+=50;
 			}
 			checks++;

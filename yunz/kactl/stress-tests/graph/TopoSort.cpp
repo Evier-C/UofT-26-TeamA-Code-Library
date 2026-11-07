@@ -13,15 +13,15 @@ int main(){
 		bool dag=R(0,1);
 		vector<int> perm(n+1);iota(perm.begin(),perm.end(),0);
 		shuffle(perm.begin()+1,perm.end(),rng);
-		for(int i=1;i<=n;i++)g[i].clear();
+		TP.init(n);
 		vector<pair<int,int>> E;
 		for(int i=0;i<m;i++){
 			int a=R(1,n),b=R(1,n);
 			if(dag){if(a==b)continue;if(a>b)swap(a,b);}
 			E.push_back({perm[a],perm[b]});
-			g[perm[a]].push_back(perm[b]);
+			TP.g[perm[a]].push_back(perm[b]);
 		}
-		bool res=topo(n);
+		bool res=TP.topo(n);
 		// brute: cycle exists? repeatedly remove sources
 		vector<int> indeg(n+1),alive(n+1,1);
 		for(auto[a,b]:E)indeg[b]++;
@@ -33,10 +33,10 @@ int main(){
 		while(!st.empty()){int u=st.back();st.pop_back();removed++;
 			for(int v:adj[u])if(--indeg[v]==0)st.push_back(v);}
 		assert(res==(removed==n));
-		assert(cnt==removed);
+		assert(TP.cnt==removed);
 		if(dag)assert(res);
 		vector<int> pos(n+1,-1);
-		for(int i=1;i<=cnt;i++){assert(pos[ord[i]]==-1);pos[ord[i]]=i;}
+		for(int i=1;i<=TP.cnt;i++){assert(pos[TP.ord[i]]==-1);pos[TP.ord[i]]=i;}
 		for(auto[a,b]:E)if(pos[b]!=-1)assert(pos[a]!=-1&&pos[a]<pos[b]);
 		checks++;
 	}

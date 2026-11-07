@@ -6,6 +6,7 @@ typedef long long ll;
 mt19937 rng(37);
 int R(int a,int b){return rng()%(b-a+1)+a;}
 
+const int N=2e5+5;
 int dfn[N],par[N],dep[N],tim;
 vector<int> G[N];
 void dfs(int u,int f){
@@ -36,7 +37,7 @@ int main(){
 			shuffle(all.begin(),all.end(),rng);
 			for(int i=1;i<=k;i++)h[i]=all[i-1];
 			vector<int> keys(h+1,h+k+1);
-			build(h,k);
+			VT.build(h,k);
 			// brute: S = keys + root + pairwise lca
 			set<int> S(keys.begin(),keys.end());S.insert(1);
 			for(int x:keys)for(int y:keys)S.insert(lca(x,y));
@@ -46,13 +47,13 @@ int main(){
 				exp.insert({y,x});
 			}
 			set<int> vsSet;
-			for(int i=1;i<=vn;i++){assert(!vsSet.count(vs[i]));vsSet.insert(vs[i]);}
+			for(int i=1;i<=VT.vn;i++){assert(!vsSet.count(VT.vs[i]));vsSet.insert(VT.vs[i]);}
 			assert(vsSet==S);
-			for(int i=1;i<=vn;i++)for(int v:vt[vs[i]]){
-				assert(!got.count({vs[i],v}));got.insert({vs[i],v});
+			for(int i=1;i<=VT.vn;i++)for(int v:VT.vt[VT.vs[i]]){
+				assert(!got.count({VT.vs[i],v}));got.insert({VT.vs[i],v});
 			}
 			assert(exp==got);
-			assert(vn<=2*k);
+			assert(VT.vn<=2*k);
 			checks++;
 		}
 	}
