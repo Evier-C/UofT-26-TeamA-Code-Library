@@ -2,11 +2,10 @@
  * Author: Johan Sannemo, Simon Lindholm
  * Date: 2016-12-15
  * License: CC0
- * Description: Finds a minimum vertex cover in a bipartite graph (A, B)
- *  with |A| = n, |B| = m. g should be a list of neighbors of the left
- *  partition.
- *  The size is the same as the size of a maximum matching, and
- *  the complement is a maximum independent set.
+ * Description: 求二分图 (A, B) 的最小点覆盖, $|A| = n$, $|B| = m$.
+ *  $g$ 为左部各点的邻接表.
+ *  覆盖的大小等于最大匹配数, 其补集是最大独立集.
+ * Usage: vi c = cover(g, n, m); // 右部点 j 记为 n + j
  * Status: stress-tested
  */
 #pragma once

@@ -3,7 +3,9 @@
  * Date: 2009-04-08
  * License: CC0
  * Source:
- * Description: Returns the center of mass for a polygon.
+ * Description: 返回多边形的重心 (质心).
+ * Usage:
+ * 	P c = polygonCenter(v);
  * Time: O(n)
  * Status: Tested
  */

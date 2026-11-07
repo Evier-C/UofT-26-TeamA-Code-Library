@@ -3,9 +3,11 @@
  * Date: 2017-05-11
  * License: CC0
  * Source: folklore
- * Description: Computes sums a[i,j] for all i<I, j<J, and increases single elements a[i,j].
- *  Requires that the elements to be updated are known in advance (call fakeUpdate() before init()).
- * Time: $O(\log^2 N)$. (Use persistent segment trees for $O(\log N)$.)
+ * Description: 二维树状数组: 求所有 $i < I, j < J$ 的 a[i,j] 之和, 单点增加 a[i,j].
+ * 要求事先知道所有要修改的位置 (先对它们调用 fakeUpdate(), 再 init()).
+ * Usage: FT2 f(X); f.fakeUpdate(x, y); // 先登记所有修改点
+ * f.init(); f.update(x, y, d); f.query(I, J);
+ * Time: $O(\log^2 N)$. (用可持久化线段树可做到 $O(\log N)$.)
  * Status: stress-tested
  */
 #pragma once

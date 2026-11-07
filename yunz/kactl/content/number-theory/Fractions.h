@@ -1,7 +1,8 @@
 /**
  * Author: Robert Chung
  * Source: None
- * Description: Fractions. Products may overflow, be careful.
+ * Description: 分数类（自动约分）。乘积可能溢出，需注意。
+ * Usage: frac a(1, 2), b(1, 3); frac c = a + b; // 5/6
  * Status: tested on https://open.kattis.com/submissions/19398895
  */
 #pragma once

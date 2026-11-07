@@ -289,7 +289,7 @@
 
 \newboolean{hasusage}
 \newcommand{\defusage}[1]{
-	\def\@defusage{\texttt{#1}}
+	\def\@defusage{\raggedright\texttt{#1}}
 	\setboolean{hasusage}{true}
 }
 \defusage{}
@@ -315,13 +315,17 @@
 \newcommand{\codeheader}[2]{
 	{\par\noindent\footnotesize{\textbf{#1:} #2\par}}
 }
+% Last header line: keep room at the right so it never runs under the hash caption.
+\newcommand{\codeheaderlast}[2]{
+	{\par\noindent\footnotesize{\textbf{#1:} #2\hspace*{6.5em}\par}}
+}
 
 \long\def\@makecaption#1#2{
 	\vspace{-3pt}
-	\ifthenelse{\boolean{hasdescription}}{\codeheader{Description}{\@defdescription}}{}
-	\ifthenelse{\boolean{hasusage}}{\codeheader{Usage}{\@defusage}}{}
-	\ifthenelse{\boolean{hasmemory}}{\codeheader{Memory}{\@defmemory}}{}
-	\ifthenelse{\boolean{hastime}}{\codeheader{Time}{\@deftime}}{}
+	\ifthenelse{\boolean{hasdescription}}{\ifthenelse{\boolean{hasusage} \OR \boolean{hasmemory} \OR \boolean{hastime}}{\codeheader}{\codeheaderlast}{Description}{\@defdescription}}{}
+	\ifthenelse{\boolean{hasusage}}{\ifthenelse{\boolean{hasmemory} \OR \boolean{hastime}}{\codeheader}{\codeheaderlast}{Usage}{\@defusage}}{}
+	\ifthenelse{\boolean{hasmemory}}{\ifthenelse{\boolean{hastime}}{\codeheader}{\codeheaderlast}{Memory}{\@defmemory}}{}
+	\ifthenelse{\boolean{hastime}}{\codeheaderlast{Time}{\@deftime}}{}
 	\ifthenelse{\boolean{hasleftcaption}}{\vspace{0pt}}{\vspace{-5pt}}
 	\tiny
 	\texttt{\@leftcaption} \hfill \@rightcaption

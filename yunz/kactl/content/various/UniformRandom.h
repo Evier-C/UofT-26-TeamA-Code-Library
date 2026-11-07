@@ -4,11 +4,11 @@
  * License: CC0
  * Source: https://codeforces.com/blog/entry/61587
  * Description:
- * High-quality uniform RNG for integers.
- * Usage: urand(a, b) returns an integer in [a, b].
- * Time: 400ms for 1e8 numbers.
+ * 高质量的均匀整数随机数生成器。
+ * Usage: int x = urand(a, b); // [a, b] 内的均匀随机整数
+ * Time: 生成 1e8 个数约 400ms。
  * Status: untested
  */
-// can also use mt19937_64 for 64-bit integers
+// 64 位整数可用 mt19937_64
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 int urand(int a, int b) { return uniform_int_distribution<int>(a, b)(rng); }

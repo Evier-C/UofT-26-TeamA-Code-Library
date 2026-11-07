@@ -3,9 +3,12 @@
  * Date: 2015-03-20
  * License: CC0
  * Source: me
- * Description: Split a monotone function on [from, to) into a minimal set of half-open intervals on which it has the same value.
- *  Runs a callback g for each such interval.
- * Usage: constantIntervals(0, sz(v), [\&](int x){return v[x];}, [\&](int lo, int hi, T val){...});
+ * Description: 将 [from, to) 上的单调函数划分为最少的若干半开区间，使函数在每个区间上取值相同。
+ *  对每个这样的区间调用回调 g。
+ * Usage: auto f = [\&](int x) { return v[x]; };
+ * auto g = [\&](int lo, int hi, T val) { ... };
+ * constantIntervals(0, sz(v), f, g);
+ * // 对每段 [lo, hi) 调用 g, 段内 f 的值均为 val
  * Time: O(k\log\frac{n}{k})
  * Status: tested
  */

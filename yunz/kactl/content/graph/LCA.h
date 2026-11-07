@@ -3,9 +3,9 @@
  * Date: 2020-02-20
  * License: CC0
  * Source: Folklore
- * Description: Data structure for computing lowest common ancestors in a tree
- * (with `rt' as root). C should be an adjacency list of the tree, either directed
- * or undirected.
+ * Description: 求树上最近公共祖先 (LCA) 的数据结构 (以 `rt' 为根).
+ * C 为树的邻接表, 有向或无向均可.
+ * Usage: LCA l(C, rt); int w = l.lca(a, b);
  * Time: $O(N \log N + Q)$
  * Status: stress-tested
  */

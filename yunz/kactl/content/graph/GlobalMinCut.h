@@ -3,7 +3,10 @@
  * Date: 2021-01-09
  * License: CC0
  * Source: https://en.wikipedia.org/wiki/Stoer%E2%80%93Wagner_algorithm
- * Description: Find a global minimum cut in an undirected graph, as represented by an adjacency matrix.
+ * Description: Stoer-Wagner 算法: 求无向图的全局最小割, 图以邻接矩阵给出.
+ * 返回 (割的权值, 割的一侧点集).
+ * Usage: vector<vi> mat(n, vi(n)); // mat[a][b] 为对称的边权
+ * auto [w, side] = globalMinCut(mat); // 割值 w 与一侧点集
  * Time: O(V^3)
  * Status: Stress-tested together with GomoryHu
  */
@@ -17,7 +20,7 @@ pair<int, vi> globalMinCut(vector<vi> mat) {
 	rep(ph,1,n) {
 		vi w = mat[0];
 		size_t s = 0, t = 0;
-		rep(it,0,n-ph) { // O(V^2) -> O(E log V) with prio. queue
+		rep(it,0,n-ph) { // 用优先队列可优化为 O(E log V)
 			w[t] = INT_MIN;
 			s = t, t = max_element(all(w)) - w.begin();
 			rep(i,0,n) w[i] += mat[t][i];

@@ -3,9 +3,10 @@
  * Date: 2017-05-10
  * License: CC0
  * Source: Wikipedia
- * Description: Given $n$ points (x[i], y[i]), computes an n-1-degree polynomial $p$ that
- *  passes through them: $p(x) = a[0]*x^0 + ... + a[n-1]*x^{n-1}$.
- *  For numerical precision, pick $x[k] = c*\cos(k/(n-1)*\pi), k=0 \dots n-1$.
+ * Description: 给定 $n$ 个点 (x[i], y[i]), 求经过它们的 $n-1$ 次多项式 $p$:
+ *  $p(x) = a[0]*x^0 + ... + a[n-1]*x^{n-1}$.
+ *  为保证数值精度, 可取 $x[k] = c*\cos(k/(n-1)*\pi), k=0 \dots n-1$.
+ * Usage: vd a = interpolate(x, y, n); // a[i] 为 x^i 的系数
  * Time: O(n^2)
  */
 #pragma once

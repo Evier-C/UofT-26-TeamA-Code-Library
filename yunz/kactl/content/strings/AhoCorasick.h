@@ -3,24 +3,25 @@
  * Date: 2015-02-18
  * License: CC0
  * Source: marian's (TC) code
- * Description: Aho-Corasick automaton, used for multiple pattern matching.
- * Initialize with AhoCorasick ac(patterns); the automaton start node will be at index 0.
- * find(word) returns for each position the index of the longest word that ends there, or -1 if none.
- * findAll($-$, word) finds all words (up to $N \sqrt N$ many if no duplicate patterns)
- * that start at each position (shortest first).
- * Duplicate patterns are allowed; empty patterns are not.
- * To find the longest words that start at each position, reverse all input.
- * For large alphabets, split each symbol into chunks, with sentinel bits for symbol boundaries.
- * Time: construction takes $O(26N)$, where $N =$ sum of length of patterns.
- * find(x) is $O(N)$, where N = length of x. findAll is $O(NM)$.
+ * Description: AC 自动机 (Aho-Corasick), 用于多模式串匹配. 起始节点下标为 0.
+ * 默认字母表为大写字母, 按需修改 alpha 和 first.
+ * find(word) 对每个位置返回在该处结尾的最长模式串的下标, 没有则为 -1.
+ * findAll($-$, word) 对每个位置找出从该处开始的所有模式串 (短的在前;
+ * 若无重复模式串, 总数至多 $N \sqrt N$).
+ * 允许重复模式串, 不允许空串. 要求从每个位置开始的最长模式串, 就把输入全部反转.
+ * 字母表很大时, 把每个符号拆成若干块, 并用哨兵位标记符号边界.
+ * Usage: AhoCorasick ac(pat); // pat 为 vector<string>
+ * vi r = ac.find(word); vector<vi> res = ac.findAll(pat, word);
+ * Time: 构建 $O(26N)$, 其中 $N =$ 模式串总长. find(x) 为 $O(N)$,
+ * 其中 N = x 的长度. findAll 为 $O(NM)$.
  * Status: stress-tested
  */
 #pragma once
 
 struct AhoCorasick {
-	enum {alpha = 26, first = 'A'}; // change this!
+	enum {alpha = 26, first = 'A'}; // 按需修改!
 	struct Node {
-		// (nmatches is optional)
+		// (nmatches 可选)
 		int back, next[alpha], start = -1, end = -1, nmatches = 0;
 		Node(int v) { memset(next, v, sizeof(next)); }
 	};

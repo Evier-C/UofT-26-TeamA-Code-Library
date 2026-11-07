@@ -3,7 +3,9 @@
  * Date: 2016-09-06
  * License: CC0
  * Source: folklore
- * Description: Calculates determinant of a matrix. Destroys the matrix.
+ * Description: 计算实矩阵的行列式 (列主元高斯消元). 会破坏原矩阵.
+ * Usage: vector<vector<double>> a(n, vector<double>(n));
+ * double d = det(a); // a 会被修改
  * Time: $O(N^3)$
  * Status: somewhat tested
  */

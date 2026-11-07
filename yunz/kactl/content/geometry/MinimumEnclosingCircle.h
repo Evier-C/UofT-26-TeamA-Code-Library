@@ -3,8 +3,10 @@
  * Date: 2019-05-07
  * License: CC0
  * Source: folklore
- * Description: Computes the minimum circle that encloses a set of points.
- * Time: expected O(n)
+ * Description: 求覆盖点集的最小圆.
+ * Usage:
+ * 	auto [o, r] = mec(ps); // 圆心 o, 半径 r
+ * Time: 期望 O(n)
  * Status: stress-tested
  */
 #pragma once

@@ -3,16 +3,18 @@
  * Date: 2019-12-28
  * License: CC0
  * Source: https://github.com/hoke-t/tamu-kactl/blob/master/content/data-structures/MoQueries.h
- * Description: Answer interval or tree path queries by moving from one query to the next by adding/removing points at the ends.
- * If values are on tree edges, change \texttt{step} to add/remove the edge $(a, c)$ and remove the initial \texttt{add} call (but keep \texttt{in}).
+ * Description: 莫队: 回答区间或树上路径询问, 在端点处加入/删除点, 从一个询问移到下一个.
+ * 若值在树边上, 把 \texttt{step} 改为加入/删除边 $(a, c)$, 并去掉开头的 \texttt{add} 调用 (但保留 \texttt{in}).
+ * Usage: vi ans = mo(Q); // Q 为 vector<pii>, 区间 [L, R)
+ * vi ans2 = moTree(P, ed, root); // P[i] = {u, v}, ed 为邻接表
  * Time: O(N \sqrt Q)
  * Status: stress-tested
  */
 #pragma once
 
-void add(int ind, int end) { ... } // add a[ind] (end = 0 or 1)
-void del(int ind, int end) { ... } // remove a[ind]
-int calc() { ... } // compute current answer
+void add(int ind, int end) { ... } // 加 a[ind] (end 为 0/1)
+void del(int ind, int end) { ... } // 删除 a[ind]
+int calc() { ... } // 计算当前答案
 
 vi mo(vector<pii> Q) {
 	int L = 1, R = 1, blk = 350; // ~N/sqrt(Q)
@@ -28,7 +30,7 @@ vi mo(vector<pii> Q) {
         while (R > y) del(--R, 1);
         res[qi] = calc();
     }
-	return res; // Q must use [L, R) (incl-excl) intervals.
+	return res; // Q 用左闭右开区间 [L, R)
 }
 
 vi moTree(vector<array<int, 2>> Q, vector<vi>& ed, int root=0) {
@@ -57,5 +59,5 @@ vi moTree(vector<array<int, 2>> Q, vector<vi>& ed, int root=0) {
 		while (i--) step(I[i]);
 		if (end) res[qi] = calc();
 	}
-	return res; // Q must use [L, R] (incl-incl) intervals.
+	return res; // Q 用闭区间 [L, R]
 }

@@ -3,12 +3,11 @@
  * Date: 2018-02-14
  * License: CC0
  * Source: Chinese material
- * Description: Generates the $k$'th term of an $n$-order
- * linear recurrence $S[i] = \sum_j S[i-j-1]tr[j]$,
- * given $S[0 \ldots \ge n-1]$ and $tr[0 \ldots n-1]$.
- * Faster than matrix multiplication.
- * Useful together with Berlekamp--Massey.
- * Usage: linearRec({0, 1}, {1, 1}, k) // k'th Fibonacci number
+ * Description: 给定 $S[0 \ldots \ge n-1]$ 与 $tr[0 \ldots n-1]$, 求 $n$ 阶
+ * 线性递推 $S[i] = \sum_j S[i-j-1]tr[j]$ 的第 $k$ 项 ($k$ 从 0 开始, 模 \texttt{mod}).
+ * 比矩阵快速幂更快.
+ * 常与 Berlekamp--Massey 配合使用.
+ * Usage: linearRec({0, 1}, {1, 1}, k) // 第 k 个 Fibonacci 数
  * Time: O(n^2 \log k)
  * Status: bruteforce-tested mod 5 for n <= 5
  */

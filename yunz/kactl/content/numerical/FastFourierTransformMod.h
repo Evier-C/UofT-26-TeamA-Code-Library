@@ -3,13 +3,14 @@
  * Date: 2019-04-25
  * License: CC0
  * Source: http://neerc.ifmo.ru/trains/toulouse/2017/fft2.pdf
- * Description: Higher precision FFT, can be used for convolutions modulo arbitrary integers
- * as long as $N\log_2N\cdot \text{mod} < 8.6 \cdot 10^{14}$ (in practice $10^{16}$ or higher).
- * Inputs must be in $[0, \text{mod})$.
- * Time: O(N \log N), where $N = |A|+|B|$ (twice as slow as NTT or FFT)
+ * Description: 更高精度的 FFT, 可用于模任意整数的卷积,
+ * 只要 $N\log_2N\cdot \text{mod} < 8.6 \cdot 10^{14}$ (实际可到 $10^{16}$ 或更高).
+ * 输入须在 $[0, \text{mod})$ 内.
+ * Usage: vl c = convMod<1000000007>(a, b); // a, b 为 vl
+ * Time: O(N \log N), 其中 $N = |A|+|B|$ (比 NTT 或 FFT 慢一倍)
  * Status: stress-tested
- * Details: An in-depth examination of precision for both FFT and FFTMod can be found
- * here (https://github.com/simonlindholm/fft-precision/blob/master/fft-precision.md)
+ * Details: FFT 与 FFTMod 精度的详细分析见
+ * (https://github.com/simonlindholm/fft-precision/blob/master/fft-precision.md)
  */
 #pragma once
 

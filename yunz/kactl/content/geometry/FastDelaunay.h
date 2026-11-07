@@ -3,12 +3,14 @@
  * Date: 2016
  * License: MIT
  * Source: https://github.com/Bathlamos/delaunay-triangulation/
- * Description: Fast Delaunay triangulation.
- * Each circumcircle contains none of the input points.
- * There must be no duplicate points.
- * If all points are on a line, no triangles will be returned.
- * Should work for doubles as well, though there may be precision issues in 'circ'.
- * Returns triangles in order \{t[0][0], t[0][1], t[0][2], t[1][0], \dots\}, all counter-clockwise.
+ * Description: 快速 Delaunay 三角剖分.
+ * 每个三角形的外接圆内都不含任何输入点.
+ * 不能有重复点. 若所有点共线, 不返回任何三角形.
+ * 也可用于 double, 但 circ 中可能有精度问题.
+ * 三角形按 \{t[0][0], t[0][1], t[0][2], t[1][0], \dots\} 的顺序返回, 均为逆时针.
+ * Usage:
+ * 	vector<P> t = triangulate(pts);
+ * 	// 第 i 个三角形为 t[3*i], t[3*i+1], t[3*i+2]
  * Time: O(n \log n)
  * Status: stress-tested
  */
@@ -18,8 +20,8 @@
 
 typedef Point<ll> P;
 typedef struct Quad* Q;
-typedef __int128_t lll; // (can be ll if coords are < 2e4)
-P arb(LLONG_MAX,LLONG_MAX); // not equal to any other point
+typedef __int128_t lll; // 坐标小于 2e4 时可用 ll
+P arb(LLONG_MAX,LLONG_MAX); // 不等于任何其他点
 
 struct Quad {
 	Q rot, o; P p = arb; bool mark;
@@ -29,7 +31,7 @@ struct Quad {
 	Q next() { return r()->prev(); }
 } *H;
 
-bool circ(P p, P a, P b, P c) { // is p in the circumcircle?
+bool circ(P p, P a, P b, P c) { // p 是否在外接圆内
 	lll p2 = p.dist2(), A = a.dist2()-p2,
 	    B = b.dist2()-p2, C = c.dist2()-p2;
 	return p.cross(a,b)*C + p.cross(b,c)*A + p.cross(c,a)*B > 0;

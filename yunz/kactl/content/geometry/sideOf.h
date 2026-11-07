@@ -3,12 +3,12 @@
  * Date: 2009-03-21
  * License: CC0
  * Source:
- * Description: Returns where $p$ is as seen from $s$ towards $e$. 1/0/-1 $\Leftrightarrow$ left/on line/right.
- * If the optional argument $eps$ is given 0 is returned if $p$ is within distance $eps$ from the line.
- * P is supposed to be Point<T> where T is e.g. double or long long.
- * It uses products in intermediate steps so watch out for overflow if using int or long long.
+ * Description: 返回从 $s$ 看向 $e$ 时 $p$ 所在的位置. 1/0/-1 $\Leftrightarrow$ 左侧/在直线上/右侧.
+ * 若给出可选参数 $eps$, 则 $p$ 到直线距离不超过 $eps$ 时返回 0.
+ * P 应为 Point<T>, T 如 double 或 long long.
+ * 中间有乘积, 用 int 或 long long 时注意溢出.
  * Usage:
- * 	bool left = sideOf(p1,p2,q)==1;
+ * 	bool left = sideOf(p1,p2,q)==1; // q 在 p1 到 p2 的左侧
  * Status: tested
  */
 #pragma once

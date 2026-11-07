@@ -2,8 +2,10 @@
  * Author: Simon Lindholm
  * Date: 2015-09-01
  * License: CC0
- * Description: Computes the pair of points at which two circles intersect.
- * Returns false in case of no intersection.
+ * Description: 求两圆的两个交点, 写入 out. 无交点时返回 false.
+ * 两圆同心时要求 r1 != r2 (有 assert).
+ * Usage:
+ * 	pair<P, P> out; bool ok = circleInter(a, b, r1, r2, \&out);
  * Status: stress-tested
  */
 #pragma once

@@ -3,11 +3,14 @@
  * Date: 2019-10-31
  * License: CC0
  * Source: https://vlecomte.github.io/cp-geo.pdf
- * Description: Finds the external tangents of two circles, or internal if r2 is negated.
- * Can return 0, 1, or 2 tangents -- 0 if one circle contains the other (or overlaps it, in the internal case, or if the circles are the same);
- * 1 if the circles are tangent to each other (in which case .first = .second and the tangent line is perpendicular to the line between the centers).
- * .first and .second give the tangency points at circle 1 and 2 respectively.
- * To find the tangents of a circle with a point set r2 to 0.
+ * Description: 求两圆的外公切线; 把 r2 取负则求内公切线.
+ * 可能返回 0, 1 或 2 条切线 -- 0 条: 一圆包含另一圆 (求内公切线时还包括两圆相交), 或两圆相同;
+ * 1 条: 两圆相切 (此时 .first = .second, 切线垂直于两圆心连线).
+ * .first 和 .second 分别是圆 1 和圆 2 上的切点.
+ * 求点到圆的切线时令 r2 = 0.
+ * Usage:
+ * 	vector<pair<P, P>> v = tangents(c1, r1, c2, r2);
+ * 	// 圆 1 上切点 v[i].first, 圆 2 上切点 v[i].second
  * Status: tested
  */
 #pragma once

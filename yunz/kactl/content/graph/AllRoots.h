@@ -1,26 +1,28 @@
 /**
  * Author: Shashank Bhatt
  * License: CC0
- * Description: 0-indexed reroot DP assuming associativity and commutativity of +.
- * operator+ combines children into a single representation.
- * promote() finds a child's contribution to its parent.
+ * Description: 换根 DP (0 起编号), 要求 + 满足结合律和交换律.
+ * operator+ 把多个儿子合并为一个值.
+ * promote() 求一个儿子对父亲的贡献.
+ * Usage: vector<pii> el; // n - 1 条树边 (a, b), 第 i 条边编号 i
+ * vector<ART> res = AllRoots<ART>::calc(el); // 各点为根的答案
  * Time: O(N).
  * Status: Tested on https://cses.fi/problemset/result/16593762/ and https://cses.fi/problemset/result/16593328/.
  */
 #pragma once
 
 struct ART {
-  // default constructor must give identity elmt
-  int ans = 0; // max distance to another node
+  // 默认构造必须是单位元
+  int ans = 0; // 到其他点的最远距离
   ART operator+(const ART& o) const {
     return {max(ans, o.ans)};
   }
   ART promote(int x, int e) const {
     if (e == -1) return *this;
-    return {ans+1}; // x = node idx, e = edge idx
+    return {ans+1}; // x 为点编号 ; e 为边编号
   }
 };
-ART base{}; // value of a single node, not always id
+ART base{}; // 单点的值 , 不一定是单位元
 template<class T>
 struct AllRoots {
   int n; vector<vector<pii>> adj;
@@ -30,7 +32,7 @@ struct AllRoots {
       adj[a].pb({b,ei});
       adj[b].pb({a, ei});
     }
-    for (auto &s : suf) s.pb(base); // initial value of node
+    for (auto &s : suf) s.pb(base); // 点的初始值
   }
   T down(int x, int p = -1) {
     for (auto &c : adj[x])

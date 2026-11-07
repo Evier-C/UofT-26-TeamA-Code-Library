@@ -4,4 +4,74 @@
 % \kactlimport[-l sh]{.bashrc}
 % \kactlimport[-l raw]{.vimrc}
 \kactlimport[-l raw]{hash.sh}
+
+\subsection{Python 速查}
+\begin{lstlisting}[language=Python]
+import sys, math
+from collections import deque, Counter, defaultdict
+from heapq import heappush, heappop, heapify, nsmallest
+from bisect import bisect_left, bisect_right, insort
+from itertools import accumulate, combinations, product
+from functools import lru_cache, cmp_to_key
+from fractions import Fraction
+from decimal import Decimal, getcontext
+input = sys.stdin.readline  # 快速读入, 行尾带换行
+sys.setrecursionlimit(1 << 20)  # 递归深的题优先改成循环
+n, m = map(int, input().split())
+a = list(map(int, input().split()))
+rest = sys.stdin.read().split()  # 一次读入剩下全部
+print(*a)  # 空格分隔输出
+sys.stdout.write("\n".join(map(str, a)) + "\n")
+x = 10 ** 100  # 整数没有上限
+p = 998244353
+y = pow(3, x, p)  # 快速幂取模
+z = pow(3, -1, p)  # 逆元, 需 3.8 以上
+g = math.gcd(12, 18); s = math.isqrt(10 ** 20)
+c = math.comb(50, 25); l = math.lcm(4, 6)  # lcm 需 3.9 以上
+q = -7 // 2  # 向下取整得 -4, 和 C++ 不同, % 也是
+f = Fraction(1, 3) + Fraction(1, 6)  # 精确分数
+getcontext().prec = 50
+d = Decimal(2).sqrt()  # 高精度小数
+h = int("ff", 16); b = bin(10)[2:]; k = (10).bit_length()
+pc = bin(10).count("1"); t = "abc"[::-1]; o = ord("a")
+a.sort(key=lambda v: (-v, v % 3))  # 多关键字排序
+a.sort(key=cmp_to_key(lambda u, v: u - v))  # 自定义比较
+adj = [[] for _ in range(n)]  # 不要写 [[]] * n
+dp = [[0] * m for _ in range(n)]
+pq = [5, 1, 4]; heapify(pq); heappush(pq, 2)
+mn = heappop(pq)  # 小根堆, 大根堆存相反数
+dq = deque([1, 2]); dq.appendleft(0); dq.pop()
+i = bisect_left([1, 3, 5], 3)  # 同 lower_bound
+cnt = Counter("abca"); dd = defaultdict(int)
+pre = list(accumulate([1, 2, 3], initial=0))  # 前缀和
+@lru_cache(maxsize=None)  # 记忆化搜索
+def fib(v): return v if v < 2 else fib(v - 1) + fib(v - 2)
+INF = float("inf")
+# 字符串, 不可修改, 要改先转成 list(s)
+s = "  Hello,World  "
+w = s.strip().split(",")  # 去首尾空白, 按逗号切
+j = "-".join(w); u = s.upper(); lo = s.lower()
+pos = s.find("o"); r = s.replace("l", "L")  # 找不到返回 -1
+ok = "123".isdigit(); bg = s.strip().startswith("He")
+cs = list("abc"); cs[0] = "z"; s2 = "".join(cs)
+fs = f"{3.14159:.3f} {42:05d} {255:x}"  # 格式化输出
+# 列表
+a = [3, 1, 2]; a.append(5); a.insert(0, 9); a.pop()
+a.extend([7, 7]); c7 = a.count(7); i1 = a.index(1)
+b = sorted(a, reverse=True); a.reverse()
+sq = [v * v for v in a if v % 2]  # 列表推导
+mx = max(a, key=lambda v: -v); sm = sum(a)
+for i, v in enumerate(a): pass
+pairs = list(zip([1, 2], "ab")); rv = a[::-1]; sub = a[1:3]
+# 集合 / 字典 / 元组
+st = {1, 2}; st.add(3); st.discard(9); st2 = st | {4}
+inter = st & {2, 3}; diff = st - {1}; has = 2 in st
+d = {"x": 1}; d["y"] = 2; gv = d.get("z", 0)
+for k, v in sorted(d.items(), key=lambda t: -t[1]): pass
+dl = defaultdict(list); dl[1].append(2)
+x1, y1 = (4, 5); x1, y1 = y1, x1  # 解包, 交换
+mc = Counter("aabbbc").most_common(2)  # 出现最多的两个
+small = nsmallest(2, [5, 1, 4]); dq2 = deque([1, 2, 3])
+dq2.rotate(1)  # 循环右移一位
+\end{lstlisting}
 % \kactlimport[-l raw]{troubleshoot.txt}

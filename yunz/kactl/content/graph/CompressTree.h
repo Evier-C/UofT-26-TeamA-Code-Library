@@ -2,11 +2,12 @@
  * Author: Simon Lindholm
  * Date: 2016-01-14
  * License: CC0
- * Description: Given a rooted tree and a subset S of nodes, compute the minimal
- * subtree that contains all the nodes by adding all (at most $|S|-1$)
- * pairwise LCA's and compressing edges.
- * Returns a list of (par, orig\_index) representing a tree rooted at 0.
- * The root points to itself.
+ * Description: 虚树: 给定有根树和点集 S, 加入所有两两的 LCA (至多 $|S|-1$ 个)
+ * 并压缩边, 得到包含 S 中所有点的最小子树.
+ * 返回 (par, orig\_index) 的列表, 表示一棵以 0 为根的树,
+ * 其中 par 是该列表中的下标, 根指向自己.
+ * Usage: LCA lca(C, rt); vpi t = compressTree(lca, S);
+ * // t[i] = (par, orig) , par 为 t 中的下标 , t[0] 为根
  * Time: $O(|S| \log |S|)$
  * Status: Tested at CodeForces
  */

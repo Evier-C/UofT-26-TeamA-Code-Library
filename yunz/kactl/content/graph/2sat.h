@@ -3,18 +3,17 @@
  * Date: 2011-11-29
  * License: CC0
  * Source: folklore
- * Description: Calculates a valid assignment to boolean variables a, b, c,... to a 2-SAT problem,
- * so that an expression of the type $(a||b)\&\&(!a||c)\&\&(d||!b)\&\&...$
- * becomes true, or reports that it is unsatisfiable.
- * Negated variables are represented by bit-inversions (\texttt{\tilde{}x}).
+ * Description: 求解 2-SAT: 给布尔变量 a, b, c, ... 赋值, 使形如
+ * $(a||b)\&\&(!a||c)\&\&(d||!b)\&\&...$ 的表达式为真, 或报告无解.
+ * 取反的变量用按位取反表示 (\texttt{\tilde{}x}).
  * Usage:
- *  TwoSat ts(number of boolean variables);
- *  ts.either(0, \tilde3); // Var 0 is true or var 3 is false
- *  ts.setValue(2); // Var 2 is true
- *  ts.atMostOne({0,\tilde1,2}); // <= 1 of vars 0, \tilde1 and 2 are true
- *  ts.solve(); // Returns true iff it is solvable
- *  ts.values[0..N-1] holds the assigned values to the vars
- * Time: O(N+E), where N is the number of boolean variables, and E is the number of clauses.
+ *  TwoSat ts(n); // n 为布尔变量个数
+ *  ts.either(0, \tilde3); // 变量 0 为真或变量 3 为假
+ *  ts.setValue(2); // 变量 2 为真
+ *  ts.atMostOne({0,\tilde1,2}); // 0 , \tilde1 , 2 中至多一个为真
+ *  ts.solve(); // 有解时返回 true
+ *  ts.values[0..N-1] 为各变量的赋值
+ * Time: O(N+E), 其中 N 为布尔变量个数, E 为子句个数.
  * Status: stress-tested
  */
 #pragma once
@@ -22,11 +21,11 @@
 struct TwoSat {
 	int N;
 	vector<vi> gr;
-	vi values; // 0 = false, 1 = true
+	vi values; // 0 为假 ; 1 为真
 
 	TwoSat(int n = 0) : N(n), gr(2*n) {}
 
-	int addVar() { // (optional)
+	int addVar() { // 可选
 		gr.emplace_back();
 		gr.emplace_back();
 		return N++;
@@ -40,7 +39,7 @@ struct TwoSat {
 	}
 	void setValue(int x) { either(x, x); }
 
-	void atMostOne(const vi& li) { // (optional)
+	void atMostOne(const vi& li) { // 可选
 		if (sz(li) <= 1) return;
 		int cur = ~li[0];
 		rep(i,2,sz(li)) {

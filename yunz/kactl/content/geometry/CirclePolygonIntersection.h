@@ -3,8 +3,9 @@
  * Date: 2019-10-31
  * License: CC0
  * Source: https://github.com/spaghetti-source/algorithm/blob/master/geometry/_geom.cc#L744
- * Description: Returns the area of the intersection of a circle with a
- * ccw polygon.
+ * Description: 求圆与逆时针 (ccw) 多边形的交集面积.
+ * Usage:
+ * 	double a = circlePoly(c, r, ps); // ps 为逆时针多边形
  * Time: O(n)
  * Status: Tested on GNYR 2019 Gerrymandering, stress-tested
  */

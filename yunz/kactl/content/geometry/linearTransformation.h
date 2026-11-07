@@ -5,13 +5,15 @@
  * Source:
  * Description:\\
 \begin{minipage}{75mm}
- Apply the linear transformation (translation, rotation and scaling) which takes line p0-p1 to line q0-q1 to point r.
+ 对点 r 施加把直线 p0-p1 变到直线 q0-q1 的线性变换 (平移, 旋转和缩放).
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-8mm}
 \includegraphics[width=\textwidth]{content/geometry/linearTransformation}
 \vspace{-2mm}
 \end{minipage}
+ * Usage:
+ * 	P r2 = linearTransformation(p0, p1, q0, q1, r);
  * Status: not tested
  */
 #pragma once

@@ -3,8 +3,10 @@
  * Date: 2019-05-05
  * License: Boost Software License
  * Source: https://codeforces.com/blog/entry/48868
- * Description: Returns the two points with max distance on a convex hull (ccw,
- * no duplicate/collinear points).
+ * Description: 返回凸包 (逆时针, 无重复点和共线点) 上距离最远的两点.
+ * Usage:
+ * 	array<P, 2> d = hullDiameter(hull);
+ * 	ll D2 = (d[0]-d[1]).dist2(); // 直径的平方
  * Status: stress-tested, tested on kattis:roberthood
  * Time: O(n)
  */

@@ -3,8 +3,11 @@
  * Date: 2019-04-26
  * License: CC0
  * Source: https://cp-algorithms.com/graph/dinic.html
- * Description: Flow algorithm with complexity $O(VE\log U)$ where $U = \max |\text{cap}|$.
- * $O(\min(E^{1/2}, V^{2/3})E)$ if $U = 1$; $O(\sqrt{V}E)$ for bipartite matching.
+ * Description: 最大流 Dinic 算法 (带容量缩放), 复杂度 $O(VE\log U)$,
+ * 其中 $U = \max |\text{cap}|$. 若 $U = 1$ 为 $O(\min(E^{1/2}, V^{2/3})E)$;
+ * 二分图匹配为 $O(\sqrt{V}E)$.
+ * Usage: Dinic d(n); d.addEdge(a, b, c); // 第 4 个参数是反向容量
+ * ll f = d.calc(s, t); bool L = d.leftOfMinCut(v);
  * Status: Tested on SPOJ FASTFLOW and SPOJ MATCHING, stress-tested
  */
 #pragma once
@@ -13,7 +16,7 @@ struct Dinic {
 	struct Edge {
 		int to, rev;
 		ll c, oc;
-		ll flow() { return max(oc - c, 0LL); } // if you need flows
+		ll flow() { return max(oc - c, 0LL); } // 需要流量时用
 	};
 	vi lvl, ptr, q;
 	vector<vector<Edge>> adj;
@@ -36,7 +39,7 @@ struct Dinic {
 	}
 	ll calc(int s, int t) {
 		ll flow = 0; q[0] = s;
-		rep(L,0,31) do { // 'int L=30' maybe faster for random data
+		rep(L,0,31) do { // 随机数据下 'int L=30' 可能更快
 			lvl = ptr = vi(sz(q));
 			int qi = 0, qe = lvl[s] = 1;
 			while (qi < qe && !lvl[t]) {

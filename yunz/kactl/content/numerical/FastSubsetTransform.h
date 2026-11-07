@@ -3,10 +3,13 @@
  * Date: 2015-06-25
  * License: GNU Free Documentation License 1.2
  * Source: csacademy
- * Description: Transform to a basis with fast convolutions of the form
- * $\displaystyle c[z] = \sum\nolimits_{z = x \oplus y} a[x] \cdot b[y]$,
- * where $\oplus$ is one of AND, OR, XOR. The size of $a$ must be a power of two.
- * Time: O(N \log N)
+ * Description: 变换到一组基, 使得形如
+ * $\displaystyle c[z] = \sum\nolimits_{z = x \oplus y} a[x] \cdot b[y]$ 的卷积可快速计算,
+ * 其中 $\oplus$ 为 AND, OR, XOR 之一 (默认 XOR, 其余换用注释中的行). $a$ 的长度必须是 2 的幂.
+ * point\_add / point\_eval 在变换后的数组上对原数组单点加 / 单点求值.
+ * Usage: vl c = conv(a, b); // a, b 等长, 长度为 2 的幂
+ * FST(a, 0); point_add(a, i, v); ll x = point_eval(a, i);
+ * Time: O(N \log N), 单点操作 O(N)
  * Status: stress-tested
  */
 #pragma once
@@ -29,14 +32,14 @@ vl conv(vl a, vl b) {
     FST(a, 1); return a;
 }
 int psgn(int x) { return __builtin_popcount(x)&1 ? -1 : 1; }
-// a[i] += val (for transformed a)
+// 原数组 a[i] += val, 此处 a 已变换
 void point_add(vl &a, int i, ll val) {
     rep(j,0,sz(a))
         // a[j] += val * ((i|j) == sz(a)-1); // AND /// include-line
         // a[j] += val * ((i&j) == 0); // OR /// include-line
         a[j] += val * psgn(i&j); // XOR
 }
-// return a[i] (for transformed a)
+// 返回原数组 a[i], 此处 a 已变换
 ll point_eval(const vl &a, int i) {
     ll res = 0;
     rep(j,0,sz(a))

@@ -3,7 +3,9 @@
  * Date: 2019-04-17
  * License: CC0
  * Source: https://codeforces.com/blog/entry/58747
- * Description: Finds the closest pair of points.
+ * Description: 求平面最近点对.
+ * Usage:
+ * 	pair<P, P> pq = closest(v); // 要求 sz(v) > 1
  * Time: O(n \log n)
  * Status: stress-tested
  */

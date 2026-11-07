@@ -2,9 +2,11 @@
  * Author: Johan Sannemo
  * Date: 2016-12-15
  * License: CC0
- * Description: pi[x] computes the length of the longest prefix of s that ends at x,
- * other than s[0...x] itself (abacaba -> 0010123).
- * Can be used to find all occurrences of a string.
+ * Description: pi[x] 为 s 的最长前缀中以 x 结尾者的长度, 不算 s[0...x] 本身
+ * (即 s[0...x] 的最长真 border; abacaba 得 0010123).
+ * match 找出 pat 在 s 中的所有出现位置.
+ * Usage: vi p = pi(s);
+ * vi occ = match(s, pat); // 每次出现的起始下标
  * Time: O(n)
  * Status: Tested on kattis:stringmatching
  */

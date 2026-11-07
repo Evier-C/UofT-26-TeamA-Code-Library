@@ -5,14 +5,16 @@
  * Source: https://github.com/stjepang/snippets/blob/master/convex_hull.cpp
  * Description:
 \\\begin{minipage}{75mm}
-Returns a vector of the points of the convex hull in counter-clockwise order.
-Points on the edge of the hull between two other points are not considered part of the hull.
+按逆时针顺序返回凸包上的点.
+位于凸包边上 (在另外两点之间) 的点不算在凸包内.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-6mm}
 \includegraphics[width=\textwidth]{content/geometry/ConvexHull}
 \vspace{-6mm}
 \end{minipage}
+ * Usage:
+ * 	vector<P> hull = convexHull(pts);
  * Time: O(n \log n)
  * Status: stress-tested, tested with kattis:convexhull
 */

@@ -1,8 +1,9 @@
 /**
  * Author: User adamant on CodeForces
  * Source: http://codeforces.com/blog/entry/12143
- * Description: For each position in a string, computes p[0][i] = half length of
- *  longest even palindrome around pos i-1 and i, p[1][i] = longest odd (half rounded down).
+ * Description: 对串的每个位置求: p[0][i] = 以 i-1 和 i 之间为中心的最长偶回文的半长,
+ *  p[1][i] = 以 i 为中心的最长奇回文的半长 (向下取整).
+ * Usage: array<vi, 2> p = manacher(s); // p[0] 长 n+1, p[1] 长 n
  * Time: O(N)
  * Status: Stress-tested
  */

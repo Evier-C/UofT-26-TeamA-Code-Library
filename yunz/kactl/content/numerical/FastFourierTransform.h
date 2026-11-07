@@ -4,18 +4,20 @@
  * License: CC0
  * Source: http://neerc.ifmo.ru/trains/toulouse/2017/fft2.pdf (do read, it's excellent)
    Accuracy bound from http://www.daemonology.net/papers/fft.pdf
- * Description: fft(a) computes $\hat f(k) = \sum_x a[x] \exp(2\pi i \cdot k x / N)$ for all $k$. N must be a power of 2.
-   Useful for convolution:
-   \texttt{conv(a, b) = c}, where $c[x] = \sum a[i]b[x-i]$.
-   For convolution of complex numbers or more than two vectors: FFT, multiply
-   pointwise, divide by n, reverse(start+1, end), FFT back.
-   Rounding is safe if $(\sum a_i^2 + \sum b_i^2)\log_2{N} < 9\cdot10^{14}$
-   (in practice $10^{16}$; higher for random inputs).
-   Otherwise, use NTT/FFTMod.
- * Time: O(N \log N) with $N = |A|+|B|$ ($\tilde 1s$ for $N=2^{22}$)
+ * Description: fft(a) 对所有 $k$ 计算 $\hat f(k) = \sum_x a[x] \exp(2\pi i \cdot k x / N)$. N 必须是 2 的幂.
+   用于卷积:
+   \texttt{conv(a, b) = c}, 其中 $c[x] = \sum a[i]b[x-i]$.
+   对复数或多于两个向量做卷积: 先 FFT, 逐点相乘,
+   除以 n, reverse(start+1, end), 再 FFT 回来.
+   若 $(\sum a_i^2 + \sum b_i^2)\log_2{N} < 9\cdot10^{14}$ 则取整是安全的
+   (实际约 $10^{16}$; 随机输入可更高).
+   否则用 NTT/FFTMod.
+ * Usage: vd c = conv(a, b); // 实数卷积, 长度 sz(a)+sz(b)-1
+ * vector<C> v(n); fft(v); // n 须为 2 的幂
+ * Time: O(N \log N), 其中 $N = |A|+|B|$ ($N=2^{22}$ 时约 $\tilde 1s$)
  * Status: somewhat tested
- * Details: An in-depth examination of precision for both FFT and FFTMod can be found
- * here (https://github.com/simonlindholm/fft-precision/blob/master/fft-precision.md)
+ * Details: FFT 与 FFTMod 精度的详细分析见
+ * (https://github.com/simonlindholm/fft-precision/blob/master/fft-precision.md)
  */
 #pragma once
 
@@ -24,7 +26,7 @@ typedef vector<double> vd;
 void fft(vector<C>& a) {
 	int n = sz(a), L = 31 - __builtin_clz(n);
 	static vector<complex<long double>> R(2, 1);
-	static vector<C> rt(2, 1);  // (^ 10% faster if double)
+	static vector<C> rt(2, 1);  // (^ 用 double 快 10%)
 	for (static int k = 2; k < n; k *= 2) {
 		R.resize(n); rt.resize(n);
 		auto x = polar(1.0L, acos(-1.0L) / k);
@@ -35,7 +37,7 @@ void fft(vector<C>& a) {
 	rep(i,0,n) if (i < rev[i]) swap(a[i], a[rev[i]]);
 	for (int k = 1; k < n; k *= 2)
 		for (int i = 0; i < n; i += 2 * k) rep(j,0,k) {
-			// C z = rt[j+k] * a[i+j+k]; // (25% faster if hand-rolled)  /// include-line
+			// C z = rt[j+k] * a[i+j+k]; // 手写展开快 25%  /// include-line
 			auto x = (double *)&rt[j+k], y = (double *)&a[i+j+k];        /// exclude-line
 			C z(x[0]*y[0] - x[1]*y[1], x[0]*y[1] + x[1]*y[0]);           /// exclude-line
 			a[i + j + k] = a[i + j] - z;

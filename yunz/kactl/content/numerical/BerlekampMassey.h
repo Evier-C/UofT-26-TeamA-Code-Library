@@ -3,12 +3,12 @@
  * Date: 2017-10-31
  * License: CC0
  * Source: Wikipedia
- * Description: Recovers any $n$-order linear recurrence relation from the first
- * $2n$ terms of the recurrence.
- * Useful for guessing linear recurrences after brute-forcing the first terms.
- * Should work on any field, but numerical stability for floats is not guaranteed.
- * Output will have size $\le n$.
- * Usage: berlekampMassey({0, 1, 1, 3, 5, 11}) // {1, 2}
+ * Description: 由数列的前 $2n$ 项恢复出任意 $n$ 阶线性递推关系 (此处在模素数 \texttt{mod} 下计算).
+ * 返回 $C$, 满足 $s[i] = \sum_j C[j] s[i-j-1]$.
+ * 常用于暴力算出前若干项后猜线性递推式.
+ * 理论上适用于任意域, 但用浮点数时不保证数值稳定.
+ * 输出长度 $\le n$.
+ * Usage: berlekampMassey({0, 1, 1, 3, 5, 11}) // 得 {1, 2}
  * Time: O(N^2)
  * Status: bruteforce-tested mod 5 for n <= 5 and all s
  */

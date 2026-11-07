@@ -1,7 +1,8 @@
 /**
  * Author: Johan Sannemo
  * License: CC0
- * Description: Compute indices for the longest increasing subsequence.
+ * Description: 求最长严格上升子序列，返回其各元素的下标。
+ * Usage: vi idx = lis(S); // S 为 vector, 返回递增的下标序列
  * Time: $O(N \log N)$
  * Status: Tested on kattis:longincsubseq, stress-tested
  */
@@ -13,7 +14,7 @@ template<class I> vi lis(const vector<I>& S) {
 	typedef pair<I, int> p;
 	vector<p> res;
 	rep(i,0,sz(S)) {
-		// change 0 -> i for longest non-decreasing subsequence
+		// 求最长不降子序列时把 0 改为 i
 		auto it = lower_bound(all(res), p{S[i], 0});
 		if (it == res.end()) res.emplace_back(), it = res.end()-1;
 		*it = {S[i], i};

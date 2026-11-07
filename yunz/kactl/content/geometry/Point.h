@@ -3,8 +3,10 @@
  * Date: 2009-02-26
  * License: CC0
  * Source: My head with inspiration from tinyKACTL
- * Description: Class to handle points in the plane.
- * 	T can be e.g. double or long long. (Avoid int.)
+ * Description: 平面点类. T 可取 double 或 long long (避免用 int).
+ * Usage:
+ * 	typedef Point<double> P; P a(1, 2), b(3, 4);
+ * 	double d = (b-a).dist(), c = a.cross(b); // 叉积
  * Status: Works fine, used a lot
  */
 #pragma once
@@ -26,12 +28,12 @@ struct Point {
 	T cross(P a, P b) const { return (a-*this).cross(b-*this); }
 	T dist2() const { return x*x + y*y; }
 	double dist() const { return sqrt((double)dist2()); }
-	// angle to x-axis in interval [-pi, pi]
+	// 与 x 轴的夹角 取值 [-pi, pi]
 	double angle() const { return atan2(y, x); }
-	P unit() const { return *this/dist(); } // makes dist()=1
-	P perp() const { return P(-y, x); } // rotates +90 degrees
+	P unit() const { return *this/dist(); } // 长度变为 1
+	P perp() const { return P(-y, x); } // 逆时针转 90 度
 	P normal() const { return perp().unit(); }
-	// returns point rotated 'a' radians ccw around the origin
+	// 绕原点逆时针旋转 a 弧度
 	P rotate(double a) const {
 		return P(x*cos(a)-y*sin(a),x*sin(a)+y*cos(a)); }
 	friend ostream& operator<<(ostream& os, P p) {

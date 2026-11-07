@@ -3,9 +3,10 @@
  * Date: 2019-12-26
  * License: CC0
  * Source: folklore
- * Description: Disjoint-set data structure with undo.
- * If undo is not needed, skip st, time() and rollback().
- * Usage: int t = uf.time(); ...; uf.rollback(t);
+ * Description: 可撤销并查集 (按大小合并, 无路径压缩).
+ * 不需要撤销时可去掉 st, time() 和 rollback().
+ * Usage: RollbackUF uf(n); uf.join(a, b); uf.find(x); uf.size(x);
+ * int t = uf.time(); ...; uf.rollback(t);
  * Time: $O(\log(N))$
  * Status: tested as part of DirectedMST.h
  */

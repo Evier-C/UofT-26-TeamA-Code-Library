@@ -2,14 +2,16 @@
  * Author: Simon Lindholm
  * License: CC0
  * Source: Codeforces
- * Description: Given $a[i] = \min_{lo(i) \le k < hi(i)}(f(i, k))$ where the (minimal)
- * optimal $k$ increases with $i$, computes $a[i]$ for $i = L..R-1$.
+ * Description: 给定 $a[i] = \min_{lo(i) \le k < hi(i)}(f(i, k))$，其中（最小的）
+ * 最优 $k$ 随 $i$ 单调不减，对 $i = L..R-1$ 求出 $a[i]$。
+ * Usage: 按需改写 lo, hi, f, store; DP().solve(L, R);
+ * // 每个 i 求出最优 k 后调用 store(i, k, a[i])
  * Time: O((N + (hi-lo)) \log N)
  * Status: tested on http://codeforces.com/contest/321/problem/E
  */
 #pragma once
 
-struct DP { // Modify at will:
+struct DP { // 按需修改
 	int lo(int ind) { return 0; }
 	int hi(int ind) { return ind; }
 	ll f(int ind, int k) { return dp[ind][k]; }

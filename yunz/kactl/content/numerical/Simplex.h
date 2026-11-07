@@ -2,20 +2,20 @@
  * Author: Stanford
  * Source: Stanford Notebook
  * License: MIT
- * Description: Solves a general linear maximization problem: maximize $c^T x$ subject to $Ax \le b$, $x \ge 0$.
- * Returns -inf if there is no solution, inf if there are arbitrarily good solutions, or the maximum value of $c^T x$ otherwise.
- * The input vector is set to an optimal $x$ (or in the unbounded case, an arbitrary solution fulfilling the constraints).
- * Numerical stability is not guaranteed. For better performance, define variables such that $x = 0$ is viable.
+ * Description: 求解一般线性规划 (最大化): 在 $Ax \le b$, $x \ge 0$ 约束下最大化 $c^T x$.
+ * 无解返回 -inf, 目标可任意大 (无界) 返回 inf, 否则返回 $c^T x$ 的最大值.
+ * 传入的向量 x 会被设为一个最优解 (无界时为任意一个满足约束的解).
+ * 不保证数值稳定. 为提高效率, 应让 $x = 0$ 是可行解.
  * Usage:
  * vvd A = {{1,-1}, {-1,1}, {-1,-2}};
  * vd b = {1,1,-4}, c = {-1,-1}, x;
- * T val = LPSolver(A, b, c).solve(x);
- * Time: O(NM * \#pivots), where a pivot may be e.g. an edge relaxation. O(2^n) in the general case.
+ * T val = LPSolver(A, b, c).solve(x); // x 存最优解
+ * Time: O(NM * \#pivots), 一次 pivot 可类比一次边松弛. 最坏情况 O(2^n).
  * Status: seems to work?
  */
 #pragma once
 
-typedef double T; // long double, Rational, double + mod<P>...
+typedef double T; // 或 long double, Rational, double+mod<P>
 typedef vector<T> vd;
 typedef vector<vd> vvd;
 

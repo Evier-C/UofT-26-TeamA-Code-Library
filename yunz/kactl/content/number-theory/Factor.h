@@ -3,9 +3,10 @@
  * Date: 2020-03-04
  * License: CC0
  * Source: own
- * Description: Pollard-rho randomized factorization algorithm. Returns prime
- * factors of a number, in arbitrary order (e.g. 2299 -> \{11, 19, 11\}).
- * Time: $O(n^{1/4})$, less for numbers with small factors.
+ * Description: Pollard-rho 随机化质因数分解。返回一个数的
+ * 所有质因子，顺序任意（如 2299 -> \{11, 19, 11\}）。
+ * Usage: vector<ull> f = factor(n); // 含重复 , 无序
+ * Time: $O(n^{1/4})$，有小因子时更快。
  * Status: stress-tested
  *
  * Details: This implementation uses the improvement described here

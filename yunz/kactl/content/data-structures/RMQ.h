@@ -3,11 +3,11 @@
  * Date: 2015-02-06
  * License: CC0
  * Source: Folklore
- * Description: Range Minimum Queries on an array. Returns
- * min(V[a], V[a + 1], ... V[b - 1]) in constant time.
+ * Description: 数组区间最小值查询 (ST 表). 常数时间返回
+ * min(V[a], V[a + 1], ... V[b - 1]).
  * Usage:
  *  RMQ rmq(values);
- *  rmq.query(inclusive, exclusive);
+ *  rmq.query(a, b); // [a, b) 的最小值, 需 a < b
  * Time: $O(|V| \log |V| + Q)$
  * Status: stress-tested
  */
@@ -24,7 +24,7 @@ struct RMQ {
 		}
 	}
 	T query(int a, int b) {
-		assert(a < b); // or return inf if a == b
+		assert(a < b); // 或在 a 等于 b 时返回 inf
 		int dep = 31 - __builtin_clz(b - a);
 		return min(jmp[dep][a], jmp[dep][b - (1 << dep)]);
 	}

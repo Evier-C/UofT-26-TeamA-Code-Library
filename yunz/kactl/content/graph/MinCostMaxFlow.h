@@ -3,15 +3,17 @@
  * Date: 2026-01-30
  * Source: https://12tqian.github.io/cp-library/library/graphs/flows/min-cost-max-flow.hpp.html
  *
- * Description: Minimum-cost maximum flow, assumes no negative cycles. 
- 	* It is possible to choose negative edge costs such that the first 
- 	* run of Dijkstra is slow, but this hasn't been an issue in the past. 
- 	* Edge weights $\ge 0$ for every subsequent run. To get flow through 
- 	* original edges, assign ID's during \texttt{ae}.
- * Time: Ignoring first run of Dijkstra, $O(FM\log M)$ 
- 	* if caps are integers and $F$ is max flow. */
+ * Description: 最小费用最大流, 要求无负环. 可以构造负边权使第一次
+ * Dijkstra 很慢, 但实践中没出过问题. 之后每轮 (加势能后) 边权都 $\ge 0$.
+ * 想得到原边上的流量, 在 \texttt{ae} 时记下边的编号.
+ * Usage: MCMF<ll, ll> mf(n); mf.ae(u, v, cap, cost);
+ * auto [fl, co] = mf.calc(s, t); // 最大流 与 最小费用
+ * mf.edges[2 * i].flow // 第 i 次 ae 的边上的流量
+ * Time: 不计第一次 Dijkstra, 若容量为整数且 $F$ 为最大流,
+ * 则为 $O(FM\log M)$.
+ */
 #pragma once
-template <class F, class C> // F = flow type, C = cost type
+template <class F, class C> // F 为流量类型 ; C 为费用类型
 struct MCMF {
     struct Edge { int to; F flow, cap; C cost; };
 

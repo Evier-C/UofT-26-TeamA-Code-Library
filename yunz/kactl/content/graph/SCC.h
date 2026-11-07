@@ -3,13 +3,11 @@
  * Date: 2009-10-28
  * License: CC0
  * Source: Czech graph algorithms book, by Demel. (Tarjan's algorithm)
- * Description: Finds strongly connected components in a
- * directed graph. If vertices $u, v$ belong to the same component,
- * we can reach $u$ from $v$ and vice versa.
- * Usage: scc(graph, [\&](vi\& v) { ... }) visits all components
- * in reverse topological order. comp[i] holds the component
- * index of a node (a component only has edges to components with
- * lower index). ncomps will contain the number of components.
+ * Description: 求有向图的强连通分量. 若 $u, v$ 在同一分量中,
+ * 则 $u$ 可达 $v$ 且 $v$ 可达 $u$.
+ * Usage: scc(graph, [\&](vi\& v) { ... }); // 按逆拓扑序访问各分量
+ * comp[i] 为点 i 所在分量的编号 ; 分量只会连向
+ * 编号更小的分量 . ncomps 为分量个数
  * Time: O(E + V)
  * Status: Bruteforce-tested for N <= 5
  */

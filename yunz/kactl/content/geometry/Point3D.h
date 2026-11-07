@@ -3,9 +3,10 @@
  * Date: 2009-04-14
  * License: CC0
  * Source:
- * Description: Class to handle points in 3D space.
- * 	T can be e.g. double or long long.
+ * Description: 三维空间点类. T 可取 double 或 long long.
  * Usage:
+ * 	typedef Point3D<double> P3; P3 a(1, 0, 0), b(0, 1, 0);
+ * 	P3 n = a.cross(b); double d = a.dot(b), l = n.dist();
  * Status: tested, except for phi and theta
  */
 #pragma once
@@ -29,14 +30,14 @@ template<class T> struct Point3D {
 	}
 	T dist2() const { return x*x + y*y + z*z; }
 	double dist() const { return sqrt((double)dist2()); }
-	//Azimuthal angle (longitude) to x-axis in interval [-pi, pi]
+	// 方位角 即经度 与 x 轴夹角 取值 [-pi, pi]
 	double phi() const { return atan2(y, x); } 
-	//Zenith angle (latitude) to the z-axis in interval [0, pi]
+	// 天顶角 即纬度 与 z 轴夹角 取值 [0, pi]
 	double theta() const { return atan2(sqrt(x*x+y*y),z); }
-	P unit() const { return *this/(T)dist(); } //makes dist()=1
-	//returns unit vector normal to *this and p
+	P unit() const { return *this/(T)dist(); } // 长度变为 1
+	// 与 *this 和 p 都垂直的单位向量
 	P normal(P p) const { return cross(p).unit(); }
-	//returns point rotated 'angle' radians ccw around axis
+	// 绕 axis 逆时针旋转 angle 弧度
 	P rotate(double angle, P axis) const {
 		double s = sin(angle), c = cos(angle); P u = axis.unit();
 		return u*dot(u)*(1-c) + (*this)*c - cross(u)*s;

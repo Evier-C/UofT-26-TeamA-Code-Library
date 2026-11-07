@@ -1,9 +1,10 @@
 /**
  * Author: Simon Lindholm
  * License: CC0
- * Description: Add and remove intervals from a set of disjoint intervals.
- * Will merge the added interval with any overlapping intervals in the set when adding.
- * Intervals are [inclusive, exclusive).
+ * Description: 在一组互不相交的区间中添加或删除区间。
+ * 添加时会与集合中所有重叠的区间合并。区间均为左闭右开 $[L, R)$。
+ * Usage: set<pii> is; auto it = addInterval(is, L, R);
+ * removeInterval(is, L, R); // it 指向合并后的区间
  * Time: O(\log N)
  * Status: stress-tested
  */

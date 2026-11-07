@@ -1,14 +1,13 @@
 /**
- * Description: FHQ treap (split/merge, no rotations). Node 0 is null.
- * Two modes sharing split/merge: an ordered multiset by value, or a sequence
- * by position with lazy reverse and range sum (b below holds [l, r)).
- * Don't mix reverse with value ops.
+ * Description: FHQ treap (split/merge, 无旋转). 节点 0 表示空.
+ * 两种用法共用 split/merge: 按值有序的 multiset, 或按位置的序列
+ * (支持懒标记翻转和区间和, 下面的 b 即 [l, r) 段). 不要把翻转和按值操作混用.
  * Usage: Treap T; T.insert(v); T.erase(v); T.rank(v); T.kth(k);
  * prev(v) = T.kth(T.rank(v) - 1), next(v) = T.kth(T.rank(v + 1));
- * T.rt = T.merge(T.rt, T.nn(v)); // append to sequence
+ * T.rt = T.merge(T.rt, T.nn(v)); // 加到序列末尾
  * int a, b, c; T.split(T.rt, l, a, b); T.split(b, r - l, b, c);
  * T.t[b].rev ^= 1; T.t[b].sum; T.rt = T.merge(T.merge(a, b), c);
- * Time: O(\log N) expected per operation
+ * Time: 每次操作期望 O(\log N)
  */
 #pragma once
 

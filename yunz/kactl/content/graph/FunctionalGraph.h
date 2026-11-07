@@ -3,19 +3,17 @@
  * Date: 2026-03-16
  * License: None
  * Source: https://github.com/programming-team-code/programming_team_code/blob/main/graphs/uncommon/functional_graph_processor.hpp
- * Description: 
+ * Description: 函数图 (每个点 $i$ 恰有一条出边指向 $a[i]$, $0 \le a[i] < n$) 的分解.
+ * cycles[id] 为第 id 个环上的点 (沿出边顺序). root\_of[v] = \{环编号, 环中位置\},
+ * 对应的点 root 是从 $v$ 出发沿出边到达的第一个环上点.
+ * childs 为不在环上的边反向后构成的森林 (childs[$a[v]$] 含 $v$).
+ * Usage: auto [root_of, cycles, childs] = func_graph(a);
+ * auto [cyc_id, cyc_pos] = root_of[v];
+ * int root = cycles[cyc_id][cyc_pos]; bool on_cyc = (v == root);
  * Time: O(N)
  * Status: tested on https://cses.fi/problemset/result/16581553/, https://cses.fi/problemset/result/16581641/
  */
 #pragma once
-//   // 0 <= a[i] < n
-//   auto [root_of, cycles, childs] = func_graph(a);
-//   auto [cyc_id, cyc_pos] = root_of[v];
-//   int root = cycles[cyc_id][cyc_pos];
-//   bool is_on_cycle = (v == root);
-
-//  root = first reachable node on cycle from v
-//  t[v].childs = forest of reversed edges not in cycles
 struct func_graph {
   vector<pii> root_of;
   vector<vi> cycles, childs;

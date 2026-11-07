@@ -1,7 +1,11 @@
 /**
  * Author: David Rydh, Per Austrin
  * Date: 2003-03-16
- * Description:
+ * Description: 实系数多项式, $a[i]$ 为 $x^i$ 的系数. \texttt{p(x)} 用 Horner 法求值;
+ * \texttt{diff()} 原地求导; \texttt{divroot(x0)} 原地除以 $(x - x_0)$ (余数丢弃, $x_0$ 应为根).
+ * Usage: Poly p{{2,-3,1}}; // a[i] 为 x^i 的系数
+ * double y = p(0.5); p.divroot(1); // 除以 (x - 1)
+ * p.diff(); // 原地求导
  */
 #pragma once
 

@@ -2,9 +2,12 @@
  * Author: Johan Sannemo
  * Date: 2017-04-18
  * Source: derived from https://gist.github.com/msg555/4963794 by Mark Gordon
- * Description: Computes all faces of the 3-dimension hull of a point set.
- *  *No four points must be coplanar*, or else random results will be returned.
- *  All faces will point outwards.
+ * Description: 求点集三维凸包的所有面.
+ *  *不能有四点共面*, 否则结果随机.
+ *  所有面都朝外.
+ * Usage:
+ * 	vector<F> fs = hull3d(pts);
+ * 	// 面 f 的顶点下标 f.a, f.b, f.c, 外法向 f.q
  * Time: O(n^2)
  * Status: tested on SPOJ CH3D
  */

@@ -2,8 +2,9 @@
  * Author: Mårten Wiman
  * License: CC0
  * Source: Pisinger 1999, "Linear Time Algorithms for Knapsack Problems with Bounded Weights"
- * Description: Given N non-negative integer weights w and a non-negative target t,
- * computes the maximum S <= t such that S is the sum of some subset of the weights.
+ * Description: 给定 N 个非负整数重量 w 和非负目标 t，
+ * 求最大的 $S \le t$，使 S 是某个重量子集之和。
+ * Usage: int S = knapsack(w, t); // w 为 vi
  * Time: O(N \max(w_i))
  * Status: Tested on kattis:eavesdropperevasion, stress-tested
  */

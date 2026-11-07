@@ -3,11 +3,11 @@
  * Date: 2019-05-10
  * License: GPL3+
  * Source: https://en.wikipedia.org/wiki/MaxCliqueDyn_maximum_clique_algorithm, https://gitlab.com/janezkonc/mcqd/blob/master/mcqd.h
- * Description: Quickly finds a maximum clique of a graph (given as symmetric bitset
- * matrix; self-edges not allowed). Can be used to find a maximum independent
- * set by finding a clique of the complement graph.
- * Time: Runs in about 1s for n=155 and worst case random graphs (p=.90). Runs
- * faster for sparse graphs.
+ * Description: 快速求图的最大团 (图以对称的 bitset 矩阵给出, 不允许自环).
+ * 对补图求最大团即可得到最大独立集.
+ * Usage: vb g(n); // g[i][j] = 1 表示有边 , 需对称
+ * vi c = Maxclique(g).maxClique(); // 最大团的点
+ * Time: 对 n=155 的最坏随机图 (p=.90) 约 1s. 稀疏图上更快.
  * Status: stress-tested
  */
 typedef vector<bitset<200>> vb;

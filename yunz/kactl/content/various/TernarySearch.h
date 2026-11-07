@@ -4,9 +4,9 @@
  * License: CC0
  * Source: own work
  * Description:
- * Find the smallest i in $[a,b]$ that maximizes $f(i)$, assuming that $f(a) < \dots < f(i) \ge \dots \ge f(b)$.
- * To reverse which of the sides allows non-strict inequalities, change the < marked with (A) to <=, and reverse the loop at (B).
- * To minimize $f$, change it to >, also at (B).
+ * 在 $[a,b]$ 中找使 $f(i)$ 最大的最小的 i，前提是 $f(a) < \dots < f(i) \ge \dots \ge f(b)$。
+ * 若要让另一侧允许非严格不等，把 (A) 处的 < 改为 <=，并把 (B) 处的循环反向。
+ * 若要求最小值，把它改为 >，(B) 处同样修改。
  * Usage:
 	int ind = ternSearch(0,n-1,[\&](int i){return a[i];});
  * Time: O(\log(b-a))

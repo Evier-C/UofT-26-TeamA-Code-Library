@@ -1,7 +1,10 @@
 /**
  * Author: Mattias de Zalenski
  * Date: 2002-11-04
- * Description: Magic formula for the volume of a polyhedron. Faces should point outwards.
+ * Description: 求多面体 (有向) 体积的神奇公式. 各面须朝外.
+ * trilist 的元素需有下标成员 a, b, c, 如 3dHull 的 F.
+ * Usage:
+ * 	double vol = signedPolyVolume(pts, hull3d(pts));
  * Status: tested
  */
 #pragma once

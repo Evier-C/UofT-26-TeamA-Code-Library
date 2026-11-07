@@ -1,9 +1,10 @@
 /**
  * Author: Arnav Sastry
  * Date: 2024-10-29
- * Description: Given arrays $a$, $b$ where $b$ is concave,
- *   return the array $c_k = \max_{i+j=k}(a_i + b_j)$ of size equal to $a$.
- *   A zero is implicitly inserted at the start of $b$.
+ * Description: 给定数组 $a$, $b$, 其中 $b$ 是凹的,
+ *   返回数组 $c_k = \max_{i+j=k}(a_i + b_j)$, 长度与 $a$ 相同.
+ *   $b$ 的开头隐式插入一个 0.
+ * Usage: vll c = maxPlusConv(a, b); // b 须为凹数组
  * Source: http://serjudging.vanb.org/?p=2081
  * Time: O(N \log N)
  * Status: Tested on https://codeforces.com/problemset/problem/808/E, https://open.kattis.com/problems/balatro/

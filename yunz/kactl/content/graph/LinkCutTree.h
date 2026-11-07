@@ -2,22 +2,23 @@
  * Author: Simon Lindholm
  * Date: 2016-07-25
  * Source: https://github.com/ngthanhtrung23/ACM_Notebook_new/blob/master/DataStructure/LinkCutTree.h
- * Description: Represents a forest of unrooted trees. You can add and remove
- * edges (as long as the result is still a forest), and check whether
- * two nodes are in the same tree.
- * Time: All operations take amortized O(\log N).
+ * Description: 维护无根树构成的森林. 可以加边和删边 (要求结果仍是森林),
+ * 并查询两点是否在同一棵树中.
+ * Usage: LinkCut lc(N); lc.link(u, v); lc.cut(u, v);
+ * bool b = lc.connected(u, v);
+ * Time: 所有操作均摊 O(\log N).
  * Status: Stress-tested a bit for N <= 20
  */
 #pragma once
 
-struct Node { // Splay tree. Root's pp contains tree's parent.
+struct Node { // Splay 树 . 根的 pp 存原树中的父亲
 	Node *p = 0, *pp = 0, *c[2];
 	bool flip = 0;
 	Node() { c[0] = c[1] = 0; fix(); }
 	void fix() {
 		if (c[0]) c[0]->p = this;
 		if (c[1]) c[1]->p = this;
-		// (+ update sum of subtree elements etc. if wanted)
+		// 需要时在此更新子树和等信息
 	}
 	void pushFlip() {
 		if (!flip) return;
@@ -40,7 +41,7 @@ struct Node { // Splay tree. Root's pp contains tree's parent.
 		if (p) p->fix();
 		swap(pp, y->pp);
 	}
-	void splay() { /// Splay this up to the root. Always finishes without flip set.
+	void splay() { /// 把自己 splay 到根 , 结束时 flip 为 0
 		for (pushFlip(); p; ) {
 			if (p->p) p->p->pushFlip();
 			p->pushFlip(); pushFlip();
@@ -49,7 +50,7 @@ struct Node { // Splay tree. Root's pp contains tree's parent.
 			else p->p->rot(c2, c1 != c2);
 		}
 	}
-	Node* first() { /// Return the min element of the subtree rooted at this, splayed to the top.
+	Node* first() { /// 返回子树最小元素 , 并把它 splay 到顶
 		pushFlip();
 		return c[0] ? c[0]->first() : (splay(), this);
 	}
@@ -59,12 +60,12 @@ struct LinkCut {
 	vector<Node> node;
 	LinkCut(int N) : node(N) {}
 
-	void link(int u, int v) { // add an edge (u, v)
+	void link(int u, int v) { // 加边 (u, v)
 		assert(!connected(u, v));
 		makeRoot(&node[u]);
 		node[u].pp = &node[v];
 	}
-	void cut(int u, int v) { // remove an edge (u, v)
+	void cut(int u, int v) { // 删边 (u, v)
 		Node *x = &node[u], *top = &node[v];
 		makeRoot(top); x->splay();
 		assert(top == (x->pp ?: x->c[0]));
@@ -74,11 +75,11 @@ struct LinkCut {
 			x->fix();
 		}
 	}
-	bool connected(int u, int v) { // are u, v in the same tree?
+	bool connected(int u, int v) { // u , v 是否在同一棵树
 		Node* nu = access(&node[u])->first();
 		return nu == access(&node[v])->first();
 	}
-	void makeRoot(Node* u) { /// Move u to root of represented tree.
+	void makeRoot(Node* u) { /// 把 u 变为所在原树的根
 		access(u);
 		u->splay();
 		if(u->c[0]) {
@@ -89,7 +90,7 @@ struct LinkCut {
 			u->fix();
 		}
 	}
-	Node* access(Node* u) { /// Move u to root aux tree. Return the root of the root aux tree.
+	Node* access(Node* u) { /// 把 u 移到根辅助树 , 返回其根
 		u->splay();
 		while (Node* pp = u->pp) {
 			pp->splay(); u->pp = 0;

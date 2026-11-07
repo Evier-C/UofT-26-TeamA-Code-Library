@@ -3,7 +3,7 @@
  * Date: 2009-08-15
  * License: CC0
  * Source: https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
- * Description: $x=\textrm{tridiagonal}(d,p,q,b)$ solves the equation system
+ * Description: $x=\textrm{tridiagonal}(d,p,q,b)$ 求解方程组
 \[
 \left(\begin{array}{c}b_0\\b_1\\b_2\\b_3\\\vdots\\b_{n-1}\end{array}\right) =
 \left(\begin{array}{cccccc}
@@ -17,17 +17,18 @@ q_0 & d_1 & p_1 & 0 & \cdots & 0\\
 \left(\begin{array}{c}x_0\\x_1\\x_2\\x_3\\\vdots\\x_{n-1}\end{array}\right).
 \]
 
-This is useful for solving problems on the type
+可用于求解如下形式的问题
 \[ a_i=b_ia_{i-1}+c_ia_{i+1}+d_i,\,1\leq i\leq n, \]
-where $a_0$, $a_{n+1}$, $b_i$, $c_i$ and $d_i$ are known. $a$ can then be obtained from
+其中 $a_0$, $a_{n+1}$, $b_i$, $c_i$ 与 $d_i$ 已知. 则 $a$ 可由下式求得
 \begin{align*}
 \{a_i\}=\textrm{tridiagonal}(&\{1,-1,-1,...,-1,1\}, \{0,c_1,c_2,\dots,c_n\},\\
 &\{b_1,b_2,\dots,b_n,0\}, \{a_0,d_1,d_2,\dots,d_n,a_{n+1}\}).
 \end{align*}
-Fails if the solution is not unique.
+解不唯一时会失败.
 
-If $|d_i| > |p_i| + |q_{i-1}|$ for all $i$, or $|d_i| > |p_{i-1}| + |q_i|$, or the matrix is positive definite,
-the algorithm is numerically stable and neither \texttt{tr} nor the check for \texttt{diag[i] == 0} is needed.
+若对所有 $i$ 有 $|d_i| > |p_i| + |q_{i-1}|$, 或 $|d_i| > |p_{i-1}| + |q_i|$, 或矩阵正定,
+则算法数值稳定, 不需要 \texttt{tr} 以及对 \texttt{diag[i] == 0} 的检查.
+ * Usage: vector<T> x = tridiagonal(d, p, q, b); // 记号同上
  * Time: O(N)
  * Status: Brute-force tested mod 5 and 7 and stress-tested for real matrices obeying the criteria above.
  */

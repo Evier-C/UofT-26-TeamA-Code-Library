@@ -3,8 +3,9 @@
  * Date: 2015-02-11
  * License: CC0
  * Source: Wikipedia
- * Description: Fast integration using an adaptive Simpson's rule.
+ * Description: 用自适应 Simpson 法快速计算数值积分.
  * Usage:
+	// 三重积分求单位球体积
 	double sphereVolume = quad(-1, 1, [](double x) {
 	return quad(-1, 1, [\&](double y) {
 	return quad(-1, 1, [\&](double z) {

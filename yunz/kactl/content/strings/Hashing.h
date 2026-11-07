@@ -3,16 +3,17 @@
  * Date: 2015-03-15
  * License: CC0
  * Source: own work
- * Description: Self-explanatory methods for string hashing.
+ * Description: 字符串哈希, 各函数用途见名知意.
+ * Usage: HashInterval hi(s); H h = hi.hashInterval(a, b); // [a, b)
+ * vector<H> hs = getHashes(s, len); H g = hashString(s);
  * Status: stress-tested
  */
 #pragma once
 
-// Arithmetic mod 2^64-1. 2x slower than mod 2^64 and more
-// code, but works on evil test data (e.g. Thue-Morse, where
-// ABBA... and BAAB... of length 2^10 hash the same mod 2^64).
-// "typedef ull H;" instead if you think test data is random,
-// or work mod 10^9+7 if the Birthday paradox is not a problem.
+// 模 2^64-1 运算. 比模 2^64 慢 2 倍, 代码也更长, 但能防恶意
+// 数据, 如 Thue-Morse 串, 长 2^10 的 ABBA... 和 BAAB...
+// 模 2^64 哈希相同. 数据随机时可改用 typedef ull H;
+// 不担心生日悖论时也可模 10^9+7.
 typedef uint64_t ull;
 struct H {
 	ull x; H(ull x=0) : x(x) {}
@@ -24,7 +25,7 @@ struct H {
 	bool operator==(H o) const { return get() == o.get(); }
 	bool operator<(H o) const { return get() < o.get(); }
 };
-static const H C = (ll)1e11+3; // (order ~ 3e9; random also ok)
+static const H C = (ll)1e11+3; // 阶约 3e9; 随机也可
 
 struct HashInterval {
 	vector<H> ha, pw;
@@ -34,7 +35,7 @@ struct HashInterval {
 			ha[i+1] = ha[i] * C + str[i],
 			pw[i+1] = pw[i] * C;
 	}
-	H hashInterval(int a, int b) { // hash [a, b)
+	H hashInterval(int a, int b) { // [a, b) 的哈希
 		return ha[b] - ha[a] * pw[b - a];
 	}
 };

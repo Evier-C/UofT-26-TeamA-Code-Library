@@ -3,8 +3,10 @@
  * Date: 2026-03-16
  * License: Unknown
  * Source: https://cp-algorithms.com/string/suffix-automaton.html
- * Description: Suffix automaton. Node 0 is always the start node,
- * but the nodes are not necessarily in topological order.
+ * Description: 后缀自动机. 节点 0 总是起始节点, 但节点不一定按拓扑序排列.
+ * 每个状态有 len (最长串长度), link (后缀链接), next (转移).
+ * Usage: SAM sam; for (char c : s) sam.extend(c);
+ * sam.q[v].len; sam.q[v].link; sam.q[v].next[c];
  * Time: O(n \log \Sigma)
  * Status: untested
  */

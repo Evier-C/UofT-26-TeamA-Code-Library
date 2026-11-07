@@ -3,8 +3,10 @@
  * Date: 2019-04-24
  * License: CC0
  * Source: https://github.com/RamchandraApte/OmniTemplate/blob/master/src/number_theory/modulo.hpp
- * Description: Calculate $a\cdot b\bmod c$ (or $a^b \bmod c$) for $0 \le a, b \le c \le 7.2\cdot 10^{18}$.
- * Time: O(1) for \texttt{modmul}, O(\log b) for \texttt{modpow}
+ * Description: 计算 $a\cdot b\bmod c$（或 $a^b \bmod c$），要求 $0 \le a, b \le c \le 7.2\cdot 10^{18}$。
+ * Usage: ull x = modmul(a, b, M); // a*b mod M
+ * ull y = modpow(b, e, M); // b 的 e 次方 mod M
+ * Time: \texttt{modmul} 为 O(1)，\texttt{modpow} 为 O(\log b)
  * Status: stress-tested, proven correct
  * Details:
  * This runs ~2x faster than the naive (__int128_t)a * b % M.

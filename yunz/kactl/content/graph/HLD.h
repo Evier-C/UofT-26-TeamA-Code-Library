@@ -3,11 +3,11 @@
  * Date: 2020-01-12
  * License: CC0
  * Source: https://codeforces.com/blog/entry/53170, https://github.com/bqi343/USACO/blob/master/Implementations/content/graphs%20(12)/Trees%20(10)/HLD%20(10.3).h
- * Description: Decomposes a tree into vertex disjoint heavy paths and light
- * edges such that the path from any leaf to the root contains at most log(n)
- * light edges. Takes as input the adjacency list (comment out (*) in dfsSz if no parent edges),
- * a list of initial values $v$, and the root. VALS\_EDGES being true means
- * that values are stored in the edges, as opposed to the nodes.
+ * Description: 树链剖分: 把树分解为点不相交的重链和轻边, 使任意叶子到根的路径上
+ * 至多有 log(n) 条轻边. 输入邻接表 (若邻接表中没有指向父亲的边, 注释掉 dfsSz
+ * 中的 (*) 行), 初值数组 $v$ 和根. VALS\_EDGES 为真表示值存在边上而不是点上.
+ * Usage: HLD<false> h(adj, vals, root); h.modifyPath(u, v, val);
+ * T x = h.queryPath(u, v), y = h.querySubtree(v);
  * Time: O((\log N)^2)
  * Status: tested on https://cses.fi/problemset/result/16580118/
 */
@@ -24,7 +24,7 @@ template <bool VALS_EDGES> struct HLD {
         : N(sz(adj)), adj(adj), par(N, -1), siz(N, 1),
           rt(N,root),pos(N),tail(N,-1),tree(N) {
         dfsSz(root); dfsHld(root);
-        rep(i,root,sz(v)) tree.set(pos[i], v[i]); // init vals
+        rep(i,root,sz(v)) tree.set(pos[i], v[i]); // 初始化值
     }
 	void dfsSz(int v) {
 		for (int& u : adj[v]) {
@@ -52,21 +52,21 @@ template <bool VALS_EDGES> struct HLD {
 		}
 		op(pos[u] + VALS_EDGES, pos[v] + 1);
 	}
-    T get(int u) { // point set is similar
+    T get(int u) { // 单点修改类似
         return tree.get(pos[u]);
     }
 	void modifyPath(int u, int v, U val) {
 		process(u, v, [&](int l, int r) { tree.update(l, r, val); });
 	}
-	// T query_chain(int v) { return tree.query(pos[rt[v]], pos[tail[v]]+1); }
-    T queryPath(int u, int v) { // Modify depending on problem
-        T res = idT; // unit
-        process(u, v, [&](int l, int r) { // res = op(res, query)
+	// 查整条链用 tree.query(pos[rt[v]], pos[tail[v]] + 1)
+    T queryPath(int u, int v) { // 按题意修改
+        T res = idT; // 单位元
+        process(u, v, [&](int l, int r) { // 合并区间答案
                 res = f(res, tree.query(l, r));
         });
         return res;
     }
-    T querySubtree(int v) { // modifySubtree is similar
+    T querySubtree(int v) { // modifySubtree 类似
         return tree.query(pos[v] + VALS_EDGES, pos[v] + siz[v]);
     }
 };

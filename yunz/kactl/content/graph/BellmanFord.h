@@ -3,9 +3,11 @@
  * Date: 2015-02-23
  * License: CC0
  * Source: http://en.wikipedia.org/wiki/Bellman-Ford_algorithm
- * Description: Calculates shortest paths from $s$ in a graph that might have negative edge weights.
- * Unreachable nodes get dist = inf; nodes reachable through negative-weight cycles get dist = -inf.
- * Assumes $V^2 \max |w_i| < \tilde{} 2^{63}$.
+ * Description: 求从 $s$ 出发的单源最短路, 允许负边权.
+ * 不可达的点 dist = inf; 能经过负环到达的点 dist = -inf.
+ * 要求 $V^2 \max |w_i| < \tilde{} 2^{63}$.
+ * Usage: vector<Node> nodes(n); vector<Ed> eds{{a, b, w}};
+ * bellmanFord(nodes, eds, s); // nodes[v].dist, nodes[v].prev
  * Time: O(VE)
  * Status: Tested on kattis:shortestpath3
  */
@@ -19,7 +21,7 @@ void bellmanFord(vector<Node>& nodes, vector<Ed>& eds, int s) {
 	nodes[s].dist = 0;
 	sort(all(eds), [](Ed a, Ed b) { return a.s() < b.s(); });
 
-	int lim = sz(nodes) / 2 + 2; // /3+100 with shuffled vertices
+	int lim = sz(nodes) / 2 + 2; // 顶点随机打乱时可用 /3+100
 	rep(i,0,lim) for (Ed ed : eds) {
 		Node cur = nodes[ed.a], &dest = nodes[ed.b];
 		if (abs(cur.dist) == inf) continue;

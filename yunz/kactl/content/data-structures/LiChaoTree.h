@@ -1,12 +1,11 @@
 /**
- * Description: Li Chao tree on integer x in [lo, hi). Nodes are created on
- * demand, so any range works without compression. add inserts a line, or a
- * segment that only exists on [a, b). query returns the max at x, or LLONG\_MIN
- * if nothing covers x. For min, add $(-k, -m)$ and negate the answer.
- * Needs $|kx + m| < 9 \cdot 10^{18}$ and $C = hi - lo < 9 \cdot 10^{18}$.
+ * Description: 李超树, 整数 x 取值于 [lo, hi). 节点动态开点, 任意范围都无需离散化.
+ * add 插入一条直线 $kx + m$, 或只在 [a, b) 上存在的线段. query 返回 x 处的最大值,
+ * 若没有线段覆盖 x 则返回 LLONG\_MIN. 求最小值: 加入 $(-k, -m)$ 并对答案取负.
+ * 要求 $|kx + m| < 9 \cdot 10^{18}$ 且 $C = hi - lo < 9 \cdot 10^{18}$.
  * Usage: LiChao lc(-1e9, 1e9 + 1);
  * lc.add({k, m}); lc.add({k, m}, a, b); lc.query(x);
- * Time: O(\log C) per line or query, O(\log^2 C) per segment
+ * Time: 每条直线或每次查询 O(\log C), 每条线段 O(\log^2 C)
  */
 #pragma once
 

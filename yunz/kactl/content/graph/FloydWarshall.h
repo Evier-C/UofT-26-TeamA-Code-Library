@@ -3,10 +3,12 @@
  * Date: 2016-12-15
  * License: CC0
  * Source: http://en.wikipedia.org/wiki/Floyd–Warshall_algorithm
- * Description: Calculates all-pairs shortest path in a directed graph that might have negative edge weights.
- * Input is an distance matrix $m$, where $m[i][j] = \texttt{inf}$ if $i$ and $j$ are not adjacent.
- * As output, $m[i][j]$ is set to the shortest distance between $i$ and $j$, \texttt{inf} if no path,
- * or \texttt{-inf} if the path goes through a negative-weight cycle.
+ * Description: 有向图全源最短路, 允许负边权.
+ * 输入距离矩阵 $m$, 若 $i$ 与 $j$ 不相邻则 $m[i][j] = \texttt{inf}$.
+ * 结束后 $m[i][j]$ 为 $i$ 到 $j$ 的最短距离, 无路径时为 \texttt{inf},
+ * 路径经过负环时为 \texttt{-inf}.
+ * Usage: vector<vector<ll>> m(n, vector<ll>(n, inf));
+ * m[a][b] = min(m[a][b], w); floydWarshall(m);
  * Time: O(N^3)
  * Status: slightly tested
  */

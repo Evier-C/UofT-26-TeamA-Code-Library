@@ -1,11 +1,11 @@
 /**
- * Description: Point update, range query on [0, n). upd returns a new root;
- * old roots stay valid. Root 0 is the empty tree. Change T, f, unit as needed.
- * kth needs f = + and version i holding the counts of a[0..i).
+ * Description: 可持久化线段树, 下标 [0, n), 单点修改, 区间查询. upd 返回新根,
+ * 旧根仍然有效. 根 0 为空树. 按需修改 T, f, unit.
+ * kth 要求 f 为加法, 且版本 i 存的是 a[0..i) 中各值的出现次数.
  * Usage: PST t(n); vi rt = {0};
  * rt.push_back(t.upd(rt.back(), p, v)); // a[p] = f(a[p], v)
- * t.query(rt[i], l, r); // f over [l, r) in version i
- * t.kth(rt[l], rt[r], k); // k-th (0-indexed) smallest value in a[l..r)
+ * t.query(rt[i], l, r); // 版本 i 中 [l, r) 的 f 值
+ * t.kth(rt[l], rt[r], k); // a[l..r) 第 k 小, k 从 0 起
  * Time: O(\log N)
  */
 #pragma once

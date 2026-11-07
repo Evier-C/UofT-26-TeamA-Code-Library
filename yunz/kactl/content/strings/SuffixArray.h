@@ -4,14 +4,13 @@
  * License: Unknown
  * Source: Suffix array - a powerful tool for dealing with strings
  * (Chinese IOI National team training paper, 2009)
- * Description: Builds suffix array for a string.
- * \texttt{sa[i]} is the starting index of the suffix which
- * is $i$'th in the sorted suffix array.
- * The returned vector is of size $n+1$, and \texttt{sa[0] = n}.
- * The \texttt{lcp} array contains longest common prefixes for
- * neighbouring strings in the suffix array:
+ * Description: 构建字符串的后缀数组.
+ * \texttt{sa[i]} 是排序后第 $i$ 个后缀的起始下标.
+ * 返回的数组长 $n+1$, 且 \texttt{sa[0] = n}.
+ * \texttt{lcp} 数组存后缀数组中相邻后缀的最长公共前缀:
  * \texttt{lcp[i] = lcp(sa[i], sa[i-1])}, \texttt{lcp[0] = 0}.
- * The input string must not contain any nul chars.
+ * 输入串不能含字符 0.
+ * Usage: SuffixArray S(s); S.sa[i]; S.lcp[i];
  * Time: O(n \log n)
  * Status: stress-tested
  */
@@ -19,7 +18,7 @@
 
 struct SuffixArray {
 	vi sa, lcp;
-	SuffixArray(string s, int lim=256) { // or vector<int>
+	SuffixArray(string s, int lim=256) { // 或 vector<int>
 		s.push_back(0); int n = sz(s), k = 0, a, b;
 		vi x(all(s)), y(n), ws(max(n, lim));
 		sa = lcp = y, iota(all(sa), 0);

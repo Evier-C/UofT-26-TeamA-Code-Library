@@ -1,8 +1,8 @@
 /**
  * Author: chilli
  * License: CC0
- * Description: z[i] computes the length of the longest common prefix of s[i:] and s,
- * except z[0] = 0. (abacaba -> 0010301)
+ * Description: z[i] 为 s[i:] 与 s 的最长公共前缀长度, 但 z[0] = 0. (abacaba 得 0010301)
+ * Usage: vi z = Z(s);
  * Time: O(n)
  * Status: stress-tested
  */

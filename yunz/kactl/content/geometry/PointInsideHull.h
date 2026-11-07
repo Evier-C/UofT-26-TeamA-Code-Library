@@ -3,10 +3,10 @@
  * Date: 2019-05-17
  * License: CC0
  * Source: https://github.com/ngthanhtrung23/ACM_Notebook_new
- * Description: Determine whether a point t lies inside a convex hull (CCW
- * order, with no collinear points). Returns true if point lies within
- * the hull. If strict is true, points on the boundary aren't included.
+ * Description: 判断点 p 是否在凸包 (逆时针, 无共线点) 内, 在内则返回 true.
+ * strict 为 true 时边界上的点不算在内.
  * Usage:
+ * 	bool in = inHull(hull, p, false); // 含边界
  * Status: stress-tested
  * Time: O(\log N)
  */

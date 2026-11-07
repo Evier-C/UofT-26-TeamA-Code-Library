@@ -3,8 +3,10 @@
  * Date: 2016-08-27
  * License: CC0
  * Source: own work
- * Description: Solves $Ax = b$ over $\mathbb F_2$. If there are multiple solutions, one is returned arbitrarily.
- *  Returns rank, or -1 if no solutions. Destroys $A$ and $b$.
+ * Description: 在 $\mathbb F_2$ 上求解 $Ax = b$, $m$ 为未知数个数. 若有多解, 任意返回一个.
+ *  返回秩, 无解返回 -1. 会破坏 $A$ 与 $b$.
+ * Usage: vector<bs> A(n); vi b(n); bs x;
+ * int r = solveLinear(A, b, x, m); // m 为未知数个数
  * Time: O(n^2 m)
  * Status: bruteforce-tested for n, m <= 4
  */
@@ -42,5 +44,5 @@ int solveLinear(vector<bs>& A, vi& b, bs& x, int m) {
 		x[col[i]] = 1;
 		rep(j,0,i) b[j] ^= A[j][i];
 	}
-	return rank; // (multiple solutions if rank < m)
+	return rank; // rank < m 时有多解
 }

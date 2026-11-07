@@ -3,7 +3,9 @@
  * Date: 2016-07-24
  * License: CC0
  * Source: Russian page
- * Description: Pre-computation of modular inverses. Assumes LIM $\le$ mod and that mod is a prime.
+ * Description: 预处理模逆元。要求 LIM $\le$ mod 且 mod 为质数。
+ * Usage: // 下面的代码需放在 main 等函数内
+ * inv[i]; // 1 到 LIM-1 中 i 模 mod 的逆元
  * Status: Works
  */
 #pragma once

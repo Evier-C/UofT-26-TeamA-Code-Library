@@ -5,7 +5,7 @@
  * Source:
  * Description:\\
 \begin{minipage}{75mm}
- Returns a vector with the vertices of a polygon with everything to the left of the line going from s to e cut away.
+ 用从 s 到 e 的直线切割多边形, 切掉直线左侧的部分, 返回剩余多边形的顶点.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-6mm}
@@ -14,7 +14,7 @@
 \end{minipage}
  * Usage:
  * 	vector<P> p = ...;
- * 	p = polygonCut(p, P(0,0), P(1,0));
+ * 	p = polygonCut(p, P(0,0), P(1,0)); // 切掉 x 轴上方
  * Status: tested but not extensively
  */
 #pragma once

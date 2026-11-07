@@ -3,8 +3,10 @@
  * Date: 2016-12-09
  * License: CC0
  * Source: http://www.mimuw.edu.pl/~mucha/pub/mucha_sankowski_focs04.pdf
- * Description: Matching for general graphs.
- * Fails with probability $N / mod$.
+ * Description: 一般图最大匹配 (随机化, 基于 Tutte 矩阵求逆).
+ * 失败概率为 $N / mod$.
+ * Usage: vector<pii> ed{{a, b}}; // 点编号 0..N-1 的无向边
+ * vector<pii> m = generalMatching(N, ed); // 匹配边
  * Time: O(N^3)
  * Status: not very well tested
  */

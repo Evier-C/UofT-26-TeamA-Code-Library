@@ -2,9 +2,10 @@
  * Author: Unknown
  * Date: 2002-09-15
  * Source: predates tinyKACTL
- * Description: Finds two integers $x$ and $y$, such that $ax+by=\gcd(a,b)$. If
- * you just need gcd, use the built in \texttt{\_\_gcd} instead.
- * If $a$ and $b$ are coprime, then $x$ is the inverse of $a \pmod{b}$.
+ * Description: 求两个整数 $x$ 和 $y$，使 $ax+by=\gcd(a,b)$。若
+ * 只需要 gcd，请直接用内置的 \texttt{\_\_gcd}。
+ * 若 $a$ 与 $b$ 互质，则 $x$ 是 $a$ 的逆元 $\pmod{b}$。
+ * Usage: ll x, y, g = euclid(a, b, x, y); // g = gcd(a, b)
  */
 #pragma once
 

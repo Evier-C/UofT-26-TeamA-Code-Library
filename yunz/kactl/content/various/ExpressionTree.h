@@ -2,34 +2,34 @@
  * Author: Robert Chung
  * License: CC0
  * Source: CP-algorithms
- * Description: Creates an expression tree for left-associative operations.
- * Change N and prec() as needed.
- * Usage: Val *root = parseExpression(s); // tree dp...
+ * Description: 为左结合运算构建表达式树。
+ * 按需修改 N 与 prec()。
+ * Usage: Val *root = parseExpression(s); // 之后在树上 dp...
  * Time: O(N)
  * Status: tested on https://dmoj.ca/problem/acsl1p6, https://dmoj.ca/problem/riddletroll
  */
 #pragma once
 
-const int N = 2e6; // max node cnt in expr tree. |S| is enough
-struct Val { // 32 bytes/node
-    int v; // only used if op = 0
-    char op; Val *l, *r; // only used if op != 0
+const int N = 2e6; // 树的最大节点数 取 |S| 即可
+struct Val { // 每个节点 32 字节
+    int v; // 仅当 op = 0 时使用
+    char op; Val *l, *r; // 仅当 op 非 0 时使用
     Val(int v=0) : v(v), op(0), l(0), r(0) {}
     Val(char op, Val *l, Val *r) : op(op), l(l), r(r) {}
 };
 Val arr[N]; int last = 0;
 
 Val *parseExpression(string &s) {
-    using C = array<int, 3>; // precedence comparator
+    using C = array<int, 3>; // 优先级比较键
     vector<pair<C, char>> ops;
     vector<Val*> vals;
     int depth = 0;
 
-    auto prec = [&](char c, int i) -> C { // change to your ops
+    auto prec = [&](char c, int i) -> C { // 改成你的运算符
         int r;
         if (c == '+' || c == '-') r = 0;
         else if (c == '*' || c == '/' || c == '_') r = 1;
-        else assert(0); // i for right assoc, -i for left
+        else assert(0); // 右结合用 i, 左结合用 -i
         return {depth, r, c == '_' ? i : -i}; 
     };
     auto clear = [&](C minp) {
@@ -38,9 +38,9 @@ Val *parseExpression(string &s) {
             if (p < minp) break;
             ops.pop_back();
             auto b = vals.back(); vals.pop_back();
-            if (c == '_') {  // unary op
+            if (c == '_') {  // 一元运算
                 vals.pb(&(arr[last++] = Val(c, b, 0)));
-            } else { // binary op
+            } else { // 二元运算
                 auto a = vals.back(); vals.pop_back();
                 vals.pb(&(arr[last++] = Val(c, a, b)));
             }
@@ -54,8 +54,9 @@ Val *parseExpression(string &s) {
             if (pdigit) vals.back()->v = 10*vals.back()->v + c-'0';
             else vals.pb(&(arr[last++] = Val(c-'0')));
         } else {
+            // 一元运算
             if (c == '-' && !pdigit
-                && !(i >= 1 && s[i-1] == ')')) c = '_'; // unary op
+                && !(i >= 1 && s[i-1] == ')')) c = '_';
             clear(prec(c, i)); ops.pb({prec(c, i), c});
         }
     }

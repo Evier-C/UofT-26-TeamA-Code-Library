@@ -4,8 +4,11 @@
  * License: CC0
  * Source: https://github.com/spaghetti-source/algorithm/blob/master/graph/arborescence.cc
  * and https://github.com/bqi343/USACO/blob/42d177dfb9d6ce350389583cfa71484eb8ae614c/Implementations/content/graphs%20(12)/Advanced/DirectedMST.h for the reconstruction
- * Description: Finds a minimum spanning
- * tree/arborescence of a directed graph, given a root node. If no MST exists, returns -1.
+ * Description: 给定根, 求有向图的最小树形图 (有向 MST).
+ * 若不存在则返回 -1.
+ * Usage: vector<Edge> g{{a, b, w}}; // 从 a 到 b 的边
+ * auto [cost, par] = dmst(n, r, g); // 无解时 cost = -1
+ * par[v] 为 v 的父亲 , par[r] = -1
  * Time: O(E \log V)
  * Status: Stress-tested, also tested on NWERC 2018 fastestspeedrun
  */
@@ -14,7 +17,7 @@
 #include "../data-structures/UnionFindRollback.h"
 
 struct Edge { int a, b; ll w; };
-struct Node { /// lazy skew heap node
+struct Node { /// 懒标记斜堆节点
 	Edge key;
 	Node *l, *r;
 	ll delta;
@@ -52,7 +55,7 @@ pair<ll, vi> dmst(int n, int r, vector<Edge>& g) {
 			heap[u]->delta -= e.w, pop(heap[u]);
 			Q[qi] = e, path[qi++] = u, seen[u] = s;
 			res += e.w, u = uf.find(e.a);
-			if (seen[u] == s) { /// found cycle, contract
+			if (seen[u] == s) { /// 找到环 , 缩点
 				Node* cyc = 0;
 				int end = qi, time = uf.time();
 				do cyc = merge(cyc, heap[w = path[--qi]]);
@@ -64,7 +67,7 @@ pair<ll, vi> dmst(int n, int r, vector<Edge>& g) {
 		rep(i,0,qi) in[uf.find(Q[i].b)] = Q[i];
 	}
 
-	for (auto& [u,t,comp] : cycs) { // restore sol (optional)
+	for (auto& [u,t,comp] : cycs) { // 还原方案 , 可选
 		uf.rollback(t);
 		Edge inEdge = in[u];
 		for (auto& e : comp) in[uf.find(e.b)] = e;

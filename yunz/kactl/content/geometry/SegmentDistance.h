@@ -5,15 +5,15 @@
  * Source:
  * Description:\\
 \begin{minipage}{75mm}
-Returns the shortest distance between point p and the line segment from point s to e.
+返回点 p 到线段 se 的最短距离.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-10mm}
 \includegraphics[width=\textwidth]{content/geometry/SegmentDistance}
 \end{minipage}
- * Usage: 
+ * Usage:
  * 	Point<double> a, b(2,2), p(1,1);
- * 	bool onSegment = segDist(a,b,p) < 1e-10;
+ * 	bool onSegment = segDist(a,b,p) < 1e-10; // p 在线段上
  * Status: tested
  */
 #pragma once

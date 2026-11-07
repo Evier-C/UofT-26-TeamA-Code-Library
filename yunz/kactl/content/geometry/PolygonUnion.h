@@ -3,10 +3,12 @@
  * Date: 2019-10-29
  * License: Unknown
  * Source: https://codeforces.com/gym/101673/submission/50481926
- * Description: Calculates the area of the union of $n$ polygons (not necessarily
- * convex). The points within each polygon must be given in CCW order.
- * (Epsilon checks may optionally be added to sideOf/sgn, but shouldn't be needed.)
- * Time: $O(N^2)$, where $N$ is the total number of points
+ * Description: 求 $n$ 个多边形 (不一定凸) 的并的面积.
+ * 每个多边形的顶点须按逆时针 (CCW) 给出.
+ * (可在 sideOf/sgn 中加 eps 判断, 但通常不需要.)
+ * Usage:
+ * 	double a = polyUnion(poly); // poly 为 vector<vector<P>>
+ * Time: $O(N^2)$, 其中 $N$ 为总点数
  * Status: stress-tested, Submitted on ECNA 2017 Problem A
  */
 #pragma once

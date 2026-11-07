@@ -3,10 +3,13 @@
  * Date: 2015-02-06
  * License: CC0
  * Source: Folklore
- * Description: Calculate power of two jumps in a tree,
- * to support fast upward jumps and LCAs.
- * Assumes the root node points to itself.
- * Time: construction $O(N \log N)$, queries $O(\log N)$
+ * Description: 预处理树上 2 的幂次跳跃表 (倍增),
+ * 支持快速向上跳和求 LCA.
+ * 要求根的父亲是它自己.
+ * Usage: vi P(n); // P[v] 为父亲 , P[root] = root
+ * vector<vi> tbl = treeJump(P); int u = jmp(tbl, v, k);
+ * int w = lca(tbl, depth, a, b); // depth 为深度数组 vi
+ * Time: 预处理 $O(N \log N)$, 查询 $O(\log N)$
  * Status: Tested at Petrozavodsk, also stress-tested via LCA.cpp
  */
 #pragma once
