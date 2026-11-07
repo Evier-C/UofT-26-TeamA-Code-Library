@@ -1,103 +1,61 @@
 /**
- * Author: Simon Lindholm
- * Date: 2016-07-25
- * Source: https://github.com/ngthanhtrung23/ACM_Notebook_new/blob/master/DataStructure/LinkCutTree.h
- * Description: 维护无根树构成的森林. 可以加边和删边 (要求结果仍是森林),
- * 并查询两点是否在同一棵树中.
- * Usage: LinkCut lc(N); lc.link(u, v); lc.cut(u, v);
- * bool b = lc.connected(u, v);
- * Time: 所有操作均摊 O(\log N).
- * Status: Stress-tested a bit for N <= 20
+ * Description: LCT 动态树 (点 $1..n$), 支持连边, 删边, 判连通, 单点
+ * 改值, 路径求和. 每条实链用一棵 splay 维护 (中序为深度从小到大),
+ * fa[x] 对 splay 根表示虚边指向的父亲. split(x,y) 后 $y$ 为 splay 根,
+ * sum[y] 即 $x$ 到 $y$ 路径和. 维护 max/xor 等改 pushup 即可.
+ * Usage: for(int i=1;i<=n;i++) val[i]=a[i]; init(n);
+ * link(x,y); cut(x,y); // 不合法的操作会被忽略
+ * connected(x,y); modify(x,v); // val[x] 改为 v
+ * split(x,y); ll s=sum[y]; // 要求 x,y 连通
+ * Time: 均摊 O(\log n)
  */
 #pragma once
 
-struct Node{ // Splay 树 . 根的 pp 存原树中的父亲
-	Node*p=0,*pp=0,*c[2];
-	bool flip=0;
-	Node(){c[0]=c[1]=0;fix();}
-	void fix(){
-		if(c[0])c[0]->p=this;
-		if(c[1])c[1]->p=this;
-		// 需要时在此更新子树和等信息
+const int N=3e5+5;
+int ch[N][2],fa[N],rev[N],st[N];ll val[N],sum[N];
+bool nrt(int x){return ch[fa[x]][0]==x||ch[fa[x]][1]==x;}
+void pushup(int x){sum[x]=sum[ch[x][0]]+sum[ch[x][1]]+val[x];}
+void pushr(int x){swap(ch[x][0],ch[x][1]),rev[x]^=1;}
+void pushdown(int x){
+	if(rev[x])pushr(ch[x][0]),pushr(ch[x][1]),rev[x]=0;
+}
+void rotate(int x){
+	int y=fa[x],z=fa[y],k=ch[y][1]==x,w=ch[x][!k];
+	if(nrt(y))ch[z][ch[z][1]==y]=x;
+	ch[x][!k]=y,ch[y][k]=w;
+	if(w)fa[w]=y;
+	fa[y]=x,fa[x]=z,pushup(y);
+}
+void splay(int x){
+	int y=x,tp=0;st[++tp]=y;
+	while(nrt(y))st[++tp]=y=fa[y];
+	while(tp)pushdown(st[tp--]);
+	while(nrt(x)){
+		y=fa[x];int z=fa[y];
+		if(nrt(y))rotate((ch[y][0]==x)^(ch[z][0]==y)?x:y);
+		rotate(x);
 	}
-	void pushFlip(){
-		if(!flip)return;
-		flip=0;swap(c[0],c[1]);
-		if(c[0])c[0]->flip^=1;
-		if(c[1])c[1]->flip^=1;
-	}
-	int up(){return p?p->c[1]==this:-1;}
-	void rot(int i,int b){
-		int h=i^b;
-		Node*x=c[i],*y=b==2?x:x->c[h],*z=b?y:x;
-		if((y->p=p))p->c[up()]=y;
-		c[i]=z->c[i^1];
-		if(b<2){
-			x->c[h]=y->c[h^1];
-			y->c[h^1]=x;
-		}
-		z->c[i^1]=this;
-		fix();x->fix();y->fix();
-		if(p)p->fix();
-		swap(pp,y->pp);
-	}
-	void splay(){ /// 把自己 splay 到根 , 结束时 flip 为 0
-		for(pushFlip();p;){
-			if(p->p)p->p->pushFlip();
-			p->pushFlip();pushFlip();
-			int c1=up(),c2=p->up();
-			if(c2==-1)p->rot(c1,2);
-			else p->p->rot(c2,c1!=c2);
-		}
-	}
-	Node*first(){ /// 返回子树最小元素 , 并把它 splay 到顶
-		pushFlip();
-		return c[0]?c[0]->first():(splay(),this);
-	}
-};
-
-struct LinkCut{
-	vector<Node>node;
-	LinkCut(int N):node(N){}
-
-	void link(int u,int v){ // 加边 (u, v)
-		assert(!connected(u,v));
-		makeRoot(&node[u]);
-		node[u].pp=&node[v];
-	}
-	void cut(int u,int v){ // 删边 (u, v)
-		Node*x=&node[u],*top=&node[v];
-		makeRoot(top);x->splay();
-		assert(top==(x->pp?:x->c[0]));
-		if(x->pp)x->pp=0;
-		else{
-			x->c[0]=top->p=0;
-			x->fix();
-		}
-	}
-	bool connected(int u,int v){ // u , v 是否在同一棵树
-		Node*nu=access(&node[u])->first();
-		return nu==access(&node[v])->first();
-	}
-	void makeRoot(Node*u){ /// 把 u 变为所在原树的根
-		access(u);
-		u->splay();
-		if(u->c[0]){
-			u->c[0]->p=0;
-			u->c[0]->flip^=1;
-			u->c[0]->pp=u;
-			u->c[0]=0;
-			u->fix();
-		}
-	}
-	Node*access(Node*u){ /// 把 u 移到根辅助树 , 返回其根
-		u->splay();
-		while(Node*pp=u->pp){
-			pp->splay();u->pp=0;
-			if(pp->c[1]){
-				pp->c[1]->p=0;pp->c[1]->pp=pp;}
-			pp->c[1]=u;pp->fix();u=pp;
-		}
-		return u;
-	}
-};
+	pushup(x);
+}
+void access(int x){
+	for(int y=0;x;y=x,x=fa[x])splay(x),ch[x][1]=y,pushup(x);
+}
+void makert(int x){access(x),splay(x),pushr(x);}
+int findrt(int x){
+	access(x),splay(x);
+	while(ch[x][0])pushdown(x),x=ch[x][0];
+	splay(x);return x;
+}
+void split(int x,int y){makert(x),access(y),splay(y);}
+bool connected(int x,int y){return findrt(x)==findrt(y);}
+void link(int x,int y){makert(x);if(findrt(y)!=x)fa[x]=y;}
+void cut(int x,int y){
+	makert(x);
+	if(findrt(y)==x&&fa[y]==x&&!ch[y][0])
+		fa[y]=ch[x][1]=0,pushup(x);
+}
+void modify(int x,ll v){splay(x),val[x]=v,pushup(x);}
+void init(int n){
+	for(int i=1;i<=n;i++)
+		ch[i][0]=ch[i][1]=fa[i]=rev[i]=0,sum[i]=val[i];
+}

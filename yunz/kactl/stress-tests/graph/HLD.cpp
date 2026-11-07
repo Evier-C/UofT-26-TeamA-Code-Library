@@ -1,143 +1,96 @@
-#include "../utilities/template.h"
-#include "../utilities/genTree.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+// simple lazy segment tree standing in for the user's one
+const int SN=2e5+5;
+ll t[SN<<2],lz[SN<<2];int segn;
+void pushdown(int p,int l,int r){
+	if(!lz[p])return;int mid=(l+r)/2;
+	t[p*2]+=lz[p]*(mid-l+1),lz[p*2]+=lz[p];
+	t[p*2+1]+=lz[p]*(r-mid),lz[p*2+1]+=lz[p];lz[p]=0;
+}
+void build(int p,int l,int r,ll*a){
+	lz[p]=0;
+	if(l==r){t[p]=a[l];return;}
+	int mid=(l+r)/2;build(p*2,l,mid,a);build(p*2+1,mid+1,r,a);t[p]=t[p*2]+t[p*2+1];
+}
+void update(int p,int l,int r,int ql,int qr,ll v){
+	if(ql<=l&&r<=qr){t[p]+=v*(r-l+1);lz[p]+=v;return;}
+	pushdown(p,l,r);int mid=(l+r)/2;
+	if(ql<=mid)update(p*2,l,mid,ql,qr,v);
+	if(qr>mid)update(p*2+1,mid+1,r,ql,qr,v);
+	t[p]=t[p*2]+t[p*2+1];
+}
+ll query(int p,int l,int r,int ql,int qr){
+	if(ql<=l&&r<=qr)return t[p];
+	pushdown(p,l,r);int mid=(l+r)/2;ll s=0;
+	if(ql<=mid)s+=query(p*2,l,mid,ql,qr);
+	if(qr>mid)s+=query(p*2+1,mid+1,r,ql,qr);
+	return s;
+}
+void upd(int l,int r,ll v){update(1,1,segn,l,r,v);}
+ll qry(int l,int r){return query(1,1,segn,l,r);}
 #include "../../content/graph/HLD.h"
 
-namespace old {
-#include "oldHLD.h"
-}
-struct bruteforce { // values in nodes
-	vector<vector<int>> tree;
-	vector<int> vals;
-	vector<int> pars;
-	int unit = -1e9;
-	int f(int a, int b) { return max(a, b); }
-	void root(int cur, int p = -1) {
-		pars[cur] = p;
-		for (auto i: tree[cur]) {
-			if (i != p) root(i, cur);
-		}
-	}
-	bruteforce(vector<vector<int>> _tree): tree(_tree), vals(sz(tree)), pars(sz(tree)) {
-		root(0);
-	}
-	bool dfsModify(int cur, int target, int val, int p=-1) {
-		if (cur == target) {
-			vals[cur] += val;
-			return true;
-		}
-		bool alongPath = false;
-		for (auto i: tree[cur]) {
-			if (i == p) continue;
-			alongPath |= dfsModify(i, target, val, cur);
-		}
-		if (alongPath) vals[cur] += val;
-		return alongPath;
-	}
-	void modifyPath(int a, int b, int val) {
-		dfsModify(a, b, val);
-	}
+mt19937 rng(41);
+int R(int a,int b){return rng()%(b-a+1)+a;}
+ll a[N],b[N],val[N];
+int par[N],dp[N];
 
-	int dfsQuery(int cur, int target, int p = -1) {
-		if (cur == target) {
-			return vals[cur];
+int main(){
+	long long checks=0;
+	for(int it=0;it<400;it++){
+		bool big=it>=395;
+		int n=big?R(5000,5000):R(1,40),rt=R(1,n);
+		segn=n;
+		for(int i=1;i<=n;i++)g[i].clear(),son[i]=0;
+		tim=0;
+		vector<int> perm(n+1);iota(perm.begin(),perm.end(),0);
+		shuffle(perm.begin()+1,perm.end(),rng);
+		for(int i=2;i<=n;i++){
+			int p=it%3==0?i-1:R(1,i-1);
+			g[perm[i]].push_back(perm[p]),g[perm[p]].push_back(perm[i]);
 		}
-		int res = unit;
-		for (auto i: tree[cur]) {
-			if (i == p) continue;
-			res = f(res, dfsQuery(i, target, cur));
+		for(int i=1;i<=n;i++)a[i]=val[i]=R(-1000,1000);
+		dfs1(rt,0);dfs2(rt,rt);
+		for(int i=1;i<=n;i++)b[i]=a[rnk[i]];
+		build(1,1,n,b);
+		// brute parent/depth
+		{
+			vector<int> st={rt};par[rt]=0;dp[rt]=0;vector<int> vis(n+1);vis[rt]=1;
+			while(!st.empty()){int u=st.back();st.pop_back();
+				for(int v:g[u])if(!vis[v])vis[v]=1,par[v]=u,dp[v]=dp[u]+1,st.push_back(v);}
 		}
-		if (res != unit) {
-			return f(res, vals[cur]);
-		}
-		return res;
-	}
-	int queryPath(int a, int b) {
-		return dfsQuery(a, b);
-	}
-	int dfsSubtree(int cur, int p) {
-		int res = vals[cur];
-		for (auto i: tree[cur]) {
-			if (i != p)
-				res = f(res, dfsSubtree(i, cur));
-		}
-		return res;
-	}
-	int querySubtree(int a) {
-		return dfsSubtree(a, pars[a]);
-	}
-};
-
-void testAgainstOld(int n, int iters, int queries) {
-	for (int trees = 0; trees < iters; trees++) {
-		auto graph = genRandomTree(n);
-		vector<vector<int>> tree1(n);
-		vector<vector<pair<int, int>>> tree2(n);
-		for (auto i : graph) {
-			tree1[i.first].push_back(i.second);
-			tree1[i.second].push_back(i.first);
-		}
-		for (int i = 0; i < sz(tree1); i++) {
-			for (auto j : tree1[i]) {
-				tree2[i].push_back({j, 0});
+		auto blca=[&](int x,int y){while(x!=y){if(dp[x]<dp[y])swap(x,y);x=par[x];}return x;};
+		auto inSub=[&](int y,int x){while(y&&y!=x)y=par[y];return y==x;};
+		int Q=big?2000:200;
+		for(int q=0;q<Q;q++){
+			int op=R(0,4),x=R(1,n),y=R(1,n);ll v=R(-100,100);
+			if(op==0){
+				assert(lca(x,y)==blca(x,y));
+			}else if(op==1){
+				updPath(x,y,v);
+				int l=blca(x,y);
+				for(int z=x;z!=l;z=par[z])val[z]+=v;
+				for(int z=y;z!=l;z=par[z])val[z]+=v;
+				val[l]+=v;
+			}else if(op==2){
+				int l=blca(x,y);ll s=val[l];
+				for(int z=x;z!=l;z=par[z])s+=val[z];
+				for(int z=y;z!=l;z=par[z])s+=val[z];
+				assert(qryPath(x,y)==s);
+			}else if(op==3){
+				updSub(x,v);
+				for(int z=1;z<=n;z++)if(inSub(z,x))val[z]+=v;
+				if(big)q+=50;
+			}else{
+				ll s=0;for(int z=1;z<=n;z++)if(inSub(z,x))s+=val[z];
+				assert(qrySub(x)==s);
+				if(big)q+=50;
 			}
-		}
-		HLD<false> hld(tree1);
-		old::HLD hld2(tree2);
-		hld.tree->set(0, n, 0);
-		for (int itr = 0; itr < queries; itr++) {
-			if (rand() % 2) {
-				int node = rand() % n;
-				int val = rand() % 10;
-				hld2.update(node, val);
-				hld.modifyPath(node, node, val - hld.queryPath(node, node));
-			} else {
-				int a = rand() % n;
-				int b = rand() % n;
-				assert(hld.queryPath(a, b) == hld2.query2(a, b).first);
-			}
+			checks++;
 		}
 	}
-}
-void testAgainstBrute(int n, int iters, int queries) {
-	for (int trees = 0; trees < iters; trees++) {
-		auto graph = genRandomTree(n);
-		vector<vector<int>> tree1(n);
-		for (auto i : graph) {
-			tree1[i.first].push_back(i.second);
-			tree1[i.second].push_back(i.first);
-		}
-		HLD<false> hld(tree1);
-		bruteforce hld2(tree1);
-		hld.tree->set(0, n, 0);
-		for (int itr = 0; itr < queries; itr++) {
-			int rng = rand() % 3;
-			if (rng == 0) {
-				int a = rand() % n;
-				int b = rand() % n;
-				int val = rand() % 10;
-				hld.modifyPath(a, b, val);
-				hld2.modifyPath(a, b, val);
-			} else if (rng == 1){
-				int a = rand() % n;
-				int b = rand() % n;
-				hld.queryPath(a, b);
-				hld2.queryPath(a, b);
-				assert(hld.queryPath(a, b) == hld2.queryPath(a, b));
-			} else if (rng == 2) {
-				int a = rand() % n;
-				assert(hld.querySubtree(a) == hld2.querySubtree(a));
-			}
-		}
-	}
-
-}
-int main() {
-	srand(2);
-	testAgainstBrute(5, 1000, 10000);
-	testAgainstBrute(1000, 100, 100);
-	testAgainstOld(5, 1000, 100);
-	testAgainstOld(10000, 100, 1000);
+	cout<<"checks "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
-	return 0;
 }

@@ -1,30 +1,41 @@
-\section{Various}
+\section{杂项}
 
-\subsection{Intervals}
+\subsection{区间}
 	\kactlimport{IntervalContainer.h}
 	% \kactlimport{IntervalCover.h}
 	% \kactlimport{ConstantIntervals.h}
 
-\subsection{Misc. algorithms}
+\subsection{其他算法}
 	\kactlimport{TernarySearch.h}
 	\kactlimport{LIS.h}
 	% \kactlimport{FastKnapsack.h}
 
-\subsection{Dynamic programming}
+\subsection{动态规划}
 	\kactlimport{KnuthDP.h}
 	\kactlimport{DivideAndConquerDP.h}
 
-\subsection{Debugging tricks}
+\paragraph{WQS 二分 (Aliens trick)}
+适用于恰好选 $k$ 个或恰好分 $k$ 段的最优值 $g(k)$, 且 $g$ 关于 $k$ 是凸函数 (求最小值时下凸, 求最大值时上凸). 凸性一般靠打表观察, 或由四边形不等式、费用流模型得到.
+\begin{compactitem}
+\item \textbf{去掉个数限制}: 每选一个额外加代价 $\lambda$, 做不限个数的 DP, 求 $h(\lambda)=\min_k\{g(k)+\lambda k\}$, 同时记录取到最优时选了几个, 记为 $\mathit{cnt}(\lambda)$.
+\item \textbf{打平手时取最少个数}: DP 里值相同的转移一律选个数更少的. 这样 $\mathit{cnt}(\lambda)$ 随 $\lambda$ 单调不增.
+\item \textbf{二分}: 找最小的 $\lambda$ 使 $\mathit{cnt}(\lambda)\le k$, 答案是 $g(k)=h(\lambda)-\lambda k$. 注意减去的是 $\lambda k$ 而不是 $\lambda\cdot\mathit{cnt}$, 这样多个 $k$ 共线时也正确.
+\item \textbf{求最大值}: 每选一个减去 $\lambda$, $h(\lambda)=\max_k\{g(k)-\lambda k\}$, 同样平手取最少个数, 找最小的 $\lambda$ 使 $\mathit{cnt}(\lambda)\le k$, 答案 $h(\lambda)+\lambda k$.
+\item \textbf{细节}: $g$ 是整数时 $\lambda$ 只需整数二分, 范围取相邻差分的最小到最大值 (如 $[-10^{12},10^{12}]$). 总复杂度是 DP 的复杂度乘 $\log V$.
+\item \textbf{常见题}: 恰好 $k$ 段划分, 恰好选 $k$ 个不相邻元素, 恰好 $k$ 条白边的最小生成树.
+\end{compactitem}
+
+\subsection{调试技巧}
 	\begin{itemize}
-		\item \verb@signal(SIGSEGV, [](int) { _Exit(0); });@ converts segfaults into Wrong Answers.
-			Similarly one can catch SIGABRT (assertion failures) and SIGFPE (zero divisions).
-			\verb@_GLIBCXX_DEBUG@ failures generate SIGABRT (or SIGSEGV on gcc 5.4.0 apparently).
-		\item \verb@feenableexcept(29);@ kills the program on NaNs (\texttt 1), 0-divs (\texttt 4), infinities (\texttt 8) and denormals (\texttt{16}).
+		\item \verb@signal(SIGSEGV, [](int) { _Exit(0); });@ 把段错误变成 Wrong Answer.
+			同理可捕获 SIGABRT (断言失败) 和 SIGFPE (除零).
+			\verb@_GLIBCXX_DEBUG@ 报错时产生 SIGABRT (gcc 5.4.0 上似乎是 SIGSEGV).
+		\item \verb@feenableexcept(29);@ 在遇到 NaN (\texttt 1), 除零 (\texttt 4), 无穷 (\texttt 8) 和非规格化数 (\texttt{16}) 时终止程序.
 	\end{itemize}
 
-\subsection{Optimization tricks}
-	\verb@__builtin_ia32_ldmxcsr(40896);@ disables denormals (which make floats 20x slower near their minimum value).
-	\subsubsection{Bit hacks}
+\subsection{优化技巧}
+	\verb@__builtin_ia32_ldmxcsr(40896);@ 关闭非规格化数 (它们在最小值附近让浮点运算慢 20 倍).
+	\subsubsection{位运算技巧}
 			\begin{itemize}
 			\item \verb@x&-x@ 是 \texttt{x} 的最低位的 1.
 			\item \verb@c=x&-x,r=x+c;(((r^x)>>2)/c)|r@ 是比 \texttt{x} 大且 1 的个数相同的下一个数.
@@ -39,7 +50,7 @@ for(int s=0;s<(1<<n);s++) // 每个集合 s
 	}
 // 只要非空子集: for(int t=s;t;t=(t-1)&s)
 \end{lstlisting}
-	\subsubsection{Pragmas for bitset (put before bits/stdc++.h)}
+	\subsubsection{bitset 加速 pragma (放在 bits/stdc++.h 之前)}
 		\begin{itemize}
 			\item \lstinline{#pragma GCC optimize("O3,unroll-loops")}
 			\item \lstinline{#include <bits/allocator.h>}

@@ -1,75 +1,61 @@
 /**
- * Author: Benjamin Qi, Oleksandr Kulkov, chilli
- * Date: 2020-01-12
- * License: CC0
- * Source: https://codeforces.com/blog/entry/53170, https://github.com/bqi343/USACO/blob/master/Implementations/content/graphs%20(12)/Trees%20(10)/HLD%20(10.3).h
- * Description: 树链剖分: 把树分解为点不相交的重链和轻边, 使任意叶子到根的路径上
- * 至多有 log(n) 条轻边. 输入邻接表 (若邻接表中没有指向父亲的边, 注释掉 dfsSz
- * 中的 (*) 行), 初值数组 $v$ 和根. VALS\_EDGES 为真表示值存在边上而不是点上.
- * Usage: vector<T> vals(n, {x, x, 1}); HLD<false> h(adj, vals, root);
- * h.modifyPath(u, v, {d}); // 路径上每个点加 d
- * T x = h.queryPath(u, v), y = h.querySubtree(v);
- * Time: O((\log N)^2)
- * Status: tested on https://cses.fi/problemset/result/16580118/
-*/
+ * Description: 重链剖分 (点 $1..n$, 根 rt). dfs1 求 fa, dep, siz, son
+ * (重儿子); dfs2 求 top (链顶), dfn (新编号), rnk (dfn 的逆). 每条重链
+ * 和每棵子树在 dfn 上都是连续区间, 路径拆成 $O(\log n)$ 段区间.
+ * 数据结构由用户提供: upd(l,r,v) 给 dfn 区间 $[l, r]$ 加 $v$,
+ * qry(l,r) 求区间和, 一般接到线段树上 (按 rnk 建树). 维护 max 等
+ * 只需改 qryPath 的合并. 边权: 把边权放到深的那个点上, 路径操作最后
+ * 一段改为 $[$dfn[x]$+1$, dfn[y]$]$ (x 等于 y 时跳过), 即不含 LCA.
+ * Usage: // 把 upd 和 qry 接到自己的线段树上, 例如:
+ * void upd(int l,int r,ll v){update(1,1,n,l,r,v);}
+ * ll qry(int l,int r){return query(1,1,n,l,r);}
+ * // 多组数据: g[1..n] 清空, tim=0
+ * dfs1(rt,0); dfs2(rt,rt); // 线段树第 i 个位置初值 a[rnk[i]]
+ * updPath(x,y,v); qryPath(x,y); // 路径
+ * updSub(x,v); qrySub(x); lca(x,y); // 子树, LCA
+ * Time: 每次路径操作 O(\log^2 n), 子树操作 O(\log n)
+ */
 #pragma once
 
-#include "../data-structures/LazySegmentTree.h"
-
-template<bool VALS_EDGES>struct HLD{
-    int N,tim=0;
-    vector<vi>adj;
-    vi par,siz,rt,pos,tail;
-    Seg tree=Seg(vector<T>(1,idT));
-    HLD(vector<vi>&adj,vector<T>v,int root)
-        :N(sz(adj)),adj(adj),par(N,-1),siz(N,1),
-          rt(N,root),pos(N),tail(N,-1){
-        dfsSz(root);dfsHld(root);
-        vector<T>a(N,idT);
-        rep(i,0,N)a[pos[i]]=v[i]; // 按 dfs 序放初值
-        tree=Seg(a);
-    }
-	void dfsSz(int v){
-		for(int&u:adj[v]){
-			adj[u].erase(find(all(adj[u]),v)); // (*)
-			par[u]=v;
-			dfsSz(u);
-			siz[v]+=siz[u];
-			if(siz[u]>siz[adj[v][0]])swap(u,adj[v][0]);
-		}
+const int N=2e5+5;
+void upd(int l,int r,ll v);ll qry(int l,int r); // 用户提供
+vector<int>g[N];
+int fa[N],dep[N],siz[N],son[N],top[N],dfn[N],rnk[N],tim;
+void dfs1(int u,int f){
+	fa[u]=f,dep[u]=dep[f]+1,siz[u]=1,son[u]=0;
+	for(int v:g[u])if(v!=f){
+		dfs1(v,u),siz[u]+=siz[v];
+		if(siz[v]>siz[son[u]])son[u]=v;
 	}
-    void dfsHld(int v){
-        pos[v]=tim++,tail[v]=v;
-        for(bool fst=1;int u:adj[v]){
-            rt[u]=(u==adj[v][0]?rt[v]:u);
-            dfsHld(u);
-            if(fst)tail[v]=tail[u];
-            fst=0;
-        }
-    }
-	template<class B>void process(int u,int v,B op){
-		for(;;v=par[rt[v]]){
-			if(pos[u]>pos[v])swap(u,v);
-			if(rt[u]==rt[v])break;
-			op(pos[rt[v]],pos[v]+1);
-		}
-		op(pos[u]+VALS_EDGES,pos[v]+1);
+}
+void dfs2(int u,int t){
+	top[u]=t,dfn[u]=++tim,rnk[tim]=u;
+	if(son[u])dfs2(son[u],t);
+	for(int v:g[u])if(v!=fa[u]&&v!=son[u])dfs2(v,v);
+}
+int lca(int x,int y){
+	while(top[x]!=top[y]){
+		if(dep[top[x]]<dep[top[y]])swap(x,y);
+		x=fa[top[x]];
 	}
-    T get(int u){ // 单点修改类似
-        return tree.query(pos[u],pos[u]+1);
-    }
-	void modifyPath(int u,int v,U val){
-		process(u,v,[&](int l,int r){tree.update(l,r,val);});
+	return dep[x]<dep[y]?x:y;
+}
+void updPath(int x,int y,ll v){
+	while(top[x]!=top[y]){
+		if(dep[top[x]]<dep[top[y]])swap(x,y);
+		upd(dfn[top[x]],dfn[x],v),x=fa[top[x]];
 	}
-	// 查整条链用 tree.query(pos[rt[v]], pos[tail[v]] + 1)
-    T queryPath(int u,int v){ // 按题意修改
-        T res=idT; // 单位元
-        process(u,v,[&](int l,int r){ // 合并区间答案
-                res=f(res,tree.query(l,r));
-        });
-        return res;
-    }
-    T querySubtree(int v){ // modifySubtree 类似
-        return tree.query(pos[v]+VALS_EDGES,pos[v]+siz[v]);
-    }
-};
+	if(dep[x]>dep[y])swap(x,y);
+	upd(dfn[x],dfn[y],v);
+}
+ll qryPath(int x,int y){
+	ll res=0;
+	while(top[x]!=top[y]){
+		if(dep[top[x]]<dep[top[y]])swap(x,y);
+		res+=qry(dfn[top[x]],dfn[x]),x=fa[top[x]];
+	}
+	if(dep[x]>dep[y])swap(x,y);
+	return res+qry(dfn[x],dfn[y]);
+}
+void updSub(int x,ll v){upd(dfn[x],dfn[x]+siz[x]-1,v);}
+ll qrySub(int x){return qry(dfn[x],dfn[x]+siz[x]-1);}

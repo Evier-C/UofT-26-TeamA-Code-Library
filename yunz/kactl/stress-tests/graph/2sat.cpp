@@ -1,105 +1,47 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/graph/2sat.h"
 
-int main1() {
-	const int N = 100000, M = 10000000;
-	// Random constraints, unsolvable
-	{
-		TwoSat ts(N);
-		rep(i,0,M) {
-			int r = rand();
-			int s = r;
-			r >>= 2;
-			int a = r % N;
-			r >>= 5;
-			int b = r % N;
-			if (a == b) continue;
-			ts.either(a ^ (s&1 ? 0 : -1), b ^ (s&2 ? 0 : -1));
-		}
-		assert(ts.solve() == 0);
-	}
-	// Random solvable instance
-	{
-		vector<bool> v(N);
-		rep(i,0,N) v[i] = rand() & (1 << 20);
-		TwoSat ts(N);
-		rep(i,0,M) {
-			int r = rand();
-			int s = r;
-			r >>= 2;
-			int a = r % N;
-			r >>= 5;
-			int b = r % N;
-			if (a == b) continue;
-			ts.either(a ^ (v[a] ? 0 : -1), b ^ (s&1 ? 0 : -1));
-		}
-		assert(ts.solve() == 1);
-	}
-	return 0;
-}
+mt19937 rng(23);
+int R(int a,int b){return rng()%(b-a+1)+a;}
 
-int main2() {
-	int N = 4;
-	TwoSat ts(N);
-	ts.either(0,1);
-	ts.either(0,~1);
-	ts.either(~2,~3);
-	assert(ts.solve()==1);
-	assert(ts.values == vi({1, 1, 0, 0}));
-	return 0;
-}
-
-int ra() {
-	static unsigned X;
-	X *= 1283611;
-	X += 123;
-	return X >> 1;
-}
-
-// Test at_most_one
-int main() {
-	main1();
-	main2();
-	const int N = 100, M = 400;
-	rep(it,0,100) {
-		vector<bool> v(N);
-		rep(i,0,N) v[i] = ra() & (1 << 20);
-		TwoSat ts(N);
-		vector<vi> atm;
-		vi r;
-		rep(i,0,M) {
-			if (ra()%100 < 5) {
-				int r = ra();
-				int s = r;
-				r >>= 2;
-				int a = r % N;
-				r >>= 5;
-				int b = r % N;
-				if (a == b) continue;
-				ts.either(v[a] ? a : ~a, (s&1) ? b : ~b);
-			} else {
-				int k = ra() % 4 + 1;
-				r.clear();
-				rep(ki,0,k-1) {
-					int a = ra() % N;
-					r.push_back(v[a] ? ~a : a);
-				}
-				r.push_back(ra() % (2*N) - N);
-				random_shuffle(all(r), [](int x) { return ra() % x; });
-				ts.atMostOne(r);
-				atm.push_back(r);
-			}
+int main(){
+	long long checks=0;
+	for(int it=0;it<30000;it++){
+		int nn=R(1,8),m=R(0,20);
+		init(nn);
+		vector<array<int,4>> C;
+		for(int i=0;i<m;i++){
+			int x=R(1,nn),a=R(0,1),y=R(1,nn),b=R(0,1);
+			if(R(0,9)==0)y=x,b=a;
+			C.push_back({x,a,y,b});add(x,a,y,b);
 		}
-		assert(ts.solve());
-		int to = 0;
-		rep(i,0,N) to += (ts.values[i] == v[i]);
-		for(auto &r: atm) {
-			int co = 0;
-			for(auto &x: r) co += (ts.values[max(x, ~x)] == (x >= 0));
-			assert(co <= 1);
+		bool ok=solve();
+		bool exp=false;
+		for(int mask=0;mask<(1<<nn)&&!exp;mask++){
+			bool good=true;
+			for(auto[x,a,y,b]:C)if((mask>>(x-1)&1)!=a&&(mask>>(y-1)&1)!=b)good=false;
+			if(good)exp=true;
 		}
+		assert(ok==exp);
+		if(ok)for(auto[x,a,y,b]:C)assert(ans[x]==a||ans[y]==b);
+		checks++;
 	}
+	// large planted instance
+	for(int rep=0;rep<20;rep++){
+		int nn=2000;init(nn);
+		vector<int> v(nn+1);for(int i=1;i<=nn;i++)v[i]=R(0,1);
+		vector<array<int,4>> C;
+		for(int i=0;i<6000;i++){
+			int x=R(1,nn),y=R(1,nn),a=R(0,1),b=R(0,1);
+			if(v[x]!=a&&v[y]!=b)a=v[x];
+			C.push_back({x,a,y,b});add(x,a,y,b);
+		}
+		assert(solve());
+		for(auto[x,a,y,b]:C)assert(ans[x]==a||ans[y]==b);
+		checks++;
+	}
+	cout<<"checks "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
-	return 0;
 }

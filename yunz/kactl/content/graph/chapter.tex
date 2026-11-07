@@ -1,12 +1,12 @@
-\section{Graph}
+\section{图论}
 
-\subsection{Fundamentals}
+\subsection{基础}
 	% \kactlimport{BellmanFord.h}
 	\kactlimport{FloydWarshall.h}
 	\kactlimport{TopoSort.h}
 	\kactlimport{DynamicConnectivity.h}
 
-\subsection{Network flow}
+\subsection{网络流}
 	% \kactlimport{PushRelabel.h}
 	\kactlimport{MinCostMaxFlow.h}
 	% \kactlimport{EdmondsKarp.h}
@@ -15,14 +15,14 @@
 	% \kactlimport{GlobalMinCut.h}
 	% \kactlimport{GomoryHu.h}
 
-\section{Matching}
+\section{匹配}
 	\kactlimport{HopcroftKarp.h}
 	% \kactlimport{DFSMatching.h}
 	\kactlimport{MinimumVertexCover.h}
 	\kactlimport{WeightedMatching.h}
 	\kactlimport{GeneralMatching.h}
 
-\subsection{DFS algorithms}
+\subsection{DFS 算法}
 	\kactlimport{AllRoots.h}
 	\kactlimport{SCC.h}
 	\kactlimport{BiconnectedComponents.h}
@@ -39,7 +39,7 @@
 	% \kactlimport{MaximumClique.h}
 	% \kactlimport{MaximumIndependentSet.h}
 
-\subsection{Trees}
+\subsection{树}
 	% \kactlimport{BinaryLifting.h}
 	% \kactlimport{LCA.h}
 	\kactlimport{CompressTree.h}
@@ -47,18 +47,18 @@
 	\kactlimport{LinkCutTree.h}
 	% \kactlimport{DirectedMST.h}
 
-\subsection{Math}
-	\subsubsection{Number of Spanning Trees}
+\subsection{数学}
+	\subsubsection{生成树计数}
 		% I.e. matrix-tree theorem.
 		% Source: https://en.wikipedia.org/wiki/Kirchhoff%27s_theorem
 		% Test: stress-tests/graph/matrix-tree.cpp
-		Create an $N\times N$ matrix \texttt{mat}, and for each edge $a \rightarrow b \in G$, do
-		\texttt{mat[a][b]--, mat[b][b]++} (and \texttt{mat[b][a]--, mat[a][a]++} if $G$ is undirected).
-		Remove the $i$th row and column and take the determinant; this yields the number of directed spanning trees rooted at $i$
-		(if $G$ is undirected, remove any row/column).
+		建 $N\times N$ 矩阵 \texttt{mat}, 对每条边 $a \rightarrow b \in G$ 执行
+		\texttt{mat[a][b]--, mat[b][b]++} (若 $G$ 无向, 再执行 \texttt{mat[b][a]--, mat[a][a]++}).
+		删去第 $i$ 行和对应列后求行列式, 即得以 $i$ 为根的有向生成树个数
+		(若 $G$ 无向, 删去任意一行及对应列即可).
 
-	\subsubsection{Erdős–Gallai theorem}
+	\subsubsection{Erdős–Gallai 定理}
 		% Source: https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Gallai_theorem
 		% Test: stress-tests/graph/erdos-gallai.cpp
-		A simple graph with node degrees $d_1 \ge \dots \ge d_n$ exists iff $d_1 + \dots + d_n$ is even and for every $k = 1\dots n$,
+		度数为 $d_1 \ge \dots \ge d_n$ 的简单图存在, 当且仅当 $d_1 + \dots + d_n$ 为偶数, 且对每个 $k = 1\dots n$,
 		\[ \sum _{i=1}^{k}d_{i}\leq k(k-1)+\sum _{i=k+1}^{n}\min(d_{i},k). \]

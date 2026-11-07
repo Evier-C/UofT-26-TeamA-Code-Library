@@ -1,60 +1,38 @@
 /**
- * Author: Shashank Bhatt
- * License: CC0
- * Description: 换根 DP (0 起编号), 要求 + 满足结合律和交换律.
- * operator+ 把多个儿子合并为一个值.
- * promote() 求一个儿子对父亲的贡献.
- * Usage: vector<pii> el; // n - 1 条树边 (a, b), 第 i 条边编号 i
- * vector<ART> res = AllRoots<ART>::calc(el); // 各点为根的答案
- * Time: O(N).
- * Status: Tested on https://cses.fi/problemset/result/16593762/ and https://cses.fi/problemset/result/16593328/.
+ * Description: 换根 DP 模板 (树, 点 $1..n$, 带边权). 例子同时求两件事:
+ * ans[u] $= \sum_v dist(u, v)$, far[u] $= \max_v dist(u, v)$.
+ * dfs1 自底向上求子树信息 (以 1 为根); dfs2 自顶向下, 用父亲的
+ * 答案推出儿子的答案. 去掉儿子 v 的贡献: 可减的量 (和) 直接减,
+ * 不可减的量 (max) 记最大值和次大值, 或用前缀/后缀合并.
+ * Usage: for(i=1..n) g[i].clear(); // 多组数据
+ * g[u].push_back({v,w}),g[v].push_back({u,w});
+ * dfs1(1,0); ans[1]=f[1]; up[1]=0; dfs2(1,0);
+ * far[u]=max(d1[u],up[u]);
+ * Time: O(n)
  */
 #pragma once
 
-struct ART{
-  // 默认构造必须是单位元
-  int ans=0; // 到其他点的最远距离
-  ART operator+(const ART&o)const{
-    return {max(ans,o.ans)};
-  }
-  ART promote(int x,int e)const{
-    if(e==-1)return *this;
-    return {ans+1}; // x 为点编号 ; e 为边编号
-  }
-};
-ART base{}; // 单点的值 , 不一定是单位元
-template<class T>
-struct AllRoots{
-  int n;vector<vector<pii>>adj;
-  vector<vector<T>>suf;vector<T>res;
-  AllRoots(vector<pii>&el):n(sz(el)+1),adj(n),suf(n),res(n){
-    for(int ei=-1;auto[a,b]:el){ei++;
-      adj[a].push_back({b,ei});
-      adj[b].push_back({a,ei});
-    }
-    for(auto&s:suf)s.push_back(base); // 点的初始值
-  }
-  T down(int x,int p=-1){
-    for(auto&c:adj[x])
-      if(c.first==p)swap(c,adj[x][0]);
-    for(int i=sz(adj[x])-1;i>-(p<0);--i)
-      suf[x].push_back(down(adj[x][i].first,x)+suf[x].back());
-    return (p==-1?T{}:suf[x].back().promote(x,adj[x][0].second));
-  }
-  void up(int x,int p=-1){
-    rep(i,p!=-1,sz(adj[x])){
-      auto[y,ei]=adj[x][i];
-      suf[x].pop_back();
-      res[y]=(res[x]+suf[x].back()).promote(x,ei);
-      res[x]=res[x]+suf[y].back().promote(y,ei);
-      up(y,x);
-    }
-  }
-  static vector<T>calc(vector<pii>&el){
-    AllRoots ar(el);
-    ar.down(0);
-    ar.up(0);
-    rep(i,0,ar.n)ar.res[i]=ar.res[i].promote(i,-1);
-    return ar.res;
-  }
-};
+const int N=2e5+5;
+int n,c1[N];
+vector<pair<int,int>>g[N]; // {v,w}
+// siz 子树大小, f 子树内各点到 u 的距离和, ans 全树距离和
+// d1/d2 向下最长/次长链, c1 最长链所在儿子, up 向上最长链
+ll siz[N],f[N],ans[N],d1[N],d2[N],up[N],far[N];
+void dfs1(int u,int fa){
+	siz[u]=1,f[u]=d1[u]=d2[u]=c1[u]=0;
+	for(auto[v,w]:g[u])if(v!=fa){
+		dfs1(v,u);
+		siz[u]+=siz[v],f[u]+=f[v]+siz[v]*w;
+		ll t=d1[v]+w;
+		if(t>d1[u])d2[u]=d1[u],d1[u]=t,c1[u]=v;
+		else if(t>d2[u])d2[u]=t;
+	}
+}
+void dfs2(int u,int fa){
+	for(auto[v,w]:g[u])if(v!=fa){
+		// 根从 u 移到 v: v 子树内的点近 w, 其余点远 w
+		ans[v]=ans[u]+(n-2*siz[v])*w;
+		up[v]=w+max(up[u],c1[u]==v?d2[u]:d1[u]);
+		dfs2(v,u);
+	}
+}

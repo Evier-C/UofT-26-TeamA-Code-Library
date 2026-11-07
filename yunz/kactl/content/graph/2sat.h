@@ -1,76 +1,44 @@
 /**
- * Author: Emil Lenngren, Simon Lindholm
- * Date: 2011-11-29
- * License: CC0
- * Source: folklore
- * Description: 求解 2-SAT: 给布尔变量 a, b, c, ... 赋值, 使形如
- * $(a||b)\&\&(!a||c)\&\&(d||!b)\&\&...$ 的表达式为真, 或报告无解.
- * 取反的变量用按位取反表示 (\texttt{\tilde{}x}).
- * Usage:
- *  TwoSat ts(n); // n 为布尔变量个数
- *  ts.either(0, \tilde3); // 变量 0 为真或变量 3 为假
- *  ts.setValue(2); // 变量 2 为真
- *  ts.atMostOne({0,\tilde1,2}); // 0 , \tilde1 , 2 中至多一个为真
- *  ts.solve(); // 有解时返回 true
- *  ts.values[0..N-1] 为各变量的赋值
- * Time: O(N+E), 其中 N 为布尔变量个数, E 为子句个数.
- * Status: stress-tested
+ * Description: 2-SAT (变量 $1..n$). 点 $x$ 表示 $x$ 为真, 点 $x+n$ 表示
+ * $x$ 为假. 子句 $a \lor b$ 连边 $\lnot a \to b$, $\lnot b \to a$, 再用 Tarjan
+ * 求 SCC. 无解当且仅当某个 $x$ 与 $x+n$ 在同一个 SCC. 有解时取
+ * scc 编号小的那一边 (Tarjan 编号是逆拓扑序, 编号小的在拓扑序后面).
+ * Usage: init(n); // 多组数据重新调用
+ * add(x,1,y,0); // 子句: x 为真 或 y 为假
+ * add(x,1,x,1); // 强制 x 为真
+ * if(!solve()) 无解; else ans[1..n] 为一组解 (1 为真)
+ * Time: O(n+m)
  */
 #pragma once
 
-struct TwoSat{
-	int N;
-	vector<vi>gr;
-	vi values; // 0 为假 ; 1 为真
-
-	TwoSat(int n=0):N(n),gr(2*n){}
-
-	int addVar(){ // 可选
-		gr.emplace_back();
-		gr.emplace_back();
-		return N++;
+const int N=2e5+5; // 变量数, 点数为 2N
+int n,dfn[N*2],low[N*2],stk[N*2],tp,tim,scc[N*2],cnt,ans[N];
+bool ins[N*2];vector<int>g[N*2];
+void tarjan(int u){
+	dfn[u]=low[u]=++tim,stk[++tp]=u,ins[u]=1;
+	for(int v:g[u]){
+		if(!dfn[v])tarjan(v),low[u]=min(low[u],low[v]);
+		else if(ins[v])low[u]=min(low[u],dfn[v]);
 	}
-
-	void either(int f,int j){
-		f=max(2*f,-1-2*f);
-		j=max(2*j,-1-2*j);
-		gr[f].push_back(j^1);
-		gr[j].push_back(f^1);
+	if(low[u]==dfn[u]){
+		cnt++;int v;
+		do v=stk[tp--],ins[v]=0,scc[v]=cnt;while(v!=u);
 	}
-	void setValue(int x){either(x,x);}
-
-	void atMostOne(const vi&li){ // 可选
-		if(sz(li)<=1)return;
-		int cur=~li[0];
-		rep(i,2,sz(li)){
-			int next=addVar();
-			either(cur,~li[i]);
-			either(cur,next);
-			either(~li[i],next);
-			cur=~next;
-		}
-		either(cur,~li[1]);
+}
+// 子句: (x 取值 a) 或 (y 取值 b), a,b 为 0/1
+void add(int x,int a,int y,int b){
+	g[a?x+n:x].push_back(b?y:y+n); // x 不取 a 则 y 取 b
+	g[b?y+n:y].push_back(a?x:x+n); // y 不取 b 则 x 取 a
+}
+bool solve(){
+	for(int i=1;i<=2*n;i++)if(!dfn[i])tarjan(i);
+	for(int i=1;i<=n;i++){
+		if(scc[i]==scc[i+n])return 0;
+		ans[i]=scc[i]<scc[i+n];
 	}
-
-	vi val,comp,z;int time=0;
-	int dfs(int i){
-		int low=val[i]=++time,x;z.push_back(i);
-		for(int e:gr[i])if(!comp[e])
-			low=min(low,val[e]?:dfs(e));
-		if(low==val[i])do{
-			x=z.back();z.pop_back();
-			comp[x]=low;
-			if(values[x>>1]==-1)
-				values[x>>1]=x&1;
-		}while(x!=i);
-		return val[i]=low;
-	}
-
-	bool solve(){
-		values.assign(N,-1);
-		val.assign(2*N,0);comp=val;
-		rep(i,0,2*N)if(!comp[i])dfs(i);
-		rep(i,0,N)if(comp[2*i]==comp[2*i+1])return 0;
-		return 1;
-	}
-};
+	return 1;
+}
+void init(int _n){
+	n=_n,tim=tp=cnt=0;
+	for(int i=1;i<=2*n;i++)g[i].clear(),dfn[i]=0;
+}

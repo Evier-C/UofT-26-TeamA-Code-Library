@@ -1,51 +1,47 @@
 /**
- * Author: Simon Lindholm
- * Date: 2017-04-17
- * License: CC0
- * Source: folklore
- * Description: 求无向图的所有点双连通分量, 并对每个分量的边集调用回调.
- *  同一点双内任意两点之间至少有两条内部不相交的路径 (即存在经过它们的环).
- *  一个点可以属于多个分量. 不属于任何分量的边是桥, 即不在任何环上.
- * Usage:
- *  int eid = 0; ed.resize(N); for (auto \&x: ed) x.clear();
- *  for (auto [a, b] : edges) { // 对每条边
- *    ed[a].emplace_back(b, eid);
- *    ed[b].emplace_back(a, eid++); }
- *  bicomps([\&](const vi\& edgelist) {...}); // 分量的边编号
- * Time: O(E + V)
- * Status: tested during MIPT ICPC Workshop 2017
+ * Description: 无向图 Tarjan (点 $1..n$, 边 $1..m$), 一次 DFS 同时求:
+ * (1) 割点 cut[u] 与点双连通分量 vb[1..vc] (每个点双的点集, 割点会
+ * 属于多个点双; 孤立点单独成一个点双). 根是割点当且仅当它在
+ * DFS 树上有至少两个儿子.
+ * (2) 桥 bri[id] 与边双连通分量 eb[u] (编号 $1..ec$). 用边编号判断
+ * 是否走回父边, 所以重边能正确处理. 自环不影响结果.
+ * 只需要其中一个时, 删掉另一部分的栈和代码即可.
+ * Usage: init(n,m); // 第 i 条边 (u,v):
+ * g[u].push_back({v,i}),g[v].push_back({u,i});
+ * for(int i=1;i<=n;i++) if(!dfn[i]) tarjan(i,0,i);
+ * Time: O(n+m)
  */
 #pragma once
 
-vi num,st;
-vector<vector<pii>>ed;
-int Time;
-template<class F>
-int dfs(int at,int par,F&f){
-	int me=num[at]=++Time,top=me;
-	for(auto[y,e]:ed[at])if(e!=par){
-		if(num[y]){
-			top=min(top,num[y]);
-			if(num[y]<me)
-				st.push_back(e);
-		}else{
-			int si=sz(st);
-			int up=dfs(y,e,f);
-			top=min(top,up);
-			if(up==me){
-				st.push_back(e);
-				f(vi(st.begin()+si,st.end()));
-				st.resize(si);
+const int N=2e5+5,M=4e5+5;
+vector<pair<int,int>>g[N]; // {v,边编号}
+int dfn[N],low[N],tim,s1[N],t1,s2[N],t2;
+bool cut[N],bri[M];
+int vc,ec,eb[N];vector<int>vb[N];
+// in 为进入 u 的边编号, rt 为本次 DFS 的根
+void tarjan(int u,int in,int rt){
+	dfn[u]=low[u]=++tim,s1[++t1]=s2[++t2]=u;
+	int ch=0;
+	for(auto[v,id]:g[u]){
+		if(!dfn[v]){
+			tarjan(v,id,rt),low[u]=min(low[u],low[v]);
+			if(low[v]>dfn[u])bri[id]=1;
+			if(low[v]>=dfn[u]){ // 弹出一个点双
+				if(++ch>1||u!=rt)cut[u]=1;
+				vb[++vc].clear();int x;
+				do x=s1[t1--],vb[vc].push_back(x);while(x!=v);
+				vb[vc].push_back(u);
 			}
-			else if(up<me)st.push_back(e);
-			else{ /* e 是桥 */ }
-		}
+		}else if(id!=in)low[u]=min(low[u],dfn[v]);
 	}
-	return top;
+	if(u==rt){if(!ch)vb[++vc]={u};t1=0;}
+	if(low[u]==dfn[u]){ // 弹出一个边双
+		ec++;int x;
+		do x=s2[t2--],eb[x]=ec;while(x!=u);
+	}
 }
-
-template<class F>
-void bicomps(F f){
-	num.assign(sz(ed),0);
-	rep(i,0,sz(ed))if(!num[i])dfs(i,-1,f);
+void init(int n,int m){
+	for(int i=1;i<=n;i++)g[i].clear(),dfn[i]=cut[i]=0;
+	for(int i=1;i<=m;i++)bri[i]=0;
+	tim=t1=t2=vc=ec=0;
 }
