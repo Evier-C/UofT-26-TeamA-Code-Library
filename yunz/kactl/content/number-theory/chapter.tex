@@ -1,6 +1,8 @@
-\section{数论}
+\section{数学}
 
-\subsection{模运算}
+\subsection{数论}
+
+\subsubsection{模运算}
 	\kactlimport{ModularArithmetic.h}
 	\kactlimport{ModInverse.h}
 	\kactlimport{ModPow.h}
@@ -9,26 +11,26 @@
 	\kactlimport{ModMulLL.h}
 	\kactlimport{ModSqrt.h}
 
-\subsection{素性测试}
+\subsubsection{素性测试}
 	\kactlimport{FastEratosthenes.h}
 	\kactlimport{MillerRabin.h}
 	\kactlimport{Factor.h}
 
-\subsection{整除}
+\subsubsection{整除}
 	\kactlimport{SqrtIntervals.h}
 	\kactlimport{euclid.h}
 	% \kactlimport{Euclid.java}
 	\kactlimport{CRT.h}
 	\kactlimport{ExLucas.h}
 
-	\subsubsection{Bézout 定理}
+	\paragraph{Bézout 定理}
 	对 $a \neq 0$, $b \neq 0$, $d=gcd(a,b)$ 是使下式有整数解的最小正整数
 	$$ax+by=d$$
 	若 $(x,y)$ 是一组解, 则全部解为
 	$$\left(x+\frac{kb}{\gcd(a,b)}, y-\frac{ka}{\gcd(a,b)}\right), \quad k\in\mathbb{Z}$$
 
 	\kactlimport{phiFunction.h}
-	\subsubsection{欧拉函数公式}
+	\paragraph{欧拉函数公式}
 		$\varphi(n)$ 为 $1\dots n$ 中与 $n$ 互质的数的个数.
 		\begin{compactitem}
 		\item 通项: $n=\prod p_i^{k_i}$ 时 $\varphi(n)=n\prod_{p\mid n}\left(1-\frac1p\right)$, $\varphi(p^k)=(p-1)p^{k-1}$, $\varphi(1)=1$.
@@ -39,17 +41,17 @@
 		\item 扩展欧拉定理 (不要求互质): $b\ge\varphi(m)$ 时 $a^b\equiv a^{b\bmod\varphi(m)+\varphi(m)}\pmod m$; $b<\varphi(m)$ 时直接算. 用于指数巨大或幂塔 $a^{a^{a\cdots}}$, 递归 $m\to\varphi(m)$ 约 $O(\log m)$ 层到 1.
 		\end{compactitem}
 
-\subsection{分数}
+\subsubsection{分数}
 	\kactlimport{Fractions.h}
 	% \kactlimport{ContinuedFractions.h}
 	% \kactlimport{FracBinarySearch.h}
 
-\subsection{勾股数}
+\subsubsection{勾股数}
  勾股数可唯一地表示为
  \[ a=k\cdot (m^{2}-n^{2}),\ \,b=k\cdot (2mn),\ \,c=k\cdot (m^{2}+n^{2}), \]
  其中 $m > n > 0$, $k > 0$, $m \bot n$, 且 $m$ 或 $n$ 为偶数.
 
-\subsection{素数}
+\subsubsection{素数}
 	$p=962592769$ 满足 $2^{21} \mid p-1$, 可能有用. 哈希可用
 	970592641 (31 位), 31443539979727 (45 位), 3006703054056749
 	(52 位). 小于 1\,000\,000 的素数有 78498 个.
@@ -57,12 +59,12 @@
 	除 $p = 2, a > 2$ 外, 模任意素数幂 $p^a$ 都有原根, 共 $\phi(\phi(p^a))$ 个.
 	$p = 2, a > 2$ 时, 群 $\mathbb Z_{2^a}^\times$ 同构于 $\mathbb Z_2 \times \mathbb Z_{2^{a-2}}$.
 
-\subsection{估计}
+\subsubsection{估计}
 	$\sum_{d|n} d = O(n \log \log n)$.
 
 	$n$ 的约数个数最多约为: $n < 5e4$ 时 100, $n < 1e7$ 时 500, $n < 1e10$ 时 2000, $n < 1e19$ 时 200\,000.
 
-\subsection{Mobius 函数}
+\subsubsection{Mobius 函数}
 \[
 	\mu(n) = \begin{cases} 0 & n \textrm{ is not square free}\\ 1 & n \textrm{ has even number of prime factors}\\ -1 & n \textrm{ has odd number of prime factors}\\\end{cases}
 \]
