@@ -1,12 +1,17 @@
 /**
- * Description: 整除分块. $\lfloor n/i \rfloor$ 只有 $O(\sqrt n)$ 种取值,
- * 值为 $q = \lfloor n/l \rfloor$ 的一段是 $[l, \lfloor n/q \rfloor]$.
- * 上取整: $q = \lceil n/l \rceil > 1$ 时段的右端是 $\lfloor (n-1)/(q-1) \rfloor$, $q = 1$ 时到 $n$.
- * 两个数一起分块 (如 $\lfloor n/i \rfloor \lfloor m/i \rfloor$): $r = \min(n/(n/l), m/(m/l))$, $l \le \min(n, m)$.
- * 例子求 $\sum_{i=1}^{n} \lfloor n/i \rfloor g(i)$, sg(l, r) 为 $g$ 的区间和, 按题目改.
- * Usage: ll s = floorSum(n); // sum floor(n/i) g(i), i 从 1 到 n
- * ll t = ceilSum(n); // sum ceil(n/i) g(i), i 从 1 到 n
- * Time: O(\sqrt N)
+ * Description: 整除分块 (数论分块). 当 $i$ 从 1 到 $n$ 时 $\lfloor n/i \rfloor$ 只有 $O(\sqrt n)$ 种取值,
+ * 把值相同的 $i$ 合成一段一起算. 下取整: 段的左端 $l$, 值 $q = \lfloor n/l \rfloor$, 右端 $r = \lfloor n/q \rfloor$.
+ * 上取整: 值 $q = \lceil n/l \rceil$, $q > 1$ 时右端 $r = \lfloor (n-1)/(q-1) \rfloor$, $q = 1$ 时 $r = n$.
+ * 两个数一起分块 (如求 $\sum \lfloor n/i \rfloor \lfloor m/i \rfloor$): $r = \min(\lfloor n/\lfloor n/l \rfloor \rfloor, \lfloor m/\lfloor m/l \rfloor \rfloor)$, 循环到 $\min(n, m)$.
+ * 下面 floorSum(n) 求 $\sum_{i=1}^{n} \lfloor n/i \rfloor g(i)$, ceilSum(n) 求 $\sum_{i=1}^{n} \lceil n/i \rceil g(i)$,
+ * 其中 sg(l, r) $= \sum_{i=l}^{r} g(i)$ 要按题目改 (例子里 $g = 1$; 莫比乌斯反演时 $g = \mu$, 用前缀和).
+ * $n$ 到 $10^{12}$ 左右时注意结果是否超过 long long, 必要时取模.
+ * Usage: ll s = floorSum(n); // sum floor(n/i) g(i)
+ * ll t = ceilSum(n); // sum ceil(n/i) g(i)
+ * for(ll l = 1, r; l <= n; l = r + 1) { // 直接写循环
+ *   r = n / (n / l); // [l, r] 内 n/i 都相同
+ * }
+ * Time: O(\sqrt n) 次 sg
  */
 #pragma once
 
@@ -24,7 +29,8 @@ ll ceilSum(ll n){
 	ll res=0;
 	for(ll l=1,r;l<=n;l=r+1){
 		ll q=(n+l-1)/l;
-		r=q>1?(n-1)/(q-1):n; // [l, r] 内上取整都是 q
+		if(q>1)r=(n-1)/(q-1); // [l, r] 内上取整都是 q
+		else r=n;
 		res+=q*sg(l,r);
 	}
 	return res;

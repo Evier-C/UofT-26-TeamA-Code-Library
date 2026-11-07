@@ -18,15 +18,19 @@ Node operator+(Node x,Node y){
 void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
 // ---- guide block 1 (copied verbatim) ----
 // 标记: tg[p] 为 1 表示整段待赋成 lz[p]
-ll lz[N<<2];bool tg[N<<2]; // build 里清 0
+ll lz[N<<2];
+bool tg[N<<2];
 void addtag(int p,int l,int r,ll v){ // 整段赋成 v
-	t[p].sum=v*(r-l+1),t[p].mx=v;
-	lz[p]=v,tg[p]=1; // 新赋值直接覆盖旧标记
+	t[p].sum=v*(r-l+1);
+	t[p].mx=v;
+	lz[p]=v; // 新赋值直接覆盖旧标记
+	tg[p]=1;
 }
 void pushdown(int p,int l,int r){
 	if(!tg[p])return;
 	int m=(l+r)>>1;
-	addtag(p<<1,l,m,lz[p]),addtag(p<<1|1,m+1,r,lz[p]);
+	addtag(p<<1,l,m,lz[p]);
+	addtag(p<<1|1,m+1,r,lz[p]);
 	tg[p]=0;
 }
 // ---- end of block ----
@@ -65,23 +69,30 @@ Node operator+(Node x,Node y){
 void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
 // ---- guide block 2 (copied verbatim) ----
 // 标记: 若 tg[p] 先整段赋成 sv[p], 再整段加 ad[p]
-ll sv[N<<2],ad[N<<2];bool tg[N<<2]; // build 里清 0
+ll sv[N<<2],ad[N<<2];
+bool tg[N<<2];
 void setv(int p,int l,int r,ll v){ // 整段赋成 v
-	t[p].sum=v*(r-l+1),t[p].mx=v;
-	sv[p]=v,tg[p]=1,ad[p]=0;
+	t[p].sum=v*(r-l+1);
+	t[p].mx=v;
+	sv[p]=v;
+	tg[p]=1;
+	ad[p]=0; // 赋值清掉之前的加
 }
 void addv(int p,int l,int r,ll v){ // 整段加 v
-	t[p].sum+=v*(r-l+1),t[p].mx+=v;
+	t[p].sum+=v*(r-l+1);
+	t[p].mx+=v;
 	ad[p]+=v;
 }
 void pushdown(int p,int l,int r){
 	int m=(l+r)>>1;
-	if(tg[p]){
-		setv(p<<1,l,m,sv[p]),setv(p<<1|1,m+1,r,sv[p]);
+	if(tg[p]){ // 先下传赋值
+		setv(p<<1,l,m,sv[p]);
+		setv(p<<1|1,m+1,r,sv[p]);
 		tg[p]=0;
 	}
-	if(ad[p]){
-		addv(p<<1,l,m,ad[p]),addv(p<<1|1,m+1,r,ad[p]);
+	if(ad[p]){ // 再下传加
+		addv(p<<1,l,m,ad[p]);
+		addv(p<<1|1,m+1,r,ad[p]);
 		ad[p]=0;
 	}
 }
@@ -90,7 +101,8 @@ void update(int p,int l,int r,int x,int y,int op,ll v){
 		if(op)setv(p,l,r,v);
 		else addv(p,l,r,v);
 		return;
-	} // 其余同模板, 递归时也传 op
+	}
+	// 其余同模板, 递归时也传 op
 // ---- end of block ----
 	pushdown(p,l,r);
 	int m=(l+r)>>1;
@@ -120,22 +132,25 @@ ll a[N];
 // ---- guide block 3 (copied verbatim) ----
 const ll M=998244353;
 struct Node{ll sum;};
-Node operator+(Node x,Node y){return {(x.sum+y.sum)%M};}
+Node operator+(Node x,Node y){
+	return {(x.sum+y.sum)%M};
+}
 // 标记: 整段每个数先乘 mu[p] 再加 ad[p]
 Node t[N<<2];
 void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
-ll mu[N<<2],ad[N<<2]; // build 里 mu[p]=1,ad[p]=0
-// 叶子 t[p]={a[l]%M}, 不要 mx
+ll mu[N<<2],ad[N<<2];
 void addtag(int p,int l,int r,ll k,ll b){
 	t[p].sum=(k*t[p].sum+b*(r-l+1))%M;
-	mu[p]=mu[p]*k%M,ad[p]=(ad[p]*k+b)%M;
+	mu[p]=mu[p]*k%M;
+	ad[p]=(ad[p]*k+b)%M;
 }
 void pushdown(int p,int l,int r){
 	if(mu[p]==1&&!ad[p])return;
 	int m=(l+r)>>1;
 	addtag(p<<1,l,m,mu[p],ad[p]);
 	addtag(p<<1|1,m+1,r,mu[p],ad[p]);
-	mu[p]=1,ad[p]=0;
+	mu[p]=1;
+	ad[p]=0;
 }
 // update 的参数 v 换成 k, b, 命中整段时 addtag(p,l,r,k,b)
 // ---- end of block ----
@@ -171,15 +186,16 @@ struct Node{int cnt;}; // 区间里 1 的个数
 Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
 Node t[N<<2];
 void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
-bool rev[N<<2]; // 取反标记, build 里清 0
-// 叶子 t[p]={(int)a[l]}
+bool rev[N<<2]; // 取反标记
 void addtag(int p,int l,int r){ // 整段 0 和 1 互换
-	t[p].cnt=(r-l+1)-t[p].cnt,rev[p]^=1;
+	t[p].cnt=(r-l+1)-t[p].cnt;
+	rev[p]^=1;
 }
 void pushdown(int p,int l,int r){
 	if(!rev[p])return;
 	int m=(l+r)>>1;
-	addtag(p<<1,l,m),addtag(p<<1|1,m+1,r);
+	addtag(p<<1,l,m);
+	addtag(p<<1|1,m+1,r);
 	rev[p]=0;
 }
 // update 去掉参数 v, 命中整段时 addtag(p,l,r)
@@ -212,18 +228,24 @@ namespace V5{
 const int N=2e5+5;
 ll a[N];
 // ---- guide block 5 (copied verbatim) ----
-struct Node{ll sum,pre,suf,best;}; // 前缀, 后缀, 答案
+// pre: 最大前缀和, suf: 最大后缀和, best: 答案
+struct Node{ll sum,pre,suf,best;};
 Node operator+(Node x,Node y){
-	return {x.sum+y.sum,max(x.pre,x.sum+y.pre),
-	        max(y.suf,y.sum+x.suf),
-	        max({x.best,y.best,x.suf+y.pre})};
+	Node r;
+	r.sum=x.sum+y.sum;
+	r.pre=max(x.pre,x.sum+y.pre);
+	r.suf=max(y.suf,y.sum+x.suf);
+	r.best=max({x.best,y.best,x.suf+y.pre});
+	return r;
 }
-// 叶子 t[p]={a[l],a[l],a[l],a[l]}
 // 删去 lz, addtag, pushdown 及其所有调用
 Node t[N<<2];
 void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
 void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
-	if(l==r){t[p]={v,v,v,v};return;}
+	if(l==r){
+		t[p]={v,v,v,v};
+		return;
+	}
 	int m=(l+r)>>1;
 	if(x<=m)modify(p<<1,l,m,x,v);
 	else modify(p<<1|1,m+1,r,x,v);

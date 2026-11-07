@@ -52,10 +52,13 @@
 		% I.e. matrix-tree theorem.
 		% Source: https://en.wikipedia.org/wiki/Kirchhoff%27s_theorem
 		% Test: stress-tests/graph/matrix-tree.cpp
-		建 $N\times N$ 矩阵 \texttt{mat}, 对每条边 $a \rightarrow b \in G$ 执行
-		\texttt{mat[a][b]--, mat[b][b]++} (若 $G$ 无向, 再执行 \texttt{mat[b][a]--, mat[a][a]++}).
-		删去第 $i$ 行和对应列后求行列式, 即得以 $i$ 为根的有向生成树个数
-		(若 $G$ 无向, 删去任意一行及对应列即可).
+		矩阵树定理. 建 $n\times n$ 矩阵 \texttt{mat} (初始全 0), 对每条有向边 $a\to b$ 执行
+		\texttt{mat[a][b]--, mat[b][b]++}, 即对角线放每个点的入度, 非对角线放负的边数 (重边要累加).
+		\begin{compactitem}
+		\item \textbf{有向图}: 把第 $i$ 行和第 $i$ 列 (同一个编号) 都删掉, 剩下 $(n-1)\times(n-1)$ 矩阵的行列式, 就是以 $i$ 为根、所有边都从根往外指 (外向树) 的生成树个数. 要算内向树 (边都指向根), 对角线改放出度: 对每条边 $a\to b$ 执行 \texttt{mat[a][b]--, mat[a][a]++}.
+		\item \textbf{无向图}: 每条无向边当作两条有向边, 即对角线是度数, $\mathit{mat}[a][b]$ 为负的边数 (拉普拉斯矩阵). 删去任意一个 $i$ 的第 $i$ 行和第 $i$ 列, 行列式就是生成树个数.
+		\item 答案很大时取模, 用 \texttt{IntDeterminant.h} 的 \texttt{detMod}.
+		\end{compactitem}
 
 	\subsubsection{Erdős–Gallai 定理}
 		% Source: https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93Gallai_theorem

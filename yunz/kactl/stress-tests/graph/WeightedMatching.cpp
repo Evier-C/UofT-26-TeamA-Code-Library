@@ -80,7 +80,18 @@ void testMaxAny(int L,int R){
 	assert(best==*max_element(dp.begin(),dp.end()));
 	checks++;
 }
+// missing edges with cost 1e12, compare with brute
+void testMissing(){
+	n=rnd(1,6);m=rnd(n,7);
+	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)
+		a[i][j]=rnd(0,2)?rnd(-1000,1000):(ll)1e12;
+	ll c=km();
+	assert(c==brute());
+	check(c);
+	checks++;
+}
 int main(){
+	for(int it=0;it<10000;it++)testMissing();
 	for(int it=0;it<5000;it++)testMaxAny(rnd(1,7),rnd(1,7));
 	for(int it=0;it<30000;it++){
 		int nn=rnd(1,7),mm=rnd(nn,8);

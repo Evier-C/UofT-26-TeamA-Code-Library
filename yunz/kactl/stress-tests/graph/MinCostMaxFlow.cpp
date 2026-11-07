@@ -8,7 +8,9 @@ int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
 
 struct E{int u,v;ll c,w;};
 // brute force: enumerate every integer flow on every edge
+ll bruteAny;
 pair<ll,ll>brute(int nn,vector<E>&es,int s,int t){
+	bruteAny=0;
 	int m=es.size();
 	vector<ll>f(m,0);
 	pair<ll,ll>best={-1,0};
@@ -19,6 +21,7 @@ pair<ll,ll>brute(int nn,vector<E>&es,int s,int t){
 		for(int v=1;v<=nn;v++)if(v!=s&&v!=t&&bal[v])ok=false;
 		if(ok){
 			ll val=bal[t];
+			if(val>=0)bruteAny=min(bruteAny,co);
 			if(val>best.first||(val==best.first&&co<best.second))best={val,co};
 		}
 		int i=0;
@@ -28,7 +31,36 @@ pair<ll,ll>brute(int nn,vector<E>&es,int s,int t){
 	}
 	return best;
 }
+// variant from the Description: min cost flow of any amount
+pair<ll,ll>mcmfStop(int s,int t){
+	ll flow=0,c=0;
+	while(spfa(s,t)&&dis[t]<0){
+		ll f=fl[t];
+		flow+=f;
+		c+=f*dis[t];
+		for(int v=t;v!=s;v=to[pre[v]^1]){
+			cap[pre[v]]-=f;
+			cap[pre[v]^1]+=f;
+		}
+	}
+	return {flow,c};
+}
 long long checks=0;
+void testAny(int nn,int mm){
+	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
+	vector<ll>p(nn+1);
+	for(int v=1;v<=nn;v++)p[v]=rnd(-5,5);
+	vector<E>es;init(nn);
+	for(int i=0;i<mm;i++){
+		int u=rnd(1,nn),v=rnd(1,nn);
+		ll c=rnd(0,2),w=rnd(0,5)+p[u]-p[v];
+		es.push_back({u,v,c,w});add(u,v,c,w);
+	}
+	auto r=mcmfStop(s,t);
+	brute(nn,es,s,t);
+	assert(r.second==bruteAny);
+	checks++;
+}
 void test(int nn,int mm,int maxc,int maxw,bool br){
 	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
 	vector<ll>p(nn+1);
@@ -108,6 +140,7 @@ int main(){
 	for(int it=0;it<3000;it++)test(rnd(2,30),rnd(0,150),rnd(1,20),100,false);
 	for(int it=0;it<20;it++)test(rnd(100,300),rnd(500,3000),1000,1000000,false);
 	for(int it=0;it<3000;it++)testAssign(rnd(1,7));
+	for(int it=0;it<20000;it++)testAny(rnd(2,5),rnd(0,6));
 	cout<<"checks: "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
 }

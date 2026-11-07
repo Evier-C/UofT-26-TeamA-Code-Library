@@ -1,9 +1,16 @@
 /**
- * Description: pb\_ds 哈希表, 用法同 unordered\_map, 但快约 3 倍.
- * 键 ll, 值 int, 要别的类型改 gp\_hash\_table 的前两个参数.
- * chash 让高位也参与哈希; RND 为随机数, 防 CodeForces 上的 hack.
- * Usage: h[key] = val; h.erase(key); h.clear();
- * if (h.find(key) != h.end()) ...; // 判断是否存在
+ * Description: pb\_ds 哈希表 h, 用法同 unordered\_map, 但快约 3 倍.
+ * 键为 ll, 值为 int; 要别的类型就改 gp\_hash\_table 的前两个参数,
+ * 键必须是整数类型, 因为 chash 只会哈希整数.
+ * chash 让高位也参与哈希; RND 是运行时的随机数, 防 CodeForces 上的 hack.
+ * 初始容量 $2^{16}$, 必须是 2 的幂. h[key] 在键不存在时会插入值 0.
+ * 只判断存在请用 h.find(key) != h.end(), 不要用 h[key], 否则会插入.
+ * 注意: 内存约为 unordered\_map 的 1.5 倍; 遍历顺序是随机的.
+ * Usage: h.clear(); // 多组数据清空
+ * h[key] = val; h[key]++; // 插入或修改
+ * auto it = h.find(key);
+ * if (it != h.end()) cout << it->second; // 存在则输出值
+ * h.erase(key); int sz = h.size();
  * for (auto [k, v] : h) ...; // 遍历, 顺序随机
  * Time: 均摊 O(1)
  */

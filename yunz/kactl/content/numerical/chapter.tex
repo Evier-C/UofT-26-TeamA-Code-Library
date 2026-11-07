@@ -46,17 +46,24 @@ vector<ll> t=conv(a,rb); // e[k] 即 t[m-1-k]
 \item \textbf{大整数乘法}: 低位在前存数字, 卷积后进位.
 \begin{lstlisting}
 string bigMul(string s,string t){ // 十进制, 无负号
-	int n=s.size(),m=t.size();
+	int n=s.size();
+	int m=t.size();
 	vector<ll> a(n),b(m); // 低位在前
-	for(int i=0;i<n;i++)a[i]=s[n-1-i]-'0';
-	for(int i=0;i<m;i++)b[i]=t[m-1-i]-'0';
+	for(int i=0;i<n;i++)
+		a[i]=s[n-1-i]-'0';
+	for(int i=0;i<m;i++)
+		b[i]=t[m-1-i]-'0';
 	vector<ll> c=conv(a,b);
-	string r;ll carry=0;
+	string r;
+	ll carry=0;
 	for(int i=0;i<(int)c.size()||carry;i++){
-		if(i<(int)c.size())carry+=c[i];
-		r+=char('0'+carry%10),carry/=10;
+		if(i<(int)c.size())
+			carry+=c[i];
+		r+=char('0'+carry%10);
+		carry/=10;
 	}
-	while(r.size()>1&&r.back()=='0')r.pop_back();
+	while(r.size()>1&&r.back()=='0') // 去前导 0
+		r.pop_back();
 	reverse(r.begin(),r.end());
 	return r;
 }
@@ -65,10 +72,13 @@ string bigMul(string s,string t){ // 十进制, 无负号
 \begin{lstlisting}
 vector<ll> pairSum(vector<int>&v,int V){
 	vector<ll> cnt(V+1);
-	for(int x:v)cnt[x]++;
+	for(int x:v)
+		cnt[x]++;
 	vector<ll> f=conv(cnt,cnt); // 有序对, 含 i=j
-	for(int x:v)f[2*x]--; // 去掉 i=j
-	for(auto&y:f)y/=2; // 变成无序对 i<j
+	for(int x:v)
+		f[2*x]--; // 去掉 i=j
+	for(auto&y:f)
+		y/=2; // 变成无序对 i<j
 	return f; // f[k] 为对数, 长度 2V+1
 }
 \end{lstlisting}
@@ -78,18 +88,27 @@ NTT 下和可能恰为模数的倍数, 误判概率极小; 介意可再换一个
 \begin{lstlisting}
 ll wv(char c){return c=='*'?0:c-'a'+1;} // 通配符为 0
 vector<int> wildMatch(string s,string p){
-	int n=s.size(),m=p.size();
+	int n=s.size();
+	int m=p.size();
 	vector<int> res; // 匹配的起点, 下标从 0 开始
-	if(m>n)return res;
+	if(m>n)
+		return res;
 	vector<ll> S[4],P[4]; // S[k][i] 为 s_i 的 k 次方
-	for(int k=1;k<=3;k++)S[k].resize(n),P[k].resize(m);
+	for(int k=1;k<=3;k++){
+		S[k].resize(n);
+		P[k].resize(m);
+	}
 	for(int i=0;i<n;i++){
 		ll v=wv(s[i]);
-		S[1][i]=v,S[2][i]=v*v,S[3][i]=v*v*v;
+		S[1][i]=v;
+		S[2][i]=v*v;
+		S[3][i]=v*v*v;
 	}
 	for(int j=0;j<m;j++){ // P 为 p 反转
 		ll v=wv(p[m-1-j]);
-		P[1][j]=v,P[2][j]=v*v,P[3][j]=v*v*v;
+		P[1][j]=v;
+		P[2][j]=v*v;
+		P[3][j]=v*v*v;
 	}
 	vector<ll> c1=nttConv(P[3],S[1]);
 	vector<ll> c2=nttConv(P[2],S[2]);
@@ -106,15 +125,18 @@ vector<int> wildMatch(string s,string p){
 \begin{lstlisting}
 vector<ll> pairXor(vector<int>&v,int K){
 	vector<ll> cnt(1<<K);
-	for(int x:v)cnt[x]++;
+	for(int x:v)
+		cnt[x]++;
 	vector<ll> f=xorConv(cnt,cnt); // 有序对, 含 i=j
 	f[0]-=v.size(); // i=j 时 xor 为 0
-	for(auto&y:f)y/=2;
+	for(auto&y:f)
+		y/=2;
 	return f;
 }
 // or 同理: f=orConv(cnt,cnt), 对每个 x 做 f[x]--, 再除 2
 // 子集和: g[S]=sum a[T], T 取遍 S 的子集
-vector<ll> g=a;fwtOr(g,1); // fwtOr(g,-1) 还原
+vector<ll> g=a;
+fwtOr(g,1); // fwtOr(g,-1) 还原
 // 超集和: fwtAnd(g,1)
 \end{lstlisting}
 \end{compactitem}

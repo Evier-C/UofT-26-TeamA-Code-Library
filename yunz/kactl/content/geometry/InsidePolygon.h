@@ -1,8 +1,12 @@
 /**
- * Description: 判断点 a 是否在多边形 p 内 (顺时针或逆时针, 可以是凹多边形).
- * strict 为 true 时边界上的点返回 false. 中间有乘积, 注意溢出.
- * Usage: vector<Point> p={Point(4,4),Point(1,2),Point(2,1)};
- * bool in=inPolygon(p,Point(3,3),false); // 含边界
+ * Description: 射线法判断点 a 是否在多边形 p 内, 在内返回 true.
+ * 多边形为 vector<Point> (下标 0..n-1), 顺时针或逆时针均可, 可以是凹多边形 (要求简单多边形).
+ * 点在边界上时: strict 为 true 返回 false, strict 为 false 返回 true.
+ * 边界判断用 onSegment (带 eps). T 为 ll 时结果精确, 中间有乘积, 注意溢出.
+ * Usage: vector<Point> p={Point(0,0),Point(4,0),Point(0,4)};
+ * bool a=inPolygon(p,Point(1,1)); // true, 严格在内部
+ * bool b=inPolygon(p,Point(2,0),false); // true, 含边界
+ * bool c=inPolygon(p,Point(2,0),true); // false
  * Time: O(n)
  */
 #pragma once

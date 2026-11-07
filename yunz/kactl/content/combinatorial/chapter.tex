@@ -40,6 +40,26 @@
 	\subsubsection{二项式系数}
 		\kactlimport{multinomial.h}
 
+\subsection{容斥与二项式反演}
+	\subsubsection{容斥原理}
+		\[ \Big|\bigcup_{i=1}^n A_i\Big| = \sum_{\emptyset\ne S\subseteq[n]} (-1)^{|S|+1} \Big|\bigcap_{i\in S} A_i\Big|, \qquad
+		   \#\{\text{一个条件都不满足}\} = \sum_{S\subseteq[n]} (-1)^{|S|} \Big|\bigcap_{i\in S} A_i\Big| \]
+		空集的交是全集. 套路: 条件 $i$ 是坏事件, 钦定一个集合 $S$ 里的坏事件一定发生、其余随意, 算方案数后按 $|S|$ 的奇偶加减. 只和 $|S|$ 有关时写成 $\sum_k (-1)^k \binom{n}{k} h(k)$.
+		\begin{compactitem}
+		\item 满射 ($n$ 个不同的球放进 $k$ 个不同的盒子且不空): $\sum_{j=0}^{k}(-1)^j\binom{k}{j}(k-j)^n$.
+		\item 带上界的插板: $x_1+\dots+x_k=n$, $0\le x_i\le c$ 的解数 $\sum_{j}(-1)^j\binom{k}{j}\binom{n-j(c+1)+k-1}{k-1}$.
+		\item 互质计数: $\#\{1\le a,b\le n: \gcd(a,b)=1\} = \sum_{d}\mu(d)\lfloor n/d\rfloor^2$, 莫比乌斯函数就是对质因子做容斥.
+		\end{compactitem}
+	\subsubsection{二项式反演}
+		\[ f(n)=\sum_{i=0}^{n}\binom{n}{i}g(i) \iff g(n)=\sum_{i=0}^{n}(-1)^{n-i}\binom{n}{i}f(i) \]
+		\[ f(k)=\sum_{i=k}^{n}\binom{i}{k}g(i) \iff g(k)=\sum_{i=k}^{n}(-1)^{i-k}\binom{i}{k}f(i) \]
+		第二个是最常用的 至少 转 恰好: 设 $g(k)$ 为恰好满足 $k$ 个条件的方案数, $f(k)$ 为先钦定 $k$ 个条件满足、其余随意的方案数之和 (同一方案会被算 $\binom{i}{k}$ 次), 通常 $f$ 好算, 再反演得 $g$.
+		例: 恰好 $k$ 个不动点的排列数, 钦定 $i$ 个不动点 $f(i)=\binom{n}{i}(n-i)!$, 代入上式; $k=0$ 即错排.
+	\subsubsection{子集反演}
+		\[ f(S)=\sum_{T\subseteq S}g(T) \iff g(S)=\sum_{T\subseteq S}(-1)^{|S|-|T|}f(T) \]
+		\[ f(S)=\sum_{T\supseteq S}g(T) \iff g(S)=\sum_{T\supseteq S}(-1)^{|T|-|S|}f(T) \]
+		对状压可以用子集和 (SOS DP) 的逆运算在 $O(2^n n)$ 内求出. 期望里的 min-max 容斥见 期望与概率技巧 一节.
+
 \subsection{常用计数数列}
 	\subsubsection{Bernoulli 数}
 		Bernoulli 数的 EGF 为 $B(t)=\frac{t}{e^t-1}$ (可用 FFT 求).

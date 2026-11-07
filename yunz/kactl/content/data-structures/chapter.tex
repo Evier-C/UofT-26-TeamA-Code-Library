@@ -9,43 +9,55 @@
 \paragraph{懒标记写法}
 换用途只改: Node 的字段和合并两个儿子的 \texttt{operator+}, build 里叶子的初值, 标记数组, \texttt{addtag} 和 \texttt{pushdown}.
 \texttt{addtag(p, l, r, v)}: 给整段 $[l, r]$ 打上标记 $v$, 要立刻更新 \texttt{t[p]}, 并把 $v$ 合并进 \texttt{p} 的旧标记, 旧标记先做, $v$ 后做.
-update 命中整段时调用它, pushdown 给两个儿子时也调用它. 新加的标记数组都要在 build 里设成空标记. 区间加就是上面的模板.
+update 命中整段时调用它, pushdown 给两个儿子时也调用它. 新加的标记数组都要在 build 里设成空标记, 否则多组数据会残留.
+没列出的函数 (pushup, build 的递归部分, update, query) 保持模板原样. 区间加就是上面的模板.
 \begin{compactitem}
-\item \textbf{区间赋值, 求和与最大值}: \texttt{update(1, 1, n, l, r, v)} 把 $a[l..r]$ 赋成 $v$.
+\item \textbf{区间赋值, 求和与最大值}: \texttt{update(1, 1, n, l, r, v)} 把 $a[l..r]$ 都赋成 $v$. build 里加 \texttt{tg[p]=0}.
 \begin{lstlisting}
 // 标记: tg[p] 为 1 表示整段待赋成 lz[p]
-ll lz[N<<2];bool tg[N<<2]; // build 里清 0
+ll lz[N<<2];
+bool tg[N<<2];
 void addtag(int p,int l,int r,ll v){ // 整段赋成 v
-	t[p].sum=v*(r-l+1),t[p].mx=v;
-	lz[p]=v,tg[p]=1; // 新赋值直接覆盖旧标记
+	t[p].sum=v*(r-l+1);
+	t[p].mx=v;
+	lz[p]=v; // 新赋值直接覆盖旧标记
+	tg[p]=1;
 }
 void pushdown(int p,int l,int r){
 	if(!tg[p])return;
 	int m=(l+r)>>1;
-	addtag(p<<1,l,m,lz[p]),addtag(p<<1|1,m+1,r,lz[p]);
+	addtag(p<<1,l,m,lz[p]);
+	addtag(p<<1|1,m+1,r,lz[p]);
 	tg[p]=0;
 }
 \end{lstlisting}
-\item \textbf{赋值和加混用}: update 多一个参数 \texttt{op}, 为 1 赋值, 为 0 加.
+\item \textbf{赋值和加混用}: update 多一个参数 \texttt{op}, \texttt{op} 为 1 时把 $a[l..r]$ 赋成 $v$, 为 0 时都加 $v$. build 里把 \texttt{sv, ad, tg} 都清 0.
 \begin{lstlisting}
 // 标记: 若 tg[p] 先整段赋成 sv[p], 再整段加 ad[p]
-ll sv[N<<2],ad[N<<2];bool tg[N<<2]; // build 里清 0
+ll sv[N<<2],ad[N<<2];
+bool tg[N<<2];
 void setv(int p,int l,int r,ll v){ // 整段赋成 v
-	t[p].sum=v*(r-l+1),t[p].mx=v;
-	sv[p]=v,tg[p]=1,ad[p]=0;
+	t[p].sum=v*(r-l+1);
+	t[p].mx=v;
+	sv[p]=v;
+	tg[p]=1;
+	ad[p]=0; // 赋值清掉之前的加
 }
 void addv(int p,int l,int r,ll v){ // 整段加 v
-	t[p].sum+=v*(r-l+1),t[p].mx+=v;
+	t[p].sum+=v*(r-l+1);
+	t[p].mx+=v;
 	ad[p]+=v;
 }
 void pushdown(int p,int l,int r){
 	int m=(l+r)>>1;
-	if(tg[p]){
-		setv(p<<1,l,m,sv[p]),setv(p<<1|1,m+1,r,sv[p]);
+	if(tg[p]){ // 先下传赋值
+		setv(p<<1,l,m,sv[p]);
+		setv(p<<1|1,m+1,r,sv[p]);
 		tg[p]=0;
 	}
-	if(ad[p]){
-		addv(p<<1,l,m,ad[p]),addv(p<<1|1,m+1,r,ad[p]);
+	if(ad[p]){ // 再下传加
+		addv(p<<1,l,m,ad[p]);
+		addv(p<<1|1,m+1,r,ad[p]);
 		ad[p]=0;
 	}
 }
@@ -54,58 +66,69 @@ void update(int p,int l,int r,int x,int y,int op,ll v){
 		if(op)setv(p,l,r,v);
 		else addv(p,l,r,v);
 		return;
-	} // 其余同模板, 递归时也传 op
+	}
+	// 其余同模板, 递归时也传 op
 \end{lstlisting}
-\item \textbf{区间乘再加, 求和取模}: \texttt{update(1, 1, n, l, r, k, b)} 把 $a[l..r]$ 每个数 $v$ 变成 $kv + b$, 要求 $0 \le k, b < M$.
+\item \textbf{区间乘再加, 求和取模}: \texttt{update(1, 1, n, l, r, k, b)} 把 $a[l..r]$ 每个数 $v$ 变成 $kv + b$, 要求 $0 \le k, b < M$, $0 \le a_i < M$. 去掉 mx. build 里 \texttt{mu[p]=1, ad[p]=0}, 叶子 \texttt{t[p]=\{a[l]\%M\}}.
 \begin{lstlisting}
 const ll M=998244353;
 struct Node{ll sum;};
-Node operator+(Node x,Node y){return {(x.sum+y.sum)%M};}
+Node operator+(Node x,Node y){
+	return {(x.sum+y.sum)%M};
+}
 // 标记: 整段每个数先乘 mu[p] 再加 ad[p]
-ll mu[N<<2],ad[N<<2]; // build 里 mu[p]=1,ad[p]=0
-// 叶子 t[p]={a[l]%M}, 不要 mx
+ll mu[N<<2],ad[N<<2];
 void addtag(int p,int l,int r,ll k,ll b){
 	t[p].sum=(k*t[p].sum+b*(r-l+1))%M;
-	mu[p]=mu[p]*k%M,ad[p]=(ad[p]*k+b)%M;
+	mu[p]=mu[p]*k%M;
+	ad[p]=(ad[p]*k+b)%M;
 }
 void pushdown(int p,int l,int r){
 	if(mu[p]==1&&!ad[p])return;
 	int m=(l+r)>>1;
 	addtag(p<<1,l,m,mu[p],ad[p]);
 	addtag(p<<1|1,m+1,r,mu[p],ad[p]);
-	mu[p]=1,ad[p]=0;
+	mu[p]=1;
+	ad[p]=0;
 }
 // update 的参数 v 换成 k, b, 命中整段时 addtag(p,l,r,k,b)
 \end{lstlisting}
-\item \textbf{01 序列区间取反, 数 1 的个数}: \texttt{update(1, 1, n, l, r)}, $a[i]$ 为 0 或 1.
+\item \textbf{01 序列区间取反, 数 1 的个数}: $a[i]$ 为 0 或 1, \texttt{update(1, 1, n, l, r)} 把 $a[l..r]$ 中 0 和 1 互换, \texttt{query(1, 1, n, l, r).cnt} 为其中 1 的个数. build 里 \texttt{rev[p]=0}, 叶子 \texttt{t[p]=\{(int)a[l]\}}.
 \begin{lstlisting}
 struct Node{int cnt;}; // 区间里 1 的个数
 Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
-bool rev[N<<2]; // 取反标记, build 里清 0
-// 叶子 t[p]={(int)a[l]}
+bool rev[N<<2]; // 取反标记
 void addtag(int p,int l,int r){ // 整段 0 和 1 互换
-	t[p].cnt=(r-l+1)-t[p].cnt,rev[p]^=1;
+	t[p].cnt=(r-l+1)-t[p].cnt;
+	rev[p]^=1;
 }
 void pushdown(int p,int l,int r){
 	if(!rev[p])return;
 	int m=(l+r)>>1;
-	addtag(p<<1,l,m),addtag(p<<1|1,m+1,r);
+	addtag(p<<1,l,m);
+	addtag(p<<1|1,m+1,r);
 	rev[p]=0;
 }
 // update 去掉参数 v, 命中整段时 addtag(p,l,r)
 \end{lstlisting}
-\item \textbf{最大子段和}: 只有单点赋值 \texttt{modify(1, 1, n, x, v)}, 不需要标记. \texttt{query(1, 1, n, l, r).best} 为 $a[l..r]$ 的最大非空子段和.
+\item \textbf{最大子段和}: 只有单点赋值 \texttt{modify(1, 1, n, x, v)} 把 $a[x]$ 赋成 $v$, 不需要标记. \texttt{query(1, 1, n, l, r).best} 为 $a[l..r]$ 的最大非空子段和. 叶子 \texttt{t[p]=\{a[l], a[l], a[l], a[l]\}}.
 \begin{lstlisting}
-struct Node{ll sum,pre,suf,best;}; // 前缀, 后缀, 答案
+// pre: 最大前缀和, suf: 最大后缀和, best: 答案
+struct Node{ll sum,pre,suf,best;};
 Node operator+(Node x,Node y){
-	return {x.sum+y.sum,max(x.pre,x.sum+y.pre),
-	        max(y.suf,y.sum+x.suf),
-	        max({x.best,y.best,x.suf+y.pre})};
+	Node r;
+	r.sum=x.sum+y.sum;
+	r.pre=max(x.pre,x.sum+y.pre);
+	r.suf=max(y.suf,y.sum+x.suf);
+	r.best=max({x.best,y.best,x.suf+y.pre});
+	return r;
 }
-// 叶子 t[p]={a[l],a[l],a[l],a[l]}
 // 删去 lz, addtag, pushdown 及其所有调用
 void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
-	if(l==r){t[p]={v,v,v,v};return;}
+	if(l==r){
+		t[p]={v,v,v,v};
+		return;
+	}
 	int m=(l+r)>>1;
 	if(x<=m)modify(p<<1,l,m,x,v);
 	else modify(p<<1|1,m+1,r,x,v);
@@ -122,6 +145,7 @@ void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
 \kactlimport{LiChaoTree.h}
 % \kactlimport{Treap.h}
 \kactlimport{FHQTreap.h}
+\kactlimport{CartesianTree.h}
 \kactlimport{FenwickTree.h}
 \kactlimport{FenwickTree2d.h}
 % \kactlimport{RMQ.h}

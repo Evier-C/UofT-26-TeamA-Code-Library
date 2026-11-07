@@ -28,6 +28,16 @@
 	$$\left(x+\frac{kb}{\gcd(a,b)}, y-\frac{ka}{\gcd(a,b)}\right), \quad k\in\mathbb{Z}$$
 
 	\kactlimport{phiFunction.h}
+	\subsubsection{欧拉函数公式}
+		$\varphi(n)$ 为 $1\dots n$ 中与 $n$ 互质的数的个数.
+		\begin{compactitem}
+		\item 通项: $n=\prod p_i^{k_i}$ 时 $\varphi(n)=n\prod_{p\mid n}\left(1-\frac1p\right)$, $\varphi(p^k)=(p-1)p^{k-1}$, $\varphi(1)=1$.
+		\item 积性: $\gcd(m,n)=1$ 时 $\varphi(mn)=\varphi(m)\varphi(n)$. 线性筛里: $p\mid i$ 时 $\varphi(ip)=\varphi(i)\cdot p$, 否则 $\varphi(ip)=\varphi(i)(p-1)$.
+		\item $\sum_{d\mid n}\varphi(d)=n$; $n>1$ 时与 $n$ 互质的数之和为 $n\varphi(n)/2$.
+		\item $\sum_{i=1}^{n}\gcd(i,n)=\sum_{d\mid n}d\cdot\varphi(n/d)$; $\#\{1\le i,j\le n:\gcd(i,j)=1\}=2\sum_{i=1}^{n}\varphi(i)-1$.
+		\item 欧拉定理: $\gcd(a,m)=1$ 时 $a^{\varphi(m)}\equiv1\pmod m$, 所以 $a^b\equiv a^{b\bmod\varphi(m)}$. 质数 $p$ 时即费马小定理 $a^{p-1}\equiv1$.
+		\item 扩展欧拉定理 (不要求互质): $b\ge\varphi(m)$ 时 $a^b\equiv a^{b\bmod\varphi(m)+\varphi(m)}\pmod m$; $b<\varphi(m)$ 时直接算. 用于指数巨大或幂塔 $a^{a^{a\cdots}}$, 递归 $m\to\varphi(m)$ 约 $O(\log m)$ 层到 1.
+		\end{compactitem}
 
 \subsection{分数}
 	\kactlimport{Fractions.h}

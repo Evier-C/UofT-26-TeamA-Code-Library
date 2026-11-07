@@ -22,6 +22,8 @@ vector<ll> brute(const vector<ll>&a,const vector<ll>&b){
 }
 int main(){
 	long long checks=0;
+	assert((maxPlus({1,5,2},{0,3,4})==vector<ll>{1,5,8,9,6})); // Usage
+	checks++;
 	for(int it=0;it<50000;it++){
 		int n=rng()%12+1,m=rng()%12+1;
 		ll R=rng()%2?3:1000000000;

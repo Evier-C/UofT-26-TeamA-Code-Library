@@ -21,6 +21,18 @@ void test(int nn,int mm,int ne,bool br){
 	for(int x:A)assert(1<=x&&x<=nn&&!inA[x]),inA[x]=1;
 	for(int x:B)assert(1<=x&&x<=mm&&!inB[x]),inB[x]=1;
 	for(auto [a,b]:ed)assert(inA[a]||inB[b]);
+	// max independent set: visL true on left, visR false on right
+	int isz=0;
+	for(int u=1;u<=nn;u++){
+		assert(visL[u]==!inA[u]);
+		isz+=visL[u];
+	}
+	for(int v=1;v<=mm;v++){
+		assert(visR[v]==(bool)inB[v]);
+		isz+=!visR[v];
+	}
+	for(auto [a,b]:ed)assert(!(visL[a]&&!visR[b]));
+	assert(isz==nn+mm-k);
 	// complement is an independent set (implied) and k is a matching
 	int got=0;
 	for(int u=1;u<=nn;u++)if(mL[u])got++;
