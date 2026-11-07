@@ -14,27 +14,27 @@
  * Status: tested on https://cses.fi/problemset/result/16581553/, https://cses.fi/problemset/result/16581641/
  */
 #pragma once
-struct func_graph {
-  vector<pii> root_of;
-  vector<vi> cycles, childs;
-  func_graph(const vi& a):
-    root_of(sz(a)), childs(sz(a)) {
+struct func_graph{
+  vector<pii>root_of;
+  vector<vi>cycles,childs;
+  func_graph(const vi&a):
+    root_of(sz(a)),childs(sz(a)){
     vi vis(sz(a));
-    rep(i,0,sz(a)) {
-      if (!vis[i]) {
-        int u = i;
-        for (; !vis[u]; u = a[u]) vis[u] = 1;
-        if (vis[u] == 1)
-          for (cycles.pb({}); vis[u] == 1; u = a[u]) {
-            root_of[u] = {sz(cycles) - 1,
+    rep(i,0,sz(a)){
+      if(!vis[i]){
+        int u=i;
+        for(;!vis[u];u=a[u])vis[u]=1;
+        if(vis[u]==1)
+          for(cycles.pb({});vis[u]==1;u=a[u]){
+            root_of[u]={sz(cycles)-1,
                           sz(cycles.back())};
             cycles.back().pb(u);
-            vis[u] = 2;
+            vis[u]=2;
           }
-        for (int v = i; vis[v] == 1; v = a[v]) {
-          root_of[v] = root_of[u];
+        for(int v=i;vis[v]==1;v=a[v]){
+          root_of[v]=root_of[u];
           childs[a[v]].pb(v);
-          vis[v] = 2;
+          vis[v]=2;
         }
       }
     }

@@ -3,49 +3,49 @@
 #include "../utilities/template.h"
 namespace assign {
 struct T { ll sum, mx; int len; };
-struct U { ll v; bool has; };
-const U idU = {0, 0};
+struct U{ll v;bool has;};
+const U idU={0,0};
 const T idT = {0, LLONG_MIN, 0};
 T f(T a, T b) {
 	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
 }
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) { // 整段赋成 u.v
-		t[x].sum = u.v * t[x].len, t[x].mx = u.v;
-		d[x] = u; // 新赋值直接覆盖旧标记
+	void app(int x,U u){ // 整段赋成 u.v
+		t[x].sum=u.v*t[x].len,t[x].mx=u.v;
+		d[x]=u; // 新赋值直接覆盖旧标记
 	}
-	void push(int x) {
-		if (!d[x].has) return;
-		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
+	void push(int x){
+		if(!d[x].has)return;
+		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
 	}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }
@@ -53,197 +53,197 @@ struct Seg {
 namespace assignadd {
 struct T { ll sum, mx; int len; };
 // 标记含义: 若 has 先赋成 s, 再加 add
-struct U { ll s; bool has; ll add; };
-const U idU = {0, 0, 0};
+struct U{ll s;bool has;ll add;};
+const U idU={0,0,0};
 const T idT = {0, LLONG_MIN, 0};
 T f(T a, T b) {
 	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
 }
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) {
-		T& a = t[x]; U& e = d[x];
-		if (u.has)
-			a.sum = u.s * a.len, a.mx = u.s, e = {u.s, 1, 0};
-		a.sum += u.add * a.len, a.mx += u.add, e.add += u.add;
+	void app(int x,U u){
+		T&a=t[x];U&e=d[x];
+		if(u.has)
+			a.sum=u.s*a.len,a.mx=u.s,e={u.s,1,0};
+		a.sum+=u.add*a.len,a.mx+=u.add,e.add+=u.add;
 	}
-	void push(int x) {
-		if (!d[x].has && !d[x].add) return;
-		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
+	void push(int x){
+		if(!d[x].has&&!d[x].add)return;
+		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
 	}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }
 
 namespace affine {
 
-const ll M = 998244353;
-struct T { ll sum; int len; };  struct U { ll a, b; };
-const T idT = {0, 0};           const U idU = {1, 0};
-T f(T x, T y) {
-	return {(x.sum + y.sum) % M, x.len + y.len};
+const ll M=998244353;
+struct T{ll sum;int len;};struct U{ll a,b;};
+const T idT={0,0};const U idU={1,0};
+T f(T x,T y){
+	return {(x.sum+y.sum)%M,x.len+y.len};
 }
 
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) { // 整段每个数 v 变成 a * v + b
-		t[x].sum = (u.a * t[x].sum + u.b * t[x].len) % M;
-		d[x] = {u.a * d[x].a % M, (u.a * d[x].b + u.b) % M};
+	void app(int x,U u){ // 整段每个数 v 变成 a * v + b
+		t[x].sum=(u.a*t[x].sum+u.b*t[x].len)%M;
+		d[x]={u.a*d[x].a%M,(u.a*d[x].b+u.b)%M};
 	}
-	void push(int x) {
-		if (d[x].a == 1 && !d[x].b) return;
-		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
+	void push(int x){
+		if(d[x].a==1&&!d[x].b)return;
+		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
 	}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }
 
 namespace flip {
 
-struct T { int cnt, len; };  struct U { bool r; };
-const T idT = {0, 0};        const U idU = {0};
-T f(T a, T b) { return {a.cnt + b.cnt, a.len + b.len}; }
+struct T{int cnt,len;};struct U{bool r;};
+const T idT={0,0};const U idU={0};
+T f(T a,T b){return {a.cnt+b.cnt,a.len+b.len};}
 
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) { // 整段 0 和 1 互换
-		if (u.r) t[x].cnt = t[x].len - t[x].cnt, d[x].r ^= 1;
+	void app(int x,U u){ // 整段 0 和 1 互换
+		if(u.r)t[x].cnt=t[x].len-t[x].cnt,d[x].r^=1;
 	}
-	void push(int x) {
-		if (!d[x].r) return;
-		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
+	void push(int x){
+		if(!d[x].r)return;
+		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
 	}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }
 
 namespace maxsub {
 
-const ll NEG = -(ll)1e18;
-struct T { ll sum, pre, suf, best; };
-struct U { ll v; };
-const T idT = {0, NEG, NEG, NEG};
-const U idU = {0};
-T f(T a, T b) {
-	return {a.sum + b.sum, max(a.pre, a.sum + b.pre),
-	        max(b.suf, b.sum + a.suf),
-	        max({a.best, b.best, a.suf + b.pre})};
+const ll NEG=-(ll)1e18;
+struct T{ll sum,pre,suf,best;};
+struct U{ll v;};
+const T idT={0,NEG,NEG,NEG};
+const U idU={0};
+T f(T a,T b){
+	return {a.sum+b.sum,max(a.pre,a.sum+b.pre),
+	        max(b.suf,b.sum+a.suf),
+	        max({a.best,b.best,a.suf+b.pre})};
 }
 
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) { // 只会落在叶子上
-		t[x] = {u.v, u.v, u.v, u.v};
+	void app(int x,U u){ // 只会落在叶子上
+		t[x]={u.v,u.v,u.v,u.v};
 	}
-	void push(int) {}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void push(int){}
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }
@@ -251,51 +251,51 @@ struct Seg {
 namespace def {
 
 
-struct T { ll sum, mx; int len; }; // 节点信息
-struct U { ll add; };              // 懒标记
-const T idT = {0, LLONG_MIN, 0};
-const U idU = {0};
-T f(T a, T b) {
-	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
+struct T{ll sum,mx;int len;}; // 节点信息
+struct U{ll add;}; // 懒标记
+const T idT={0,LLONG_MIN,0};
+const U idU={0};
+T f(T a,T b){
+	return {a.sum+b.sum,max(a.mx,b.mx),a.len+b.len};
 }
 
-struct Seg {
-	int n; vector<T> t; vector<U> d;
-	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
-		build(1, 0, n, a);
+struct Seg{
+	int n;vector<T>t;vector<U>d;
+	Seg(const vector<T>&a):n(sz(a)),t(4*n),d(4*n,idU){
+		build(1,0,n,a);
 	}
-	void build(int x, int l, int r, const vector<T>& a) {
-		if (r - l == 1) { t[x] = a[l]; return; }
-		int m = (l + r) / 2;
-		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+	void build(int x,int l,int r,const vector<T>&a){
+		if(r-l==1){t[x]=a[l];return;}
+		int m=(l+r)/2;
+		build(2*x,l,m,a),build(2*x+1,m,r,a);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	void app(int x, U u) { // 整段 x 打上标记 u
-		t[x].sum += u.add * t[x].len, t[x].mx += u.add;
-		d[x].add += u.add;
+	void app(int x,U u){ // 整段 x 打上标记 u
+		t[x].sum+=u.add*t[x].len,t[x].mx+=u.add;
+		d[x].add+=u.add;
 	}
-	void push(int x) { // 有标记才下传给两个儿子
-		if (!d[x].add) return;
-		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
+	void push(int x){ // 有标记才下传给两个儿子
+		if(!d[x].add)return;
+		app(2*x,d[x]),app(2*x+1,d[x]),d[x]=idU;
 	}
-	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
-	void upd(int L, int R, U u, int x, int l, int r) {
-		if (R <= l || r <= L) return;
-		if (L <= l && r <= R) return app(x, u);
+	void update(int L,int R,U u){upd(L,R,u,1,0,n);}
+	void upd(int L,int R,U u,int x,int l,int r){
+		if(R<=l||r<=L)return;
+		if(L<=l&&r<=R)return app(x,u);
 		push(x);
-		int m = (l + r) / 2;
-		upd(L, R, u, 2 * x, l, m);
-		upd(L, R, u, 2 * x + 1, m, r);
-		t[x] = f(t[2 * x], t[2 * x + 1]);
+		int m=(l+r)/2;
+		upd(L,R,u,2*x,l,m);
+		upd(L,R,u,2*x+1,m,r);
+		t[x]=f(t[2*x],t[2*x+1]);
 	}
-	T query(int L, int R) { return qry(L, R, 1, 0, n); }
-	T qry(int L, int R, int x, int l, int r) {
-		if (R <= l || r <= L) return idT;
-		if (L <= l && r <= R) return t[x];
+	T query(int L,int R){return qry(L,R,1,0,n);}
+	T qry(int L,int R,int x,int l,int r){
+		if(R<=l||r<=L)return idT;
+		if(L<=l&&r<=R)return t[x];
 		push(x);
-		int m = (l + r) / 2;
-		return f(qry(L, R, 2 * x, l, m),
-		         qry(L, R, 2 * x + 1, m, r));
+		int m=(l+r)/2;
+		return f(qry(L,R,2*x,l,m),
+		         qry(L,R,2*x+1,m,r));
 	}
 };
 }

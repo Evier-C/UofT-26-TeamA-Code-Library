@@ -22,6 +22,6 @@ Point3D 总得非负距离; 对 Point3D 需对叉积结果调用 .dist.
 #include "Point.h"
 
 template<class P>
-double lineDist(const P& a, const P& b, const P& p) {
+double lineDist(const P&a,const P&b,const P&p){
 	return (double)(b-a).cross(p-a)/(b-a).dist();
 }

@@ -14,38 +14,38 @@
  */
 #pragma once
 
-using vl = vector<ll>;
-void FST(vl& a, bool inv) {
-    for (int n = sz(a), step = 1; step < n; step *= 2) {
-        for (int i = 0; i < n; i += 2 * step) rep(j,i,i+step) {
-            ll &u = a[j], &v = a[j + step]; tie(u, v) =
+using vl=vector<ll>;
+void FST(vl&a,bool inv){
+    for(int n=sz(a),step=1;step<n;step*=2){
+        for(int i=0;i<n;i+=2*step)rep(j,i,i+step){
+            ll&u=a[j],&v=a[j+step];tie(u,v)=
                 // inv ? pair(v - u, u) : pair(v, u + v); // AND /// include-line
                 // inv ? pair(v, u - v) : pair(u + v, u); // OR /// include-line
-                pair(u + v, u - v);                   // XOR
+                pair(u+v,u-v); // XOR
         }
     }
-    if (inv) for (ll& x : a) x /= sz(a); // XOR
+    if(inv)for(ll&x:a)x/=sz(a); // XOR
 }
-vl conv(vl a, vl b) {
-    FST(a, 0); FST(b, 0);
-    rep(i,0,sz(a)) a[i] *= b[i];
-    FST(a, 1); return a;
+vl conv(vl a,vl b){
+    FST(a,0);FST(b,0);
+    rep(i,0,sz(a))a[i]*=b[i];
+    FST(a,1);return a;
 }
-int psgn(int x) { return __builtin_popcount(x)&1 ? -1 : 1; }
+int psgn(int x){return __builtin_popcount(x)&1?-1:1;}
 // 原数组 a[i] += val, 此处 a 已变换
-void point_add(vl &a, int i, ll val) {
+void point_add(vl&a,int i,ll val){
     rep(j,0,sz(a))
         // a[j] += val * ((i|j) == sz(a)-1); // AND /// include-line
         // a[j] += val * ((i&j) == 0); // OR /// include-line
-        a[j] += val * psgn(i&j); // XOR
+        a[j]+=val*psgn(i&j); // XOR
 }
 // 返回原数组 a[i], 此处 a 已变换
-ll point_eval(const vl &a, int i) {
-    ll res = 0;
+ll point_eval(const vl&a,int i){
+    ll res=0;
     rep(j,0,sz(a))
         // res += a[j] * ((i&j) == 0) * psgn(sz(a)-1-(i|j)); // AND /// include-line
         // res += a[j] * ((i|j) == sz(a)-1) * psgn(i&j); // OR /// include-line
-        res += a[j] * psgn(i&j); // XOR
-    res /= sz(a); // XOR
+        res+=a[j]*psgn(i&j); // XOR
+    res/=sz(a); // XOR
     return res;
 }

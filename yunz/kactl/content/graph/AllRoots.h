@@ -11,50 +11,50 @@
  */
 #pragma once
 
-struct ART {
+struct ART{
   // 默认构造必须是单位元
-  int ans = 0; // 到其他点的最远距离
-  ART operator+(const ART& o) const {
-    return {max(ans, o.ans)};
+  int ans=0; // 到其他点的最远距离
+  ART operator+(const ART&o)const{
+    return {max(ans,o.ans)};
   }
-  ART promote(int x, int e) const {
-    if (e == -1) return *this;
+  ART promote(int x,int e)const{
+    if(e==-1)return *this;
     return {ans+1}; // x 为点编号 ; e 为边编号
   }
 };
 ART base{}; // 单点的值 , 不一定是单位元
 template<class T>
-struct AllRoots {
-  int n; vector<vector<pii>> adj;
-  vector<vector<T>> suf; vector<T> res;
-  AllRoots(vector<pii>& el) : n(sz(el)+1), adj(n), suf(n), res(n) {
-    for (int ei = -1; auto [a, b] : el) { ei++;
+struct AllRoots{
+  int n;vector<vector<pii>>adj;
+  vector<vector<T>>suf;vector<T>res;
+  AllRoots(vector<pii>&el):n(sz(el)+1),adj(n),suf(n),res(n){
+    for(int ei=-1;auto[a,b]:el){ei++;
       adj[a].pb({b,ei});
-      adj[b].pb({a, ei});
+      adj[b].pb({a,ei});
     }
-    for (auto &s : suf) s.pb(base); // 点的初始值
+    for(auto&s:suf)s.pb(base); // 点的初始值
   }
-  T down(int x, int p = -1) {
-    for (auto &c : adj[x])
-      if(c.F == p) swap(c, adj[x][0]);
-    for(int i = sz(adj[x])-1; i > -(p<0); --i)
-      suf[x].pb(down(adj[x][i].F,x) + suf[x].back());
-    return (p == -1 ? T{} : suf[x].back().promote(x,adj[x][0].S));
+  T down(int x,int p=-1){
+    for(auto&c:adj[x])
+      if(c.F==p)swap(c,adj[x][0]);
+    for(int i=sz(adj[x])-1;i>-(p<0);--i)
+      suf[x].pb(down(adj[x][i].F,x)+suf[x].back());
+    return (p==-1?T{}:suf[x].back().promote(x,adj[x][0].S));
   }
-  void up(int x, int p = -1) {
-    rep(i, p != -1, sz(adj[x])) {
-      auto[y,ei] = adj[x][i];
+  void up(int x,int p=-1){
+    rep(i,p!=-1,sz(adj[x])){
+      auto[y,ei]=adj[x][i];
       suf[x].pop_back();
-      res[y] = (res[x] + suf[x].back()).promote(x,ei);
-      res[x] = res[x] + suf[y].back().promote(y,ei);
-      up(y, x);
+      res[y]=(res[x]+suf[x].back()).promote(x,ei);
+      res[x]=res[x]+suf[y].back().promote(y,ei);
+      up(y,x);
     }
   }
-  static vector<T> calc(vector<pii>& el) {
+  static vector<T>calc(vector<pii>&el){
     AllRoots ar(el);
     ar.down(0);
     ar.up(0);
-    rep(i,0,ar.n) ar.res[i] = ar.res[i].promote(i,-1);
+    rep(i,0,ar.n)ar.res[i]=ar.res[i].promote(i,-1);
     return ar.res;
   }
 };

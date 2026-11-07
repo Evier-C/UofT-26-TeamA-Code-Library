@@ -8,20 +8,20 @@
  */
 #pragma once
 
-template<class I> vi lis(const vector<I>& S) {
-	if (S.empty()) return {};
+template<class I>vi lis(const vector<I>&S){
+	if(S.empty())return {};
 	vi prev(sz(S));
-	typedef pair<I, int> p;
-	vector<p> res;
-	rep(i,0,sz(S)) {
+	typedef pair<I,int>p;
+	vector<p>res;
+	rep(i,0,sz(S)){
 		// 求最长不降子序列时把 0 改为 i
-		auto it = lower_bound(all(res), p{S[i], 0});
-		if (it == res.end()) res.emplace_back(), it = res.end()-1;
-		*it = {S[i], i};
-		prev[i] = it == res.begin() ? 0 : (it-1)->second;
+		auto it=lower_bound(all(res),p{S[i],0});
+		if(it==res.end())res.emplace_back(),it=res.end()-1;
+		*it={S[i],i};
+		prev[i]=it==res.begin()?0:(it-1)->second;
 	}
-	int L = sz(res), cur = res.back().second;
+	int L=sz(res),cur=res.back().second;
 	vi ans(L);
-	while (L--) ans[L] = cur, cur = prev[cur];
+	while(L--)ans[L]=cur,cur=prev[cur];
 	return ans;
 }

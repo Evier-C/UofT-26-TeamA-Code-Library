@@ -9,16 +9,16 @@
  */
 #pragma once
 
-auto fdivSplit = [](int n) {
-    vector<pii> segs;
-    for (int q, r, l = 1; l <= n; l = r+1) {
-        q = n/l, r = n/q;
-        segs.pb({l, r});
+auto fdivSplit=[](int n){
+    vector<pii>segs;
+    for(int q,r,l=1;l<=n;l=r+1){
+        q=n/l,r=n/q;
+        segs.pb({l,r});
     }
     return segs;
 };
-auto cdivSplit = [](int n) {
-    auto segs = fdivSplit(n-1);
-    segs.pb({n, n});
+auto cdivSplit=[](int n){
+    auto segs=fdivSplit(n-1);
+    segs.pb({n,n});
     return segs;
 };

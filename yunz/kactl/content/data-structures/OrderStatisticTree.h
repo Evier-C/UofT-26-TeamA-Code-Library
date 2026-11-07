@@ -15,16 +15,16 @@
 using namespace __gnu_pbds;
 
 template<class T>
-using Tree = tree<T, null_type, less<T>, rb_tree_tag,
+using Tree=tree<T,null_type,less<T>,rb_tree_tag,
     tree_order_statistics_node_update>;
 
-void example() {
-	Tree<int> t, t2; t.insert(8);
-	auto it = t.insert(10).first;
-	assert(it == t.lower_bound(9));
+void example(){
+	Tree<int>t,t2;t.insert(8);
+	auto it=t.insert(10).first;
+	assert(it==t.lower_bound(9));
 	// t.order_of_key(x) = 严格小于 x 的元素个数
-	assert(t.order_of_key(11) == 2);
+	assert(t.order_of_key(11)==2);
 	// t.find_by_order(k) = 第 k 个元素, 从 0 开始
-	assert(*t.find_by_order(0) == 8);
+	assert(*t.find_by_order(0)==8);
 	t.join(t2); // 需 t 全小于或全大于 t2, 把 t2 并入 t
 }

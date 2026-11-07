@@ -15,58 +15,58 @@
 
 #include "../data-structures/LazySegmentTree.h"
 
-template <bool VALS_EDGES> struct HLD {
-    int N, tim = 0;
-    vector<vi> adj;
-    vi par, siz, rt, pos, tail;
+template<bool VALS_EDGES>struct HLD{
+    int N,tim=0;
+    vector<vi>adj;
+    vi par,siz,rt,pos,tail;
     lztree tree;
-    HLD(vector<vi> &adj, vector<T> v, int root)
-        : N(sz(adj)), adj(adj), par(N, -1), siz(N, 1),
-          rt(N,root),pos(N),tail(N,-1),tree(N) {
-        dfsSz(root); dfsHld(root);
-        rep(i,root,sz(v)) tree.set(pos[i], v[i]); // 初始化值
+    HLD(vector<vi>&adj,vector<T>v,int root)
+        :N(sz(adj)),adj(adj),par(N,-1),siz(N,1),
+          rt(N,root),pos(N),tail(N,-1),tree(N){
+        dfsSz(root);dfsHld(root);
+        rep(i,root,sz(v))tree.set(pos[i],v[i]); // 初始化值
     }
-	void dfsSz(int v) {
-		for (int& u : adj[v]) {
-			adj[u].erase(find(all(adj[u]), v)); // (*)
-			par[u] = v;
+	void dfsSz(int v){
+		for(int&u:adj[v]){
+			adj[u].erase(find(all(adj[u]),v)); // (*)
+			par[u]=v;
 			dfsSz(u);
-			siz[v] += siz[u];
-			if (siz[u] > siz[adj[v][0]]) swap(u, adj[v][0]);
+			siz[v]+=siz[u];
+			if(siz[u]>siz[adj[v][0]])swap(u,adj[v][0]);
 		}
 	}
-    void dfsHld(int v) {
-        pos[v] = tim++, tail[v] = v;
-        for (bool fst = 1; int u : adj[v]) {
-            rt[u] = (u == adj[v][0] ? rt[v] : u);
+    void dfsHld(int v){
+        pos[v]=tim++,tail[v]=v;
+        for(bool fst=1;int u:adj[v]){
+            rt[u]=(u==adj[v][0]?rt[v]:u);
             dfsHld(u);
-            if (fst) tail[v] = tail[u];
-            fst = 0;
+            if(fst)tail[v]=tail[u];
+            fst=0;
         }
     }
-	template <class B> void process(int u, int v, B op) {
-		for (;; v = par[rt[v]]) {
-			if (pos[u] > pos[v]) swap(u, v);
-			if (rt[u] == rt[v]) break;
-			op(pos[rt[v]], pos[v] + 1);
+	template<class B>void process(int u,int v,B op){
+		for(;;v=par[rt[v]]){
+			if(pos[u]>pos[v])swap(u,v);
+			if(rt[u]==rt[v])break;
+			op(pos[rt[v]],pos[v]+1);
 		}
-		op(pos[u] + VALS_EDGES, pos[v] + 1);
+		op(pos[u]+VALS_EDGES,pos[v]+1);
 	}
-    T get(int u) { // 单点修改类似
+    T get(int u){ // 单点修改类似
         return tree.get(pos[u]);
     }
-	void modifyPath(int u, int v, U val) {
-		process(u, v, [&](int l, int r) { tree.update(l, r, val); });
+	void modifyPath(int u,int v,U val){
+		process(u,v,[&](int l,int r){tree.update(l,r,val);});
 	}
 	// 查整条链用 tree.query(pos[rt[v]], pos[tail[v]] + 1)
-    T queryPath(int u, int v) { // 按题意修改
-        T res = idT; // 单位元
-        process(u, v, [&](int l, int r) { // 合并区间答案
-                res = f(res, tree.query(l, r));
+    T queryPath(int u,int v){ // 按题意修改
+        T res=idT; // 单位元
+        process(u,v,[&](int l,int r){ // 合并区间答案
+                res=f(res,tree.query(l,r));
         });
         return res;
     }
-    T querySubtree(int v) { // modifySubtree 类似
-        return tree.query(pos[v] + VALS_EDGES, pos[v] + siz[v]);
+    T querySubtree(int v){ // modifySubtree 类似
+        return tree.query(pos[v]+VALS_EDGES,pos[v]+siz[v]);
     }
 };

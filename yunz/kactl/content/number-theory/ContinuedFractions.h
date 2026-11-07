@@ -16,23 +16,23 @@
  */
 
 typedef double d; // N 约 1e7 时可用 ; N 约 1e9 用 long double
-pair<ll, ll> approximate(d x, ll N) {
-	ll LP = 0, LQ = 1, P = 1, Q = 0, inf = LLONG_MAX; d y = x;
-	for (;;) {
-		ll lim = min(P ? (N-LP) / P : inf, Q ? (N-LQ) / Q : inf),
-		   a = (ll)floor(y), b = min(a, lim),
-		   NP = b*P + LP, NQ = b*Q + LQ;
-		if (a > b) {
+pair<ll,ll>approximate(d x,ll N){
+	ll LP=0,LQ=1,P=1,Q=0,inf=LLONG_MAX;d y=x;
+	for(;;){
+		ll lim=min(P?(N-LP)/P:inf,Q?(N-LQ)/Q:inf),
+		   a=(ll)floor(y),b=min(a,lim),
+		   NP=b*P+LP,NQ=b*Q+LQ;
+		if(a>b){
 			// 若 b 大于 a/2, 存在更优的半渐近分数
 			// 若 b = a/2, 则可能存在
 			// 可在此直接返回 {P, Q} 以得到更规范的逼近
-			return (abs(x - (d)NP / (d)NQ) < abs(x - (d)P / (d)Q)) ?
-				make_pair(NP, NQ) : make_pair(P, Q);
+			return (abs(x-(d)NP/(d)NQ)<abs(x-(d)P/(d)Q))?
+				make_pair(NP,NQ):make_pair(P,Q);
 		}
-		if (abs(y = 1/(y - (d)a)) > 3*N) {
-			return {NP, NQ};
+		if(abs(y=1/(y-(d)a))>3*N){
+			return {NP,NQ};
 		}
-		LP = P; P = NP;
-		LQ = Q; Q = NQ;
+		LP=P;P=NP;
+		LQ=Q;Q=NQ;
 	}
 }
