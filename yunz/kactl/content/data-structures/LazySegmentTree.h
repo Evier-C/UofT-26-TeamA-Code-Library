@@ -1,15 +1,4 @@
 /**
- * Description: 懒标记线段树 SegTree, 维护序列 a[1..n], 默认支持区间加,
- * 查询区间和与区间最大值. 全局对象 seg.
- * 输入: seg.n 和 seg.a[1..n], 要求 $n \le N$. 节点 p 管 [l, r], 儿子为 2p 和 2p+1.
- * build(1, 1, n): 用 a 建树, 同时清空标记.
- * update(1, 1, n, x, y, v): a[x..y] 每个数加 v, 要求 $1 \le x \le y \le n$.
- * query(1, 1, n, x, y): 返回 Node, sum 为 a[x..y] 的和, mx 为最大值.
- * 换用途只改 Node 的字段, merge, build 的叶子, 标记数组, addtag 和 pushdown,
- * 写法见下方懒标记写法. query 只合并非空的两半, 所以不需要单位元.
- * 注意: 数组开 4N, 对象很大, 必须是全局或 static 变量, 不能开在函数里;
- * 和可能超过 int, 用 ll; 多组数据重新 build 即可.
- * 要第二棵树就在全局再写一行 SegTree seg2;
  * Usage: cin >> seg.n >> q;
  * for (int i = 1; i <= seg.n; i++) cin >> seg.a[i];
  * int n = seg.n;
