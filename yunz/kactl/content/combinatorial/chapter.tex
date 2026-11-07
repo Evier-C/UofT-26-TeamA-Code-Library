@@ -60,6 +60,39 @@
 		\[ f(S)=\sum_{T\supseteq S}g(T) \iff g(S)=\sum_{T\supseteq S}(-1)^{|T|-|S|}f(T) \]
 		对状压可以用子集和 (SOS DP) 的逆运算在 $O(2^n n)$ 内求出. 期望里的 min-max 容斥见 期望与概率技巧 一节.
 
+\subsection{计数常用结论}
+	\subsubsection{插板法与二项式恒等式}
+		\begin{compactitem}
+		\item $x_1+\dots+x_k=n$ 的非负整数解有 $\binom{n+k-1}{k-1}$ 个, 正整数解有 $\binom{n-1}{k-1}$ 个; 有上界时用上一节的容斥.
+		\item 范德蒙德卷积 $\sum_i\binom{n}{i}\binom{m}{k-i}=\binom{n+m}{k}$; 曲棍球棒 $\sum_{i=r}^{n}\binom{i}{r}=\binom{n+1}{r+1}$; 吸收 $k\binom{n}{k}=n\binom{n-1}{k-1}$; $\sum_i\binom{n}{i}^2=\binom{2n}{n}$.
+		\end{compactitem}
+	\subsubsection{球盒模型}
+		$n$ 个球放进 $k$ 个盒子, $S(n,k)$ 为第二类 Stirling 数, $p_k(n)$ 为把 $n$ 拆成至多 $k$ 个正整数之和的方案数 ($p_k(n)=p_{k-1}(n)+p_k(n-k)$).
+		\begin{center}
+		\begin{tabular}{l|c|c}
+		 & 允许空盒 & 不允许空盒 \\ \hline
+		球不同, 盒不同 & $k^n$ & $k!\,S(n,k)$ \\
+		球不同, 盒相同 & $\sum_{i=0}^{k}S(n,i)$ & $S(n,k)$ \\
+		球相同, 盒不同 & $\binom{n+k-1}{k-1}$ & $\binom{n-1}{k-1}$ \\
+		球相同, 盒相同 & $p_k(n)$ & $p_k(n-k)$ \\
+		\end{tabular}
+		\end{center}
+	\subsubsection{反射原理}
+		从 $(0,0)$ 每步向右或向上走到 $(n,m)$ 共 $\binom{n+m}{m}$ 种. $n\ge m$ 时始终满足 $y\le x$ (不越过对角线) 的走法有 $\binom{n+m}{m}-\binom{n+m}{m-1}$ 种: 越过对角线的路径在第一次碰到 $y=x+1$ 之后, 把后半段关于这条线翻折, 一一对应到从 $(0,0)$ 走到 $(m-1,n+1)$ 的路径. $n=m$ 时就是 Catalan 数.
+	\subsubsection{Pólya 计数 (项链)}
+		长为 $n$ 的环用 $k$ 种颜色染色, 旋转后相同算一种 (项链): $N=\frac1n\sum_{d\mid n}\varphi(d)\,k^{n/d}$.
+		翻转后相同也算一种 (手镯): $n$ 为奇数时 $\frac12\big(N+k^{(n+1)/2}\big)$, $n$ 为偶数时 $\frac12\big(N+\frac12(k^{n/2}+k^{n/2+1})\big)$.
+		一般地, 方案数 $=\frac{1}{|G|}\sum_{g\in G}k^{c(g)}$, $c(g)$ 是置换 $g$ 的环数 (即 Burnside 引理).
+	\subsubsection{LGV 引理}
+		起点 $a_1..a_k$, 终点 $b_1..b_k$, 记 $e(a,b)$ 为 $a$ 到 $b$ 的路径数. 若互不相交的路径组只能让 $a_i$ 连到 $b_i$ (如网格上起点、终点都按同一方向排好序), 则 $k$ 条两两没有公共点的路径的方案数等于行列式 $\det\big[e(a_i,b_j)\big]_{k\times k}$. 网格上 $e=\binom{\Delta x+\Delta y}{\Delta x}$, 行列式用 \texttt{IntDeterminant.h} 取模计算.
+	\subsubsection{其他结论}
+		\begin{compactitem}
+		\item \textbf{Pick 定理}: 顶点都是格点的简单多边形, 面积 $A=I+\frac{B}{2}-1$, $I$ 为内部格点数, $B$ 为边上格点数, 一条边上的格点数是 $\gcd(|\Delta x|,|\Delta y|)$.
+		\item \textbf{欧拉公式}: 平面图 $V-E+F=1+C$ ($F$ 含外面的无穷面, $C$ 为连通块数), 连通时 $V-E+F=2$. 常用于数平面被分成几块.
+		\item \textbf{有标号有根树} $n^{n-1}$ 棵; 有标号森林, $k$ 棵树且 $1..k$ 分别在不同的树里 (作为根): $k\,n^{n-k-1}$ 种.
+		\item \textbf{Prüfer 序列}: 有标号无根树与长 $n-2$ 的序列一一对应, 每个点在序列中出现 $\deg-1$ 次, 由此得到无根树 $n^{n-2}$ 棵和按度数计数的公式.
+		\end{compactitem}
+
 \subsection{常用计数数列}
 	\subsubsection{Bernoulli 数}
 		Bernoulli 数的 EGF 为 $B(t)=\frac{t}{e^t-1}$ (可用 FFT 求).
