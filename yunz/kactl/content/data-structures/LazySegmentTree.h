@@ -1,70 +1,58 @@
 /**
- * Author: Joseph Durie
- * Date: 2020-10-11
- * Description: Remember that idT and idU must be idempotent
+ * Description: 通用懒标记线段树, 下标 [0, n), n >= 1. 换用途只改 T, U, f, g, h 和单位元,
+ * 写法见下方懒标记写法. 默认: 区间加, 查区间和与最大值.
+ * Usage: vector<T> a(n, {x, x, 1}); Seg s(a);
+ * s.update(l, r, {v}); T q = s.query(l, r); // 都是 [l, r)
  * Time: O(\log N)
  */
 #pragma once
 
-typedef ll T; T idT = {}; // node type
-typedef ll U; U idU = {}; // update type
-// combine segtree nodes a and b
-T f(T a, T b) { return a + b; }
-// apply updates f and g (f compose g)
-U g(U f, U g) { return f + g; }
-// apply update f to segtree node a
-T h(U f, T a) { return a + f; }
-struct lztree {
-	int n;
-	vector<T> t;
-	vector<U> d;
-	lztree(int n) : n(n), t(2*n, idT), d(n, idU) {}
-	void calc(ll p) { t[p] = h(d[p], f(t[p * 2], t[p * 2 + 1])); }
-	void apply(ll p, U v) {
-		t[p] = h(v, t[p]);
-		if(p < n) d[p] = g(v, d[p]);
+struct T { ll sum, mx; int len; }; // 节点信息
+struct U { ll add; };              // 懒标记
+const T idT = {0, LLONG_MIN, 0};
+const U idU = {0};
+T f(T a, T b) {
+	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
+}
+T h(U u, T a) {
+	return {a.sum + u.add * a.len, a.mx + u.add, a.len};
+}
+U g(U u, U v) { return {u.add + v.add}; } // 先 v 后 u
+
+struct Seg {
+	int n; vector<T> t; vector<U> d;
+	Seg(const vector<T>& a) : n(sz(a)), t(4 * n), d(4 * n, idU) {
+		build(1, 0, n, a);
 	}
-	void push(ll p) {
-		p += n;
-		for(int s = 24; s > 0; s--) { // need tree height <= 24
-			ll i = p >> s;
-			if(d[i] != idU) {
-				apply(i * 2, d[i]);
-				apply(i * 2 + 1, d[i]);
-				d[i] = idU;
-			}
-		}
+	void build(int x, int l, int r, const vector<T>& a) {
+		if (r - l == 1) { t[x] = a[l]; return; }
+		int m = (l + r) / 2;
+		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
+		t[x] = f(t[2 * x], t[2 * x + 1]);
 	}
-	void set(ll p, T v) { // point set arr[p] = v
-		push(p);
-		t[p += n] = v;
-		while(p > 1) calc(p /= 2);
+	void app(int x, U u) {
+		t[x] = h(u, t[x]), d[x] = g(u, d[x]);
 	}
-	T get(ll p) { // return arr[p]
-        push(p);
-        return t[p + n];
-    }
-	void update(ll l, ll r, U v) { // range update [l, r) using v
-		push(l), push(r - 1);
-		bool cl = false, cr = false;
-		for(l += n, r += n; l < r; l /= 2, r /= 2) {
-			if(cl) calc(l - 1);
-			if(cr) calc(r);
-			if(l & 1) apply(l++, v), cl = true;
-			if(r & 1) apply(--r, v), cr = true;
-		}
-		for(--l; r; l /= 2, r /= 2) {
-			if(cl) calc(l);
-			if(cr) calc(r);
-		}
+	void push(int x) {
+		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
 	}
-	T query(ll l, ll r) { // range query [l, r)
-		push(l), push(r - 1);
-		T resl = idT, resr = idT;
-		for(l += n, r += n; l < r; l /= 2, r /= 2) {
-			if(l & 1) resl = f(resl, t[l++]);
-			if(r & 1) resr = f(t[--r], resr);
-		}
-		return f(resl, resr);
+	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
+	void upd(int L, int R, U u, int x, int l, int r) {
+		if (R <= l || r <= L) return;
+		if (L <= l && r <= R) return app(x, u);
+		push(x);
+		int m = (l + r) / 2;
+		upd(L, R, u, 2 * x, l, m);
+		upd(L, R, u, 2 * x + 1, m, r);
+		t[x] = f(t[2 * x], t[2 * x + 1]);
+	}
+	T query(int L, int R) { return qry(L, R, 1, 0, n); }
+	T qry(int L, int R, int x, int l, int r) {
+		if (R <= l || r <= L) return idT;
+		if (L <= l && r <= R) return t[x];
+		push(x);
+		int m = (l + r) / 2;
+		return f(qry(L, R, 2 * x, l, m),
+		         qry(L, R, 2 * x + 1, m, r));
 	}
 };

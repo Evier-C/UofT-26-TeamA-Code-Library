@@ -3,8 +3,30 @@
 % \kactlimport{Bitset.h}
 \kactlimport{OrderStatisticTree.h}
 \kactlimport{HashMap.h}
-\kactlimport{SegmentTree.h}
+% \kactlimport{SegmentTree.h}
 \kactlimport{LazySegmentTree.h}
+
+\paragraph{懒标记写法}
+三条要求: (1) 只看节点信息 $T$ 就能算出打标记后的新值, 需要区间长度时在 $T$ 里存 \texttt{len};
+(2) 两个标记能合并成一个, $g(u, v)$ 表示先做 $v$ 再做 $u$; (3) \texttt{idU} 是什么都不做的标记.
+\begin{compactitem}
+\item \textbf{区间加, 求和/最大值}: 模板默认写法.
+\item \textbf{区间赋值}: $U=\{v, \mathit{has}\}$, \texttt{idU} $=\{0,0\}$.
+  $h$: 若 \textit{has} 则 $\mathit{sum}=v\cdot\mathit{len},\ \mathit{mx}=v$, 否则不变.
+  $g(u,v)=$ \textit{u.has} ? $u$ : $v$.
+\item \textbf{区间乘再加} ($x\to ax+b$, 求和取模): $U=\{a,b\}$, \texttt{idU} $=\{1,0\}$.
+  $h$: $\mathit{sum}\to a\cdot\mathit{sum}+b\cdot\mathit{len}$.
+  $g(u,v)=\{u.a\cdot v.a,\ u.a\cdot v.b+u.b\}$.
+\item \textbf{赋值和加混用}: $U=\{s, \mathit{has}, \mathit{add}\}$, 含义是先 (若 \textit{has}) 赋成 $s$ 再加 \textit{add}.
+  $h$: \textit{has} 时 $\mathit{sum}=(s+\mathit{add})\cdot\mathit{len}$, 否则 $\mathit{sum}$ 加 $\mathit{add}\cdot\mathit{len}$.
+  $g(u,v)=$ \textit{u.has} ? $u$ : $\{v.s,\ v.\mathit{has},\ v.\mathit{add}+u.\mathit{add}\}$.
+\item \textbf{01 序列区间取反, 数 1 的个数}: $T=\{\mathit{cnt},\mathit{len}\}$, $U=\{\mathit{flip}\}$.
+  $h$: \textit{flip} 时 $\mathit{cnt}\to\mathit{len}-\mathit{cnt}$. $g$: 两个 \textit{flip} 异或.
+\item \textbf{最大子段和} (单点修改用区间赋值的标记, 长度 1):
+  $T=\{\mathit{sum},\mathit{pre},\mathit{suf},\mathit{best}\}$,
+  $f(a,b)=\{a.\mathit{sum}+b.\mathit{sum},\ \max(a.\mathit{pre}, a.\mathit{sum}+b.\mathit{pre}),\ \max(b.\mathit{suf}, b.\mathit{sum}+a.\mathit{suf}),\ \max(a.\mathit{best}, b.\mathit{best}, a.\mathit{suf}+b.\mathit{pre})\}$.
+  \texttt{idT} 里的负无穷用 $-10^{18}$, 防止相加溢出.
+\end{compactitem}
 \kactlimport{PersistentSegmentTree.h}
 % \kactlimport{UnionFind.h}
 \kactlimport{UnionFindRollback.h}

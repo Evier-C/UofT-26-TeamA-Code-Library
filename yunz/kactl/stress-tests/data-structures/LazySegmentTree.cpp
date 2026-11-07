@@ -2,45 +2,30 @@
 
 #include "../../content/data-structures/LazySegmentTree.h"
 
-static unsigned R;
-int ra() {
-	R *= 791231;
-	R += 1231;
-	return (int)(R >> 1);
-}
-
-volatile int res;
 int main() {
-	int N = 10;
-	vi v(N);
-	iota(all(v), 0);
-	random_shuffle(all(v), [](int x) { return ra() % x; });
-	Node* tr = new Node(v,0,N);
-	rep(i,0,N) rep(j,0,N) if (i <= j) {
-		int ma = -inf;
-		rep(k,i,j) ma = max(ma, v[k]);
-		assert(ma == tr->query(i,j));
-	}
-	rep(it,0,1000000) {
-		int i = ra() % (N+1), j = ra() % (N+1);
-		if (i > j) swap(i, j);
-		int x = (ra() % 10) - 5;
-
-		int r = ra() % 100;
-		if (r < 30) {
-			::res = tr->query(i, j);
-			int ma = -inf;
-			rep(k,i,j) ma = max(ma, v[k]);
-			assert(ma == ::res);
-		}
-		else if (r < 70) {
-			tr->add(i, j, x);
-			rep(k,i,j) v[k] += x;
-		}
-		else {
-			tr->set(i, j, x);
-			rep(k,i,j) v[k] = x;
+	mt19937 rng(9);
+	auto rnd = [&](int lo, int hi) { return lo + (int)(rng() % (unsigned)(hi - lo + 1)); };
+	long long checks = 0;
+	rep(it, 0, 3000) {
+		int n = rnd(1, 50);
+		vector<ll> a(n);
+		vector<T> in(n);
+		rep(i, 0, n) a[i] = rnd(-1000, 1000), in[i] = {a[i], a[i], 1};
+		Seg s(in);
+		rep(step, 0, 150) {
+			int l = rnd(0, n - 1), r = rnd(l + 1, n);
+			if (rng() % 2) {
+				ll v = rnd(-1000, 1000);
+				s.update(l, r, {v});
+				rep(i, l, r) a[i] += v;
+			} else {
+				T q = s.query(l, r);
+				ll sm = 0, mx = LLONG_MIN;
+				rep(i, l, r) sm += a[i], mx = max(mx, a[i]);
+				assert(q.sum == sm && q.mx == mx && q.len == r - l);
+				checks++;
+			}
 		}
 	}
-	cout<<"Tests passed!"<<endl;
+	cout << "Tests passed! (" << checks << " checks)" << endl;
 }
