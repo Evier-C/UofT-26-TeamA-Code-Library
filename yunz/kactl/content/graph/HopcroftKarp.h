@@ -6,7 +6,9 @@
  * of neighbors of the left partition, and $r$ should be a vector full of
  * $-1$'s of the same size as the right partition. Returns the size of
  * the matching. $r[i]$ will be the match for vertex $i$ on the right side,
- * or $-1$ if it's not matched.
+ * or $-1$ if it's not matched. $l[i]$ in Usage is the match of left vertex $i$.
+ * Usage: vi r(m, -1); hopcroftKarp(g, r);
+ * vi l(sz(g), -1); rep(j,0,m) if (r[j] != -1) l[r[j]] = j;
  * Time: O(E \sqrt{V})
  * Status: stress-tested by MinimumVertexCover and tested on Library Checker
  */
