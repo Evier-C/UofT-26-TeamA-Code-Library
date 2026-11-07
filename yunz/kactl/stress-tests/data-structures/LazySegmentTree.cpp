@@ -12,17 +12,18 @@ int main(){
 		int n=it<2990?rnd(1,50):rnd(1000,200000);
 		int steps=it<2990?150:2000;
 		vector<ll>b(n+1);
-		for(int i=1;i<=n;i++)b[i]=a[i]=rnd(-1000,1000);
-		build(1,1,n); // multi-test: rebuild over old garbage
+		for(int i=1;i<=n;i++)b[i]=seg.a[i]=rnd(-1000,1000);
+		seg.n=n;
+		seg.build(1,1,n); // multi-test: rebuild over old garbage
 		for(int s=0;s<steps;s++){
 			int l=rnd(1,n),r=rnd(l,n);
 			if(n>50&&rng()%100)r=min(n,l+rnd(0,30));
 			if(rng()%2){
 				ll v=rnd(-1000,1000);
-				update(1,1,n,l,r,v);
+				seg.update(1,1,n,l,r,v);
 				for(int i=l;i<=r;i++)b[i]+=v;
 			}else{
-				Node q=query(1,1,n,l,r);
+				SegTree::Node q=seg.query(1,1,n,l,r);
 				ll sm=0,mx=LLONG_MIN;
 				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
 				assert(q.sum==sm&&q.mx==mx);

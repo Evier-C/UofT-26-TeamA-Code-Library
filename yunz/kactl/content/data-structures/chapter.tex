@@ -7,12 +7,13 @@
 \kactlimport{LazySegmentTree.h}
 
 \paragraph{懒标记写法}
-换用途只改: Node 的字段和合并两个儿子的 \texttt{operator+}, build 里叶子的初值, 标记数组, \texttt{addtag} 和 \texttt{pushdown}.
+下面的代码都是 \texttt{struct SegTree} 的成员, 直接替换结构体里的同名成员, 新增的数组也写在结构体里.
+换用途只改: Node 的字段和合并两个儿子的 \texttt{merge}, build 里叶子的初值, 标记数组, \texttt{addtag} 和 \texttt{pushdown}.
 \texttt{addtag(p, l, r, v)}: 给整段 $[l, r]$ 打上标记 $v$, 要立刻更新 \texttt{t[p]}, 并把 $v$ 合并进 \texttt{p} 的旧标记, 旧标记先做, $v$ 后做.
 update 命中整段时调用它, pushdown 给两个儿子时也调用它. 新加的标记数组都要在 build 里设成空标记, 否则多组数据会残留.
 没列出的函数 (pushup, build 的递归部分, update, query) 保持模板原样. 区间加就是上面的模板.
 \begin{compactitem}
-\item \textbf{区间赋值, 求和与最大值}: \texttt{update(1, 1, n, l, r, v)} 把 $a[l..r]$ 都赋成 $v$. build 里加 \texttt{tg[p]=0}.
+\item \textbf{区间赋值, 求和与最大值}: \texttt{seg.update(1, 1, n, l, r, v)} 把 $a[l..r]$ 都赋成 $v$. build 里加 \texttt{tg[p]=0}.
 \begin{lstlisting}
 // 标记: tg[p] 为 1 表示整段待赋成 lz[p]
 ll lz[N<<2];
@@ -69,11 +70,11 @@ void update(int p,int l,int r,int x,int y,int op,ll v){
 	}
 	// 其余同模板, 递归时也传 op
 \end{lstlisting}
-\item \textbf{区间乘再加, 求和取模}: \texttt{update(1, 1, n, l, r, k, b)} 把 $a[l..r]$ 每个数 $v$ 变成 $kv + b$, 要求 $0 \le k, b < M$, $0 \le a_i < M$. 去掉 mx. build 里 \texttt{mu[p]=1, ad[p]=0}, 叶子 \texttt{t[p]=\{a[l]\%M\}}.
+\item \textbf{区间乘再加, 求和取模}: \texttt{seg.update(1, 1, n, l, r, k, b)} 把 $a[l..r]$ 每个数 $v$ 变成 $kv + b$, 要求 $0 \le k, b < M$, $0 \le a_i < M$. 去掉 mx. build 里 \texttt{mu[p]=1, ad[p]=0}, 叶子 \texttt{t[p]=\{a[l]\%M\}}.
 \begin{lstlisting}
-const ll M=998244353;
+static const ll M=998244353;
 struct Node{ll sum;};
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	return {(x.sum+y.sum)%M};
 }
 // 标记: 整段每个数先乘 mu[p] 再加 ad[p]
@@ -93,10 +94,10 @@ void pushdown(int p,int l,int r){
 }
 // update 的参数 v 换成 k, b, 命中整段时 addtag(p,l,r,k,b)
 \end{lstlisting}
-\item \textbf{01 序列区间取反, 数 1 的个数}: $a[i]$ 为 0 或 1, \texttt{update(1, 1, n, l, r)} 把 $a[l..r]$ 中 0 和 1 互换, \texttt{query(1, 1, n, l, r).cnt} 为其中 1 的个数. build 里 \texttt{rev[p]=0}, 叶子 \texttt{t[p]=\{(int)a[l]\}}.
+\item \textbf{01 序列区间取反, 数 1 的个数}: $a[i]$ 为 0 或 1, \texttt{seg.update(1, 1, n, l, r)} 把 $a[l..r]$ 中 0 和 1 互换, \texttt{seg.query(1, 1, n, l, r).cnt} 为其中 1 的个数. build 里 \texttt{rev[p]=0}, 叶子 \texttt{t[p]=\{(int)a[l]\}}.
 \begin{lstlisting}
 struct Node{int cnt;}; // 区间里 1 的个数
-Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
+Node merge(Node x,Node y){return {x.cnt+y.cnt};}
 bool rev[N<<2]; // 取反标记
 void addtag(int p,int l,int r){ // 整段 0 和 1 互换
 	t[p].cnt=(r-l+1)-t[p].cnt;
@@ -111,11 +112,11 @@ void pushdown(int p,int l,int r){
 }
 // update 去掉参数 v, 命中整段时 addtag(p,l,r)
 \end{lstlisting}
-\item \textbf{最大子段和}: 只有单点赋值 \texttt{modify(1, 1, n, x, v)} 把 $a[x]$ 赋成 $v$, 不需要标记. \texttt{query(1, 1, n, l, r).best} 为 $a[l..r]$ 的最大非空子段和. 叶子 \texttt{t[p]=\{a[l], a[l], a[l], a[l]\}}.
+\item \textbf{最大子段和}: 只有单点赋值 \texttt{seg.modify(1, 1, n, x, v)} 把 $a[x]$ 赋成 $v$, 不需要标记. \texttt{seg.query(1, 1, n, l, r).best} 为 $a[l..r]$ 的最大非空子段和. 叶子 \texttt{t[p]=\{a[l], a[l], a[l], a[l]\}}.
 \begin{lstlisting}
 // pre: 最大前缀和, suf: 最大后缀和, best: 答案
 struct Node{ll sum,pre,suf,best;};
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	Node r;
 	r.sum=x.sum+y.sum;
 	r.pre=max(x.pre,x.sum+y.pre);
@@ -146,6 +147,35 @@ void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
 % \kactlimport{Treap.h}
 \kactlimport{FHQTreap.h}
 \kactlimport{CartesianTree.h}
+\kactlimport{LeftistHeap.h}
+\paragraph{Slope trick}
+\begin{compactitem}
+\item \textbf{思想}: 维护下凸的分段线性函数 $f(x)$, 拐点都是整数. 只记最小值 $m = \min f$ 和拐点多重集, 每个拐点处斜率加 1, 同一点可出现多次.
+以取到最小值的区间为界, 左边的拐点放进大根堆 $L$, 右边的放进小根堆 $R$: $f$ 在 $[\mathrm{top}(L), \mathrm{top}(R)]$ 上等于 $m$, 往左每越过 $L$ 中一个点斜率减 1, 往右每越过 $R$ 中一个点斜率加 1. 堆空时堆顶视为 $\mp\infty$.
+\item \textbf{加 $\max(0, x - a)$}: $m$ 加上 $\max(0, \mathrm{top}(L) - a)$; 把 $a$ 放进 $L$, 再把 $L$ 的堆顶弹出放进 $R$.
+\item \textbf{加 $\max(0, a - x)$}: $m$ 加上 $\max(0, a - \mathrm{top}(R))$; 把 $a$ 放进 $R$, 再把 $R$ 的堆顶弹出放进 $L$.
+\item \textbf{加 $|x - a|$}: 上面两个各做一次.
+\item \textbf{前缀最小} $g(x) = \min_{y \le x} f(y)$: 清空 $R$. \textbf{后缀最小} $g(x) = \min_{y \ge x} f(y)$: 清空 $L$. $m$ 都不变.
+\item \textbf{平移} $g(x) = f(x - c)$: 两个堆里所有点都加 $c$. 每个堆配一个懒加量 \texttt{addL}, \texttt{addR}, 堆里存真实值减懒加量, 取堆顶时加回来.
+\item \textbf{滑动窗口最小} $g(x) = \min_{y \in [x - b, x - a]} f(y)$, $a \le b$: $L$ 整体加 $a$, $R$ 整体加 $b$, 相当于把最小值区间拉宽, $m$ 不变.
+\item \textbf{例, 改成非降序列}: 给定 $a_1, \dots, a_n$, 求非降序列 $b$ 使 $\sum |a_i - b_i|$ 最小. 设 $f_i(x)$ 为前 $i$ 项且 $b_i = x$ 的最小代价, 则 $f_i(x) = \min_{y \le x} f_{i-1}(y) + |x - a_i|$.
+每步先取前缀最小清空 $R$, 所以只要一个大根堆 $L$; 加 $|x - a_i|$ 时进 $R$ 的点马上又被清掉:
+\begin{lstlisting}
+priority_queue<ll> L; // 大根堆, 存左边的拐点
+ll ans=0;
+for(int i=1;i<=n;i++){
+	L.push(a[i]);
+	if(L.top()>a[i]){ // 最小值增加 top - a[i]
+		ans+=L.top()-a[i];
+		L.pop();
+		L.push(a[i]);
+	}
+}
+// ans 即答案. 要求严格递增: 先令 a[i] 减去 i
+\end{lstlisting}
+\item \textbf{树上合并}: 若点 $u$ 的函数是各儿子函数之和, 凸函数相加就是拐点集合取并, 最小值相加. 用上面的左偏树合并拐点堆, 每次 $O(\log n)$, 再对合并后的堆做弹出最大的几个拐点, 插入新拐点之类的操作. 典型题: APIO2016 烟花表演.
+\item \textbf{复杂度}: 每个操作 $O(1)$ 次堆操作, 总共 $O(n \log n)$.
+\end{compactitem}
 \kactlimport{FenwickTree.h}
 \kactlimport{FenwickTree2d.h}
 % \kactlimport{RMQ.h}

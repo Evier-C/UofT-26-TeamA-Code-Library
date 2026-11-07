@@ -42,8 +42,8 @@
 
 \subsection{容斥与二项式反演}
 	\subsubsection{容斥原理}
-		\[ \Big|\bigcup_{i=1}^n A_i\Big| = \sum_{\emptyset\ne S\subseteq[n]} (-1)^{|S|+1} \Big|\bigcap_{i\in S} A_i\Big|, \qquad
-		   \#\{\text{一个条件都不满足}\} = \sum_{S\subseteq[n]} (-1)^{|S|} \Big|\bigcap_{i\in S} A_i\Big| \]
+		\[ \Big|\bigcup_{i=1}^n A_i\Big| = \sum_{\emptyset\ne S\subseteq[n]} (-1)^{|S|+1} \Big|\bigcap_{i\in S} A_i\Big| \]
+		\[ \#\{\text{一个条件都不满足}\} = \sum_{S\subseteq[n]} (-1)^{|S|} \Big|\bigcap_{i\in S} A_i\Big| \]
 		空集的交是全集. 套路: 条件 $i$ 是坏事件, 钦定一个集合 $S$ 里的坏事件一定发生、其余随意, 算方案数后按 $|S|$ 的奇偶加减. 只和 $|S|$ 有关时写成 $\sum_k (-1)^k \binom{n}{k} h(k)$.
 		\begin{compactitem}
 		\item 满射 ($n$ 个不同的球放进 $k$ 个不同的盒子且不空): $\sum_{j=0}^{k}(-1)^j\binom{k}{j}(k-j)^n$.

@@ -8,14 +8,16 @@ namespace V0{
 #include "../../content/data-structures/LazySegmentTree.h"
 }
 namespace V1{
-const int N=2e5+5;
+struct SegTree{
+static const int N=2e5+5;
+int n;
 ll a[N];
 struct Node{ll sum,mx;};
 Node t[N<<2];
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	return {x.sum+y.sum,max(x.mx,y.mx)};
 }
-void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void pushup(int p){t[p]=merge(t[p<<1],t[p<<1|1]);}
 // ---- guide block 1 (copied verbatim) ----
 // 标记: tg[p] 为 1 表示整段待赋成 lz[p]
 ll lz[N<<2];
@@ -55,18 +57,22 @@ Node query(int p,int l,int r,int x,int y){
 	int m=(l+r)>>1;
 	if(y<=m)return query(p<<1,l,m,x,y);
 	if(x>m)return query(p<<1|1,m+1,r,x,y);
-	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+	return merge(query(p<<1,l,m,x,y),query(p<<1|1,m+1,r,x,y));
 }
+};
+SegTree seg;
 }
 namespace V2{
-const int N=2e5+5;
+struct SegTree{
+static const int N=2e5+5;
+int n;
 ll a[N];
 struct Node{ll sum,mx;};
 Node t[N<<2];
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	return {x.sum+y.sum,max(x.mx,y.mx)};
 }
-void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void pushup(int p){t[p]=merge(t[p<<1],t[p<<1|1]);}
 // ---- guide block 2 (copied verbatim) ----
 // 标记: 若 tg[p] 先整段赋成 sv[p], 再整段加 ad[p]
 ll sv[N<<2],ad[N<<2];
@@ -123,21 +129,25 @@ Node query(int p,int l,int r,int x,int y){
 	int m=(l+r)>>1;
 	if(y<=m)return query(p<<1,l,m,x,y);
 	if(x>m)return query(p<<1|1,m+1,r,x,y);
-	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+	return merge(query(p<<1,l,m,x,y),query(p<<1|1,m+1,r,x,y));
 }
+};
+SegTree seg;
 }
 namespace V3{
-const int N=2e5+5;
+struct SegTree{
+static const int N=2e5+5;
+int n;
 ll a[N];
 // ---- guide block 3 (copied verbatim) ----
-const ll M=998244353;
+static const ll M=998244353;
 struct Node{ll sum;};
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	return {(x.sum+y.sum)%M};
 }
 // 标记: 整段每个数先乘 mu[p] 再加 ad[p]
 Node t[N<<2];
-void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void pushup(int p){t[p]=merge(t[p<<1],t[p<<1|1]);}
 ll mu[N<<2],ad[N<<2];
 void addtag(int p,int l,int r,ll k,ll b){
 	t[p].sum=(k*t[p].sum+b*(r-l+1))%M;
@@ -175,17 +185,21 @@ Node query(int p,int l,int r,int x,int y){
 	int m=(l+r)>>1;
 	if(y<=m)return query(p<<1,l,m,x,y);
 	if(x>m)return query(p<<1|1,m+1,r,x,y);
-	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+	return merge(query(p<<1,l,m,x,y),query(p<<1|1,m+1,r,x,y));
 }
+};
+SegTree seg;
 }
 namespace V4{
-const int N=2e5+5;
+struct SegTree{
+static const int N=2e5+5;
+int n;
 ll a[N];
 // ---- guide block 4 (copied verbatim) ----
 struct Node{int cnt;}; // 区间里 1 的个数
-Node operator+(Node x,Node y){return {x.cnt+y.cnt};}
+Node merge(Node x,Node y){return {x.cnt+y.cnt};}
 Node t[N<<2];
-void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void pushup(int p){t[p]=merge(t[p<<1],t[p<<1|1]);}
 bool rev[N<<2]; // 取反标记
 void addtag(int p,int l,int r){ // 整段 0 和 1 互换
 	t[p].cnt=(r-l+1)-t[p].cnt;
@@ -221,16 +235,20 @@ Node query(int p,int l,int r,int x,int y){
 	int m=(l+r)>>1;
 	if(y<=m)return query(p<<1,l,m,x,y);
 	if(x>m)return query(p<<1|1,m+1,r,x,y);
-	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+	return merge(query(p<<1,l,m,x,y),query(p<<1|1,m+1,r,x,y));
 }
+};
+SegTree seg;
 }
 namespace V5{
-const int N=2e5+5;
+struct SegTree{
+static const int N=2e5+5;
+int n;
 ll a[N];
 // ---- guide block 5 (copied verbatim) ----
 // pre: 最大前缀和, suf: 最大后缀和, best: 答案
 struct Node{ll sum,pre,suf,best;};
-Node operator+(Node x,Node y){
+Node merge(Node x,Node y){
 	Node r;
 	r.sum=x.sum+y.sum;
 	r.pre=max(x.pre,x.sum+y.pre);
@@ -240,7 +258,7 @@ Node operator+(Node x,Node y){
 }
 // 删去 lz, addtag, pushdown 及其所有调用
 Node t[N<<2];
-void pushup(int p){t[p]=t[p<<1]+t[p<<1|1];}
+void pushup(int p){t[p]=merge(t[p<<1],t[p<<1|1]);}
 void modify(int p,int l,int r,int x,ll v){ // a[x] 赋成 v
 	if(l==r){
 		t[p]={v,v,v,v};
@@ -264,8 +282,10 @@ Node query(int p,int l,int r,int x,int y){
 	int m=(l+r)>>1;
 	if(y<=m)return query(p<<1,l,m,x,y);
 	if(x>m)return query(p<<1|1,m+1,r,x,y);
-	return query(p<<1,l,m,x,y)+query(p<<1|1,m+1,r,x,y);
+	return merge(query(p<<1,l,m,x,y),query(p<<1|1,m+1,r,x,y));
 }
+};
+SegTree seg;
 }
 
 mt19937 rng(7);
@@ -283,93 +303,93 @@ int main(){
 		};
 		vector<ll>b(n+1);
 		// V0: default range add
-		for(int i=1;i<=n;i++)b[i]=V0::a[i]=rnd(-1000,1000);
-		V0::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V0::seg.a[i]=rnd(-1000,1000);
+		V0::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			int l,r;rg(l,r);
 			if(rng()%2){
-				ll v=rnd(-1000,1000);V0::update(1,1,n,l,r,v);
+				ll v=rnd(-1000,1000);V0::seg.update(1,1,n,l,r,v);
 				for(int i=l;i<=r;i++)b[i]+=v;
 			}else{
-				V0::Node q=V0::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				V0::SegTree::Node q=V0::seg.query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
 				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
 				assert(q.sum==sm&&q.mx==mx);checks++;
 			}
 		}
 		// V1: range assign
-		for(int i=1;i<=n;i++)b[i]=V1::a[i]=rnd(-1000,1000);
-		V1::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V1::seg.a[i]=rnd(-1000,1000);
+		V1::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			int l,r;rg(l,r);
 			if(rng()%2){
-				ll v=rnd(-1000,1000);V1::update(1,1,n,l,r,v);
+				ll v=rnd(-1000,1000);V1::seg.update(1,1,n,l,r,v);
 				for(int i=l;i<=r;i++)b[i]=v;
 			}else{
-				V1::Node q=V1::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				V1::SegTree::Node q=V1::seg.query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
 				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
 				assert(q.sum==sm&&q.mx==mx);checks++;
 			}
 		}
 		// V2: assign + add
-		for(int i=1;i<=n;i++)b[i]=V2::a[i]=rnd(-1000,1000);
-		V2::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V2::seg.a[i]=rnd(-1000,1000);
+		V2::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			int l,r;rg(l,r);
 			int c=rng()%3;
 			if(c<2){
-				ll v=rnd(-1000,1000);V2::update(1,1,n,l,r,c,v);
+				ll v=rnd(-1000,1000);V2::seg.update(1,1,n,l,r,c,v);
 				for(int i=l;i<=r;i++)b[i]=c?v:b[i]+v;
 			}else{
-				V2::Node q=V2::query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
+				V2::SegTree::Node q=V2::seg.query(1,1,n,l,r);ll sm=0,mx=LLONG_MIN;
 				for(int i=l;i<=r;i++)sm+=b[i],mx=max(mx,b[i]);
 				assert(q.sum==sm&&q.mx==mx);checks++;
 			}
 		}
 		// V3: multiply then add, mod
-		for(int i=1;i<=n;i++)b[i]=V3::a[i]=rng()%MOD;
-		V3::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V3::seg.a[i]=rng()%MOD;
+		V3::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			int l,r;rg(l,r);
 			if(rng()%2){
 				ll k=rng()%MOD,bb=rng()%MOD;
 				if(rng()%4==0)k=rnd(0,2);
 				if(rng()%4==0)bb=0;
-				V3::update(1,1,n,l,r,k,bb);
+				V3::seg.update(1,1,n,l,r,k,bb);
 				for(int i=l;i<=r;i++)b[i]=(k*b[i]+bb)%MOD;
 			}else{
 				ll sm=0;
 				for(int i=l;i<=r;i++)sm=(sm+b[i])%MOD;
-				assert(V3::query(1,1,n,l,r).sum==sm);checks++;
+				assert(V3::seg.query(1,1,n,l,r).sum==sm);checks++;
 			}
 		}
 		// V4: 01 flip
-		for(int i=1;i<=n;i++)b[i]=V4::a[i]=rnd(0,1);
-		V4::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V4::seg.a[i]=rnd(0,1);
+		V4::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			int l,r;rg(l,r);
 			if(rng()%2){
-				V4::update(1,1,n,l,r);
+				V4::seg.update(1,1,n,l,r);
 				for(int i=l;i<=r;i++)b[i]^=1;
 			}else{
 				ll c=0;
 				for(int i=l;i<=r;i++)c+=b[i];
-				assert(V4::query(1,1,n,l,r).cnt==c);checks++;
+				assert(V4::seg.query(1,1,n,l,r).cnt==c);checks++;
 			}
 		}
 		// V5: max subarray sum, point assign
-		for(int i=1;i<=n;i++)b[i]=V5::a[i]=rnd(-1000,1000);
-		V5::build(1,1,n);
+		for(int i=1;i<=n;i++)b[i]=V5::seg.a[i]=rnd(-1000,1000);
+		V5::seg.build(1,1,n);
 		for(int s=0;s<steps;s++){
 			if(rng()%2){
 				int x=rnd(1,n);ll v=rnd(-1000,1000);
-				V5::modify(1,1,n,x,v);b[x]=v;
+				V5::seg.modify(1,1,n,x,v);b[x]=v;
 			}else{
 				int l,r;rg(l,r);
 				ll best=LLONG_MIN,cur=0;
 				for(int i=l;i<=r;i++){
 					cur=max(cur+b[i],b[i]);best=max(best,cur);
 				}
-				V5::Node q=V5::query(1,1,n,l,r);
+				V5::SegTree::Node q=V5::seg.query(1,1,n,l,r);
 				assert(q.best==best);checks++;
 				ll sm=0;for(int i=l;i<=r;i++)sm+=b[i];
 				assert(q.sum==sm);
