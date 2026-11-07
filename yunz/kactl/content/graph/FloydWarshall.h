@@ -1,19 +1,15 @@
 /**
- * Description: Floyd 全源最短路, 点 $1..n$, 有向图, 允许负边权.
- * 全部数组和函数都在结构体 Floyd 里, 全局对象 FW.
- * init(n): 令 $d[i][i]=0$, 其余为 INF. 加边时 FW.d[u][v] 取 min (处理
- * 重边; 无向图两个方向都加). floyd(n) 之后 $d[i][j]$ 为 $i$ 到 $j$ 的
- * 最短距离, 不可达为 INF. 存在负环当且仅当某个 $d[i][i] < 0$; 最后一段
- * 把能经过负环的点对标成 $-$INF (不需要可删). 距离为 ll, 中间结果截断
- * 在 $-$INF, 不会溢出. N 为点数上限 (约 500).
- * 对象很大, 必须是全局 (或 static) 变量; 要第二个就在全局写 Floyd FW2;
+ * Description: Floyd 全源最短路, 有向图, 允许负边权. 点数 N 约 500.
+ * 有负环当且仅当某个 d[i][i] $< 0$. 对象必须是全局变量.
  * Usage: FW.init(n); // 多组数据每组调用
  * for(int i=1;i<=m;i++){
  *   cin>>u>>v>>w;
- *   FW.d[u][v]=min(FW.d[u][v],w);
+ *   FW.d[u][v]=min(FW.d[u][v],w); // 重边取 min, 无向图加两次
  * }
  * FW.floyd(n);
- * // FW.d[u][v]==FW.INF 不可达, ==-FW.INF 无下界
+ * ll x=FW.d[u][v]; // u 到 v 的最短距离
+ * // x==FW.INF 不可达; x==-FW.INF 经过负环, 无下界
+ * Floyd FW2; // 第二个对象 (全局)
  * Time: O(n^3)
  */
 #pragma once

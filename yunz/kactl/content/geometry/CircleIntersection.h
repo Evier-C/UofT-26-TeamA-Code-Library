@@ -1,14 +1,12 @@
 /**
- * Description: 求圆 $(a, r1)$ 与圆 $(b, r2)$ 的交点 (圆周的交点). 有交点时写入 out 并返回 true:
- * 相交时 out.first, out.second 为两个交点 (从 a 看向 b, first 在左侧);
- * 相切时两个交点相同. 两圆相离或一圆在另一圆内部时返回 false.
- * 两圆心重合时返回 false, 此时要求 $r1 \neq r2$ (有 assert, 同心同半径有无穷多交点).
- * 要求 T 为 double.
+ * Description: 两圆的圆周交点, 要求 T 为 double.
+ * 两圆心重合时返回 false, 且要求 $r1 \neq r2$ (有 assert).
  * Usage: Point a(0,0),b(2,0);
  * pair<Point,Point> out;
- * if(circleInter(a,b,2,2,out)){
+ * if(circleInter(a,b,2,2,out)){ // 圆 (a,2) 与圆 (b,2)
  *   // out.first=(1,sqrt(3)), out.second=(1,-sqrt(3))
- * }
+ *   // 从 a 看向 b, first 在左侧; 相切时两点相同
+ * }else{} // 相离, 内含或同心
  * Time: O(1)
  */
 #pragma once

@@ -1,23 +1,16 @@
 /**
- * Description: 普通莫队 Mo, 全局对象 mo: 离线回答 q 个区间询问 a[l..r], 要求能
- * $O(1)$ 地把一个数加入或移出当前区间, 并维护当前答案 cur.
- * 输入: mo.n, mo.q, mo.a[1..n]; 第 i 个询问存为 mo.qs[i] = \{l, r, i\},
- * 下标从 1 开始.
- * 你要改的地方: 结构体里的 add(i) 和 del(i), 把 a[i] 加入或移出当前区间并更新
- * cur, 需要的辅助数组也写成成员. 下面的 add, del 是例子: 区间不同值个数,
- * 要求 a 已离散化到 1..n.
- * solve() 之后 ans[i] 为第 i 个询问的答案, 顺序和输入一致.
- * 块长 $B = n / \sqrt q$, 奇数块按 r 升序, 偶数块按 r 降序, 减少 R 来回跑.
- * 注意: ans 和 cur 是 ll; solve 会打乱 qs 的顺序; 对象要定义在全局;
- * 多组数据清空 cnt 等自己维护的数组和 cur.
+ * Description: 普通莫队, 离线回答区间询问. 要改的只有结构体里的 add(i), del(i)
+ * 和辅助数组: 把 a[i] 加入或移出当前区间并更新 cur. 现在的例子是
+ * 区间不同值个数, 要求 a 已离散化到 1..n. 对象要定义在全局.
  * Usage: cin >> mo.n >> mo.q;
- * for (int i = 1; i <= mo.n; i++) cin >> mo.a[i]; // 先离散化
+ * for (int i = 1; i <= mo.n; i++) cin >> mo.a[i];
  * for (int i = 1; i <= mo.q; i++) {
  *   cin >> mo.qs[i].l >> mo.qs[i].r;
  *   mo.qs[i].id = i;
  * }
- * mo.solve();
+ * mo.solve(); // 会打乱 qs 的顺序
  * for (int i = 1; i <= mo.q; i++) cout << mo.ans[i] << endl;
+ * // 多组数据: 清空 cnt 等辅助数组, mo.cur = 0
  * Time: $O(n \sqrt q)$ 次 add 和 del
  */
 #pragma once

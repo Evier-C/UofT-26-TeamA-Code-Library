@@ -1,26 +1,18 @@
 /**
- * Description: LCT 动态树, 点 $1..n$, 维护一个森林, 支持连边, 删边,
- * 判连通, 单点改值, 路径求和, 每次均摊 $O(\log n)$. 结构体 LCT,
- * 全局对象 L.
- * 每条实链用一棵 splay 维护 (中序为深度从小到大); 对 splay 的根,
- * fa[x] 表示虚边指向的父亲. 点权 val[], sum[] 为 splay 子树和.
- * link(x,y): 若不连通则连边 $(x, y)$. cut(x,y): 若有边 $(x, y)$ 则删掉.
- * connected(x,y): 是否连通. findrt(x): $x$ 所在树的根.
- * makert(x): 把 $x$ 设为所在树的根. modify(x,v): val[x] 改为 $v$.
- * split(x,y): 把 $x$ 到 $y$ 的路径拉成一棵 splay, 根为 $y$, 之后
- * sum[y] 即为路径和 (要求 $x, y$ 连通).
- * 维护 max/xor 等只改 pushup; 加区间修改要再加一个标记并在 pushdown
- * 下传. N 为点数上限, 没有递归.
- * 对象很大, 必须是全局 (或 static) 变量; 要第二个就在全局写 LCT L2;
+ * Description: LCT 动态树, 维护森林的连边, 删边, 判连通, 单点改值,
+ * 路径求和. 维护 max/xor: 改 pushup. 非递归. 对象必须是全局变量.
  * Usage: for(int i=1;i<=n;i++) cin>>L.val[i];
  * L.init(n); // 多组数据每组调用 (先填 val)
- * L.link(x,y); // 加边
- * L.cut(x,y); // 删边
+ * L.link(x,y); // 加边, 已连通则忽略
+ * L.cut(x,y); // 删边, 没有这条边则忽略
+ * int r=L.findrt(x); // x 所在树的根
+ * L.makert(x); // 换根为 x
  * if(L.connected(x,y)){
  *   L.split(x,y);
  *   ll s=L.sum[y]; // 路径 x 到 y 的点权和
  * }
- * L.modify(x,v);
+ * L.modify(x,v); // val[x] 改为 v
+ * LCT L2; // 第二个对象 (全局)
  * Time: 均摊 O(\log n)
  */
 #pragma once

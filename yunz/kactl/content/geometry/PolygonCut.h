@@ -1,10 +1,8 @@
 /**
  * Description:\\
 \begin{minipage}{75mm}
- 用从 s 到 e 的有向直线切割多边形, 切掉直线左侧的部分, 保留右侧 (含直线上的点),
- 返回剩余部分的顶点, 顺序与原多边形相同. 全部被切掉时返回空.
- 多边形为 vector<Point> (下标 0..n-1). 对凸多边形结果仍是凸多边形;
- 凹多边形可能被切成几块, 结果用直线上的边连成一个 (面积仍正确). 要求 T 为 double.
+ 用有向直线切割多边形, 保留直线右侧 (含直线上的点). 要求 T 为 double.
+ 凹多边形可能被切成几块, 结果用直线上的边连成一个多边形 (面积仍正确).
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-6mm}
@@ -16,8 +14,9 @@
  * p.push_back(Point(1,-1));
  * p.push_back(Point(1,1));
  * p.push_back(Point(0,1));
+ * // 切掉 s 看向 e 的左侧, 即 x 轴上方
  * vector<Point> q=polygonCut(p,Point(0,0),Point(1,0));
- * // 切掉 x 轴上方, q 为 y 不大于 0 的部分
+ * // q 为剩下的部分, 顶点顺序同 p, 全部切掉时为空
  * Time: O(n)
  */
 #pragma once

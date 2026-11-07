@@ -1,7 +1,7 @@
 /**
  * Description:\\
 \begin{minipage}{75mm}
- 求把 p0 变到 q0, p1 变到 q1 的相似变换 (平移 + 旋转 + 缩放, 不翻转) 作用在点 r 上的结果.
+ 把 p0 变到 q0, p1 变到 q1 的相似变换 (平移 + 旋转 + 缩放, 不翻转) 作用到点 r 上.
  要求 p0 与 p1 不重合, T 为 double.
 \end{minipage}
 \begin{minipage}{15mm}

@@ -1,26 +1,17 @@
 /**
- * Description: 拉格朗日插值 (模 MOD $= 998244353$, 自带 qpow, 不依赖其他文件).
- * 不超过 $n-1$ 次的多项式由 $n$ 个点值 $(x_i, y_i)$ ($x_i$ 互不相同) 唯一确定:
- * $f(k) = \sum_i y_i \prod_{j \ne i} \frac{k - x_j}{x_i - x_j}$. 不用求系数就能求单点值.
- * 注意: 多项式次数必须不超过点数 $-1$, 否则结果错误.
- * \textbf{lagrange(x, y, k)}: 一般情况, x, y 为等长 vector<ll> (下标从 0 开始,
- * $x_i$ 模 MOD 互不相同), 返回 $f(k) \bmod MOD$. $O(n^2)$, 每项求一次逆元.
- * \textbf{lagrangeSeq(y, k)}: 点为 $x = 0, 1, \dots, n$, 传入 $y[0..n]$ ($n+1$ 个值),
- * 返回 $f(k)$, $k$ 可到 $10^{18}$. 分子用 $(k-j)$ 的前缀积和后缀积, 分母为
- * $\prod_{j \ne i} (i-j) = (-1)^{n-i} i! (n-i)!$, 用阶乘逆元, $O(n)$.
- * $k$ 恰为采样点时直接返回. 若点是 $1..n+1$: 让 y[0] 存 $f(1)$, y[1] 存 $f(2)$ ...,
- * 再调用 lagrangeSeq(y, k-1).
- * \textbf{lagrangeCoef(x, y)}: 还原系数 $a[0..n-1]$, $f(x) = \sum a_i x^i$. 先求
- * $P(x) = \prod (x - x_j)$, 每个 $i$ 用综合除法求 $P / (x - x_i)$ 再乘系数, $O(n^2)$.
- * 经典用法: 自然数幂和 $S(m) = \sum_{i=1}^{m} i^K$ 是 $m$ 的 $K+1$ 次多项式, 暴力算出
- * $S(0..K+1)$ 共 $K+2$ 个值, 再用 lagrangeSeq 求 $S(m)$. 一般地, 能证明答案
- * 是 $d$ 次多项式时, 暴力算 $d+1$ 个点再插值. 输入的 $y$ 须在 $[0, MOD)$ 内.
+ * Description: 拉格朗日插值 (模 MOD $= 998244353$, 自带 qpow): 不求系数直接求单点值.
+ * 多项式次数必须不超过点数 $-1$; $x_i$ 模 MOD 互不相同, $y_i$ 在 $[0, MOD)$ 内.
+ * 典型用法: 答案是 $d$ 次多项式时, 暴力算 $d+1$ 个点再插值.
+ * 与 NTT, BM 同时使用时 MOD 和 qpow 重名, 删掉一份.
  * Usage: vector<ll> x={1,2,3},y={1,4,9}; // f(x)=x^2
- * ll v=lagrange(x,y,10); // 100
- * vector<ll> a=lagrangeCoef(x,y); // a={0,0,1}
- * // 求 1^K+2^K+...+m^K
+ * ll v=lagrange(x,y,10); // f(10)=100, O(n^2)
+ * vector<ll> a=lagrangeCoef(x,y); // 系数 a={0,0,1}
+ * // 点为 0..n 时 O(n): ys[i]=f(i), i=0..n, k 可到 1e18
+ * ll w=lagrangeSeq(ys,k);
+ * // 点为 1..n+1 时: ys[0] 存 f(1), 调用 lagrangeSeq(ys,k-1)
+ * // 例: S(m)=1^K+...+m^K 是 K+1 次多项式
  * vector<ll> s(K+2); // s[j]=S(j), j=0..K+1
- * for(int j=1;j<=K+1;j++) // 暴力算前 K+2 项
+ * for(int j=1;j<=K+1;j++)
  *   s[j]=(s[j-1]+qpow(j,K))\%MOD;
  * ll ans=lagrangeSeq(s,m); // S(m) mod MOD
  * Time: lagrange, lagrangeCoef 为 O(n^2 + n \log MOD); lagrangeSeq 为 O(n + \log MOD)

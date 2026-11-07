@@ -1,18 +1,12 @@
 /**
- * Description: 单纯形法解线性规划: 在约束 $Ax \le b$, $x \ge 0$ 下最大化 $c^T x$.
- * 有 $m$ 个约束, $n$ 个变量, 全部下标从 1 开始: 填全局数组 $A[1..m][1..n]$,
- * $b[1..m]$ ($b$ 可为负), $c[1..n]$, 然后调用 \texttt{simplex(m, n)}.
- * 返回值: 无可行解返回 -INF; 目标无上界返回 INF; 否则返回最大值,
- * 一组最优解在 $x[1..n]$. 多组数据直接重新填 A, b, c 即可.
- * 变形: 最小化把 $c$ 取负 (答案再取负); $\ge$ 约束两边乘 $-1$;
- * 等式拆成 $\le$ 和 $\ge$; 无符号限制的变量拆成 $x' - x''$.
- * 浮点运算, eps $= 10^{-8}$, 不保证数值稳定; 用 Bland 规则防止循环.
- * $b \ge 0$ 时 $x = 0$ 可行, 跳过第一阶段, 更快.
- * Usage: m=3; n=2; // 约束数, 变量数
- * // 填 A[1..m][1..n], b[1..m], c[1..n]
+ * Description: 单纯形法: 在 $Ax \le b$, $x \ge 0$ 下最大化 $c^T x$. 下标从 1 开始, $b$ 可为负.
+ * 上限 MM, NN. 浮点运算 (eps $= 10^{-8}$), 不保证数值稳定; $b \ge 0$ 时更快.
+ * 最小化把 $c$ 取负; $\ge$ 约束乘 $-1$; 等式拆成两个不等式.
+ * Usage: m=3; n=2; // 约束数, 变量数 (全局变量)
+ * // 填 A[1..m][1..n], b[1..m], c[1..n], 多组数据重新填
  * double v=simplex(m,n);
- * if(v==-INF) puts("Infeasible");
- * else if(v==INF) puts("Unbounded");
+ * if(v==-INF) puts("Infeasible"); // 无可行解
+ * else if(v==INF) puts("Unbounded"); // 无上界
  * else ... // v 为最大值, 最优解在 x[1..n]
  * Time: O(nm \cdot \#pivots), 最坏指数级, 实际很快
  */

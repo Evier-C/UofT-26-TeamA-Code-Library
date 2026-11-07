@@ -1,11 +1,8 @@
 /**
- * Description: 确定性 Miller-Rabin 素性测试, 判断一个 long long 范围内的数是不是质数.
- * isPrime(n) 对所有 $n \le 9.2 \cdot 10^{18}$ 都正确 (用前 12 个质数 2..37 作底); $n < 2$ (包括负数) 返回 false.
- * 做法: 写 $n - 1 = d \cdot 2^s$, 对每个底 $a$ 看 $a^d, a^{2d}, \dots$ 中是否出现 1 或 $n - 1$.
- * 乘法用 \_\_int128 (mulmod), 自带 mulmod 和 powmod, 与 ModMulLL 相同, 一起复制时删掉一份.
- * 只判断 $10^7$ 以内的数时用线性筛更快.
- * Usage: if(isPrime(1000000007)) ... // true
- * bool b = isPrime(n); // n 为 long long
+ * Description: 确定性 Miller-Rabin, 对 long long 范围内所有数都正确.
+ * 自带 mulmod 和 powmod (与 ModMulLL 相同, 一起复制时删掉一份).
+ * Usage: bool b = isPrime(1000000007); // true
+ * bool c = isPrime(n); // n 为 long long, n < 2 时为 false
  * Time: 12 次快速幂, O(12 \log n)
  */
 #pragma once

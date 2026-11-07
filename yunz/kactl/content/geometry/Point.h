@@ -1,22 +1,20 @@
 /**
- * Description: 平面点 / 向量, 几何部分其余文件都 include 它. 点的运算都是成员函数.
- * 坐标类型为 T: 默认 double; 坐标都是整数且要求精确 (凸包, 面积, 判断位置等) 时改成 typedef ll T,
- * 此时 unit, rotate, 除法以及求交点的函数会被截断, 不要用; cross, dot, len2 是坐标的二次式,
- * 坐标绝对值约 $10^9$ 以内才不溢出.
- * sgn(x) 返回 x 的符号, $|x| \le eps$ 时为 0. eps 是绝对误差 (默认 1e-9), 坐标很大时要调大.
- * == 和 < (先比 x 再比 y) 也带 eps, 可直接用于 sort, unique, set.
- * a.cross(b) 为 $a \times b$; a.cross(b,c) 为 $(b-a) \times (c-a)$: 正数表示 a, b, c 逆时针
- * (c 在 a 看向 b 的左侧), 负数为顺时针, 0 为共线. a.dot(b) 为点积.
- * a.len() 为长度, a.len2() 为长度的平方, a.angle() 为极角 (范围 $[-\pi, \pi]$),
- * a.perp() 为逆时针转 $90^\circ$, a.unit() 为单位向量, a.rotate(t) 为绕原点逆时针转 t 弧度.
- * 多边形统一用 vector<Point> 存, 下标 0..n-1.
+ * Description: 平面点 / 向量, 其余几何文件都 include 它.
+ * 坐标类型 T 默认 double; 整数坐标要求精确时改成 typedef ll T, 此时不要用 unit, rotate, 除法和求交点的函数,
+ * 坐标绝对值约 $10^9$ 以内才不溢出. eps 为绝对误差 (默认 1e-9), 坐标很大时要调大; == 和 < 也带 eps.
  * Usage: Point a(1,2),b(3,4),c(0,5);
- * Point s=a+b,d=b-a,m=a*2; // 向量运算
+ * Point s=a+b,d=b-a,m=a*2,q=a/2; // 向量运算
  * T k=a.cross(b),t=a.dot(b); // 叉积, 点积
- * double l=(b-a).len(); // 两点距离
- * if(sgn(a.cross(b,c))>0){} // a,b,c 逆时针
- * Point r=a.rotate(PI/2); // 逆时针转 90 度
+ * // a.cross(b,c) 即 (b-a) 叉乘 (c-a)
+ * int o=sgn(a.cross(b,c)); // 1 逆时针, -1 顺时针, 0 共线
+ * double l=(b-a).len(); // 两点距离, len2() 为平方
+ * double th=a.angle(); // 极角, 范围 [-pi,pi]
+ * Point p=a.perp(); // 逆时针转 90 度
+ * Point u=a.unit(); // 单位向量
+ * Point r=a.rotate(PI/2); // 绕原点逆时针转 pi/2
+ * bool e=(a==b),lt=(a<b); // 带 eps, 先比 x 再比 y
  * vector<Point> poly={a,b,c}; // 多边形 poly[0..n-1]
+ * sort(poly.begin(),poly.end()); // 可直接 sort, unique
  */
 #pragma once
 

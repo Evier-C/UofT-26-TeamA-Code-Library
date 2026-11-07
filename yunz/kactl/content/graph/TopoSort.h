@@ -1,22 +1,17 @@
 /**
- * Description: Kahn 拓扑排序 (BFS), 点 $1..n$. 结构体 Topo, 全局对象 TP.
- * 输入: 有向边存在 TP.g[u] 中. init(n) 清空 g.
- * topo(n): 是 DAG 返回 1, 拓扑序在 ord[1..n] (所有边从前指向后);
- * 有环返回 0, 此时只有 ord[1..cnt] 有效, 环上的点和环能到达的点都
- * 不会出现. 入度 deg 在函数内计算, 不用手动维护.
- * 字典序最小的拓扑序: 把 queue 换成小根堆
- * priority\_queue$<$int,vector$<$int$>$,greater$<$int$>>$.
- * 对象很大, 必须是全局 (或 static) 变量; 要第二个就在全局写 Topo TP2;
+ * Description: Kahn 拓扑排序. 求字典序最小的拓扑序: 把 queue 换成
+ * priority\_queue$<$int,vector$<$int$>$,greater$<$int$>>$. 对象必须是全局变量.
  * Usage: TP.init(n); // 多组数据每组调用
  * for(int i=1;i<=m;i++){
  *   cin>>u>>v;
  *   TP.g[u].push_back(v); // 边 u 到 v
  * }
- * if(TP.topo(n)){
+ * if(TP.topo(n)){ // 1 表示是 DAG
  *   for(int i=1;i<=n;i++) cout<<TP.ord[i]<<' ';
  * }else{
- *   // 有环
+ *   // 有环: 只有 TP.ord[1..TP.cnt] 有效
  * }
+ * Topo TP2; // 第二个对象 (全局)
  * Time: O(n+m)
  */
 #pragma once

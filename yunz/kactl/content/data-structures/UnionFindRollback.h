@@ -1,23 +1,15 @@
 /**
- * Description: 并查集, 点 1..n, 两个结构体互相独立, 只抄需要的.
- * 普通并查集 DSU, 全局对象 dsu: init(n) 初始化; find(x) 返回 x 所在集合的根;
- * unite(x, y) 合并两个集合, 已在同一集合返回 0, 否则返回 1.
- * 可撤销并查集 RollbackDSU, 全局对象 rdsu: 按大小合并, 不压缩路径,
- * 所以 find 是 $O(\log n)$. init(n) 初始化; find(x) 返回根;
- * siz[find(x)] 为 x 所在集合大小; unite(x, y) 同上, 每次成功合并压栈一次;
- * time() 返回当前栈大小; rollback(t) 撤销到 time() 等于 t 时的状态,
- * 即撤销 t 之后的所有合并.
- * 常用于线段树分治, 离线动态连通性, 按顺序试加边再撤销.
- * 注意: 撤销版不能路径压缩; 多组数据重新 init 即可; 对象要定义在全局,
- * 要多个就在全局再写 DSU dsu2; 或 RollbackDSU rdsu2;
- * Usage: dsu.init(n); // 普通版
- * dsu.unite(x, y);
+ * Description: 并查集 DSU 和可撤销并查集 RollbackDSU, 点 1..n, 互相独立, 只抄需要的.
+ * 可撤销版按大小合并, 不能加路径压缩. 对象要定义在全局.
+ * Usage: dsu.init(n); // 普通版, 多组数据重新 init
+ * bool ok = dsu.unite(x, y); // 已连通返回 0
  * if (dsu.find(x) == dsu.find(y)) ...; // 是否连通
  * rdsu.init(n); // 可撤销版
  * int t = rdsu.time(); // 记下当前时间
  * rdsu.unite(x, y); rdsu.unite(y, z);
  * int s = rdsu.siz[rdsu.find(x)]; // 集合大小
- * rdsu.rollback(t); // 撤销上面两次合并
+ * rdsu.rollback(t); // 撤销 t 之后的所有合并
+ * RollbackDSU rdsu2; // 第二个对象, 写在全局
  * Time: 普通 均摊 $O(\log N)$, 实际接近 $O(1)$; 可撤销 $O(\log N)$
  */
 #pragma once

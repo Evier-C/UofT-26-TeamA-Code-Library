@@ -1,39 +1,25 @@
 /**
- * Description: 最小费用最大流. 在流量最大的前提下使总费用最小.
- * 做法: 每次用 SPFA 找费用最短的增广路, 沿它推满, 直到 $t$ 不可达.
- * 全部状态都在结构体 MCMF 里, 已定义全局对象 MF; 数组很大, 对象必须是
- * 全局 (或 static) 的. 需要第二个网络就在全局再写 MCMF MF2;
- * 可以和 Dinic.h 同时 include.
- * 输入: 点编号 $1..n$, 先 MF.init(n), 再 MF.add(u,v,c,w) 加有向边,
- * 容量 $c$, 单位流量费用 $w$ (都是 ll). 允许负费用, 但不能有负环.
- * 存图为链式前向星, cnt 从 1 开始, 边 $e$ 与反向边 $e \oplus 1$ 成对,
- * 反向边费用为 $-w$. cap[e] 是剩余容量.
- * 函数: add 返回正向边编号; mcmf(s,t) 返回 (最大流, 最小费用).
- * 输出方案:
- * (1) 每条原边的流量: $\text{MF.cap}[e \oplus 1]$, 该边费用为流量乘 $w$.
- * (2) 最小割: 跑完后 MF.dis[v] 小于 MF.INF 的点 (残量网络中 $s$
- * 能到达) 为 $S$ 侧.
- * (3) 带权二分图匹配: 源点连左部, 右部连汇点, 容量 1 费用 0,
- * 左右边容量 1 费用 $w$; 左到右满流 (MF.cap[e] 为 0) 的边为匹配边.
- * 求最大费用: 费用全取负, 答案再取负. 只要最小费用流 (不要求最大流)
- * 时, 在 mcmf 里当 dis[t] 不小于 0 就停止.
- * 注意: 无向边要 add 两次. N, M 为点数, 边数上限 (每条边占 2 个位置),
- * 按题目修改. 多组数据每组先 MF.init(n).
+ * Description: 最小费用最大流 (SPFA), 可有负费用, 不能有负环.
+ * 数组大, 对象必须是全局 (或 static) 的; 已定义 MF, 可再定义 MCMF MF2;
+ * 可与 Dinic.h 同时使用. 点 $1..n$, 容量和费用为 ll.
+ * N 为点数上限, M 为边数上限的 2 倍.
  * Usage: MF.init(n); // 每组数据先调用
  * for(int i=1;i<=m;i++){
- *   cin>>u>>v>>c>>w;
- *   id[i]=MF.add(u,v,c,w); // 记下第 i 条边的编号
+ *   cin>>u>>v>>c>>w; // 容量 c, 单位费用 w
+ *   id[i]=MF.add(u,v,c,w); // 有向边, 返回编号
  * }
+ * // 无向边要 add 两次; 求最大费用: 费用取负, 答案取负
  * auto [f,co]=MF.mcmf(s,t); // 最大流, 最小费用
  * cout<<f<<' '<<co<<endl;
  * for(int i=1;i<=m;i++) cout<<MF.cap[id[i]^1]<<' '; // 各边流量
  * for(int v=1;v<=n;v++) // 最小割 S 侧
  *   if(MF.dis[v]<MF.INF) cout<<v<<' ';
+ * // 不要求最大流, 只要费用最小: mcmf 中 dis[t] 不小于 0 时停止
  * // 带权匹配: 左 1..L, 右 L+1..L+R, s=L+R+1, t=L+R+2
  * MF.init(L+R+2);
  * for(int i=1;i<=L;i++) MF.add(s,i,1,0);
  * for(int j=1;j<=R;j++) MF.add(L+j,t,1,0);
- * for(int k=1;k<=K;k++) id[k]=MF.add(a[k],L+b[k],1,w[k]);
+ * for(int k=1;k<=K;k++) id[k]=MF.add(a[k],L+b[k],1,wt[k]);
  * auto [cntMatch,minCost]=MF.mcmf(s,t);
  * for(int k=1;k<=K;k++) // 满流的边是匹配边
  *   if(!MF.cap[id[k]]) cout<<a[k]<<' '<<b[k]<<endl;

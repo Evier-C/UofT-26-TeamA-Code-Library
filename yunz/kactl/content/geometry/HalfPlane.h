@@ -1,15 +1,13 @@
 /**
- * Description: 半平面交 (极角排序 + 双端队列). 每条有向直线 Line\{s, e\} 表示它左侧的半平面 (含边界).
- * 返回所有半平面的交 (凸多边形) 的顶点, 逆时针, 下标 0..m-1; 交集为空或面积为 0 时返回空
- * (面积极小时也可能返回退化的多边形, 按面积判断即可).
- * 要求交集有界: 不确定时先加入一个大矩形的 4 条边 (见用法). 方向相同的直线只保留最靠里的一条.
- * 要求 T 为 double, 判断用 eps.
- * Usage: vector<Line> L; // 每条直线保留左侧
+ * Description: 半平面交. 要求交集有界 (不确定时加入大矩形, 见用法), T 为 double.
+ * 面积为 0 或极小时可能返回空或退化的多边形, 按面积判断即可.
+ * Usage: vector<Line> L; // Line{s,e} 保留 s 看向 e 的左侧
  * L.push_back({Point(0,0),Point(1,0)}); // y 不小于 0
  * double B=1e7; // 逆时针的大矩形, 保证交集有界
  * Point c[4]={Point(-B,-B),Point(B,-B),Point(B,B),Point(-B,B)};
  * for(int i=0;i<4;i++)L.push_back({c[i],c[(i+1)\%4]});
- * vector<Point> poly=halfPlane(L); // 空表示无交
+ * // 交为逆时针凸多边形 poly[0..m-1], 空表示无交
+ * vector<Point> poly=halfPlane(L);
  * double S=fabs(polygonArea2(poly))/2; // 交的面积
  * Time: O(n \log n)
  */

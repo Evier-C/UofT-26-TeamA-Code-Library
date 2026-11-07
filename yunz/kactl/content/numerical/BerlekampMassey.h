@@ -1,13 +1,10 @@
 /**
- * Description: Berlekamp-Massey: 给出数列 $s_0, s_1, \dots$ 的前若干项 (模素数 MOD),
- * 求最短的线性递推式. 若真实递推阶数为 $n$, 至少要给前 $2n$ 项.
- * 返回 vector<ll> C (下标从 0 开始, 长度即阶数 $L$), 满足对所有 $i \ge L$:
- * $s_i = \sum_{j=0}^{L-1} C_j s_{i-j-1} \pmod{MOD}$. 数列全为 0 时返回空.
- * 典型用法: 暴力或 DP 算出前几百项, BM 猜出递推式, 再用 LinearRecurrence
- * 求第 $k$ 项. 输入须在 $[0, MOD)$ 内; MOD 必须是素数 (要求逆元).
- * Usage: vector<ll> s={0,1,1,3,5,11};
- * vector<ll> C=BM(s); // C={1,2}
- * // 即 s[i]=s[i-1]+2*s[i-2]
+ * Description: Berlekamp-Massey: 由数列前若干项 (模素数 MOD) 求最短线性递推式.
+ * 递推阶数为 $n$ 时至少给前 $2n$ 项, 输入在 $[0, MOD)$ 内; 全 0 数列返回空.
+ * Usage: vector<ll> s={0,1,1,3,5,11}; // 暴力算出的前若干项
+ * vector<ll> C=BM(s); // C={1,2}, 阶数 L=C.size()
+ * // s[i]=C[0]*s[i-1]+C[1]*s[i-2]+...+C[L-1]*s[i-L]
+ * ll v=linearRec(s,C,k); // 第 k 项, 见 LinearRecurrence
  * Time: O(n^2), $n$ 为给出的项数
  */
 #pragma once

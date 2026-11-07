@@ -1,11 +1,10 @@
 /**
- * Description: 最小圆覆盖 (随机增量法): 求半径最小的圆, 使所有点都在圆内或圆上.
- * 输入点集 vector<Point> (下标 0..n-1, 至少 1 个点, 可有重复点和共线点),
- * 返回 \{圆心, 半径\}. 要求 T 为 double. 判断点在圆外时用相对误差 1e-8.
- * 函数内部会打乱点的顺序 (传值, 不影响原数组).
+ * Description: 最小圆覆盖 (所有点在圆内或圆上). 要求 T 为 double, 至少 1 个点,
+ * 可有重复点和共线点. 判断点在圆外时用相对误差 1e-8.
  * Usage: vector<Point> ps={Point(0,0),Point(2,0),Point(1,1)};
- * pair<Point,double> c=mec(ps);
- * // 圆心 c.first=(1,0), 半径 c.second=1
+ * pair<Point,double> c=mec(ps); // 传值, ps 不变
+ * Point o=c.first; // 圆心 (1,0)
+ * double r=c.second; // 半径 1
  * Time: 期望 O(n)
  */
 #pragma once

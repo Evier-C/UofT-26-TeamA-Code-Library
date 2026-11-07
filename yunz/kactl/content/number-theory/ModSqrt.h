@@ -1,12 +1,10 @@
 /**
- * Description: 二次剩余 (Cipolla 算法): 求 $x$ 使 $x^2 \equiv n \pmod p$, $p$ 必须是质数.
- * cipolla(n, p) 无解时返回 $-1$; 有解时返回两个根 $x, p - x$ 中较小的那个 ($n \equiv 0$ 时返回 0).
- * $n$ 可以为负或大于 $p$. 判断有无解用欧拉判别法: $n^{(p-1)/2} \equiv 1$ 才有解.
- * 做法: 找 $a$ 使 $w = a^2 - n$ 不是二次剩余, 在 $\mathbb{F}_p[\sqrt w]$ 里算 $x = (a + \sqrt w)^{(p+1)/2}$.
- * cmul 是这个域里的乘法, $(x + y\sqrt w)(a + b\sqrt w)$. 全部乘法用 \_\_int128, $p$ 可到 $10^{18}$.
+ * Description: 二次剩余 (Cipolla): 求 $x$ 使 $x^2 \equiv n \pmod p$, $p$ 必须是质数, 可到 $10^{18}$.
+ * 无解返回 $-1$; 有解返回两个根中较小的. 全局的 W, pw, cmul 是内部用的.
  * Usage: ll x = cipolla(2, 7); // 3, 因为 3 * 3 = 9 = 2 (mod 7)
- * if(x == -1) ... // 无解
- * else { ll y = p - x; } // 另一个根 (x = 0 时只有一个根)
+ * x = cipolla(n, p); // n 可以为负
+ * if(x == -1) ...; // 无解
+ * ll y = p - x; // 另一个根 (x = 0 时只有一个根)
  * Time: 期望 O(\log p)
  */
 #pragma once

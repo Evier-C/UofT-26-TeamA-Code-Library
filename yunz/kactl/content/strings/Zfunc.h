@@ -1,20 +1,18 @@
 /**
- * Description: Z 函数, 即扩展 KMP. 串均为 1-indexed, 放在 char 数组 s[1..n], t[1..m] 中.
- * 封装在 struct Zfunc 中, 全局对象为 Z. 数组很大, 对象必须开成全局或 static.
- * Z.getz(s,n) 求 Z.z[1..n]: z[i] 为后缀 s[i..n] 与整个 s 的最长公共前缀长度, 约定 z[1] = n.
- * 例: abacaba 得 7 0 1 0 3 0 1.
- * Z.exkmp(s,n,t,m) 求 Z.ext[1..n]: ext[i] 为 s[i..n] 与 t[1..m] 的最长公共前缀长度.
- * 它要用到 t 的 z 数组, 所以必须先对同一对象调用 getz(t,m), 且之后不能再对别的串调用 getz.
- * ext[i] = m 表示 t 在 s 的位置 i 出现. Zfunc::N 为串长上限, 多组数据无需清空.
- * Usage: char s[Zfunc::N],t[Zfunc::N]; // 全局
+ * Description: Z 函数, 即扩展 KMP. 串长上限 Zfunc::N; 数组很大, 对象必须开在全局.
+ * exkmp 用的是同一对象里 t 的 z, 两次调用之间不能再对别的串 getz.
+ * Usage: char s[Zfunc::N],t[Zfunc::N]; // 全局, 从 1 开始
+ * Zfunc Z2; // 第二个实例也开在全局
  * scanf("\%s\%s",s+1,t+1);
  * int n=strlen(s+1),m=strlen(t+1);
- * Z.getz(s,n); // Z.z[1..n], s 自己的 z 函数
- * Z.getz(t,m); // 先求 t 的 z
- * Z.exkmp(s,n,t,m); // 得到 Z.ext[1..n]
+ * Z.getz(s,n);
+ * // Z.z[i]: s[i..n] 与 s 的 LCP, 约定 Z.z[1]=n
+ * Z.getz(t,m); // exkmp 之前先求 t 的 z
+ * Z.exkmp(s,n,t,m);
+ * // Z.ext[i]: s[i..n] 与 t[1..m] 的 LCP
  * for(int i=1;i<=n;i++)
- *   if(Z.ext[i]==m)printf("\%d ",i);
- * // 第二个实例也开在全局: Zfunc Z2;
+ *   if(Z.ext[i]==m)printf("\%d ",i); // t 出现在 i
+ * // 多组数据直接再调用, 无需清空
  * Time: O(n+m)
  */
 #pragma once

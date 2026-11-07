@@ -1,15 +1,11 @@
 /**
- * Description: 区间 DP 的 Knuth 优化 (四边形不等式优化), 把 $O(n^3)$ 的区间 DP 降到 $O(n^2)$.
- * 适用的转移: $f[l][r] = \min_{l \le k < r} (f[l][k] + f[k+1][r]) + w(l, r)$, $f[i][i] = 0$, 答案 $f[1][n]$.
- * 条件: 对所有 $a \le b \le c \le d$ 有 $w(a,c) + w(b,d) \le w(a,d) + w(b,c)$ (四边形不等式) 且 $w(b,c) \le w(a,d)$ (区间包含单调).
- * 此时最优分割点满足 $opt[l][r-1] \le opt[l][r] \le opt[l+1][r]$, 只在这个范围内枚举 $k$.
- * 例子是石子合并: $w(l, r)$ 为 $a_l..a_r$ 的和, 用前缀和 s; 按题目改 w 即可.
- * 调用 knuth(n) 后 f[l][r] 为区间 $[l, r]$ 的答案, opt[l][r] 为它的最优分割点 (左半边是 $[l, k]$).
- * 环形问题把数组复制一倍, 求 $\min f[i][i+n-1]$. 求最大值时一般不满足条件, 不要直接改成 max.
- * 多组数据不需要清空 (用到的 f, opt 都会重新算).
+ * Description: 区间 DP 的 Knuth 优化: $f[l][r] = \min_{l \le k < r} (f[l][k] + f[k+1][r]) + w(l, r)$.
+ * 要求 $w(a,c) + w(b,d) \le w(a,d) + w(b,c)$ 且 $w(b,c) \le w(a,d)$ ($a \le b \le c \le d$). 例子是石子合并, 按题目改 w.
  * Usage: // 读入 n 和 a[1..n]
  * for(int i = 1; i <= n; i++) s[i] = s[i - 1] + a[i];
  * ll ans = knuth(n); // f[1][n]
+ * f[l][r]; opt[l][r]; // 区间答案, 最优分割点 k, 左边是 [l, k]
+ * // 多组数据不用清空
  * Time: O(n^2)
  * Memory: N = 3005 时约 110MB
  */

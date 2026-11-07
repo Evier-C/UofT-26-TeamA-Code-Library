@@ -1,22 +1,18 @@
 /**
- * Description: Manacher 求每个中心的最长回文. 输入串 s[1..n] 为 1-indexed.
- * 封装在 struct Manacher 中, 全局对象为 MC. 数组很大, 对象必须开成全局或 static.
- * MC.manacher(s,n) 在字符间和两端插入 \#, 得到 a[1..m], $m = 2n+1$: a[2i] = s[i], 奇数位为 \#.
- * 求出 MC.p[1..m]: p[k] 为 a 中以 k 为中心的最长回文半径, 含中心.
- * 返回值为 s 的最长回文子串长度.
- * 读结果: a 中以 k 为中心的回文对应 s 中长 p[k]-1 的回文, 起点为 (k-p[k])/2+1.
- * 以 s[i] 为中心的最长奇回文长 p[2i]-1; 以 s[i], s[i+1] 之间为中心的最长偶回文长 p[2i+1]-1.
- * a[0] 与 a[m+1] 为两个不同的哨兵字符, 它们和 \# 都不能在 s 中出现.
- * a, p 开 2N, Manacher::N 为串长上限. 多组数据无需清空.
- * Usage: char s[Manacher::N]; // 全局
+ * Description: Manacher 求最长回文. 字符 \# 和代码中的两个哨兵字符不能在 s 中出现.
+ * 串长上限 Manacher::N, 数组开 2N; 对象必须开在全局.
+ * Usage: char s[Manacher::N]; // 全局, 从 1 开始
+ * Manacher MC2; // 第二个实例也开在全局
  * scanf("\%s",s+1);
  * int n=strlen(s+1);
  * int ans=MC.manacher(s,n); // 最长回文子串长度
- * // 以 s[i] 为中心的最长奇回文
+ * // 以 s[i] 为中心的最长奇回文长度
  * int odd=MC.p[2*i]-1;
- * // 以 s[i], s[i+1] 之间为中心的最长偶回文
+ * // 以 s[i], s[i+1] 之间为中心的最长偶回文长度
  * int even=MC.p[2*i+1]-1;
- * // 第二个实例也开在全局: Manacher MC2;
+ * // 一般地, 中心 k 处回文长 MC.p[k]-1, 起点为
+ * int st=(k-MC.p[k])/2+1;
+ * // 多组数据直接再调用, 无需清空
  * Time: O(n)
  */
 #pragma once

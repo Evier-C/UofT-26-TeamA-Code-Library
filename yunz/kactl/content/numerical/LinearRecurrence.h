@@ -1,14 +1,10 @@
 /**
- * Description: 线性递推求第 $k$ 项: 已知 $n$ 阶递推 $S_i = \sum_{j=0}^{n-1} tr_j S_{i-j-1}$
- * 和前 $n$ 项 $S_0..S_{n-1}$, 求 $S_k \bmod MOD$ ($k$ 从 0 开始, 可到 $10^{18}$).
- * 参数: S 至少 $n$ 项 (多给无妨), tr 长为 $n$ (系数顺序与 BM 的返回值相同),
- * 都下标从 0 开始, 值在 $[0, MOD)$ 内. tr 为空时数列全 0, 返回 0.
- * 原理: 求 $x^k$ 模特征多项式, 再与前 $n$ 项做线性组合, 比矩阵快速幂快.
- * MOD 来自 BerlekampMassey.h (单独使用时可删掉 include 自己定义 MOD).
- * Usage: ll f=linearRec({0,1},{1,1},10); // 第 10 个斐波那契数 55
- * vector<ll> s=...; // 暴力算出的前若干项
- * vector<ll> tr=BM(s); // 猜递推式
- * ll v=linearRec(s,tr,k); // 第 k 项
+ * Description: 线性递推 $S_i = \sum_{j=0}^{n-1} tr_j S_{i-j-1}$ 求第 $k$ 项模 MOD, $k$ 可到 $10^{18}$.
+ * 值在 $[0, MOD)$ 内. MOD 来自 BerlekampMassey.h (单独用时删掉 include, 自己定义 MOD).
+ * Usage: // S 至少 n 项 (S[0..n-1]), tr 长 n, 下标从 0 开始
+ * ll f=linearRec({0,1},{1,1},10); // 斐波那契 F(10)=55
+ * vector<ll> tr=BM(s); // 先猜递推式, s 为暴力算的前几百项
+ * ll v=linearRec(s,tr,k); // 第 k 项 (k 从 0 开始)
  * Time: O(n^2 \log k)
  */
 #pragma once

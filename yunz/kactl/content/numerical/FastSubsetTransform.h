@@ -1,12 +1,11 @@
 /**
- * Description: 快速沃尔什变换 (FWT) 的三个变换, 用于位运算卷积
- * $c_k = \sum_{i \oplus j = k} a_i b_j$, $\oplus$ 为 or, and, xor.
- * 与 FWT.h 相同但不含卷积函数, 见 FWT.h 的说明. 长度须为 2 的幂,
- * 下标从 0 开始, ll 精确计算. $t = 1$ 正变换, $t = -1$ 逆变换.
- * Usage: fwtXor(a,1); // a, b 等长, 长度为 2 的幂
+ * Description: FWT 的三个变换 (同 FWT.h, 不含卷积函数), 用 ll 精确计算.
+ * Usage: // a, b 等长, 长度 n 为 2 的幂, 下标从 0 开始
+ * fwtXor(a,1); // 正变换
  * fwtXor(b,1);
  * for(int i=0;i<n;i++) a[i]*=b[i];
- * fwtXor(a,-1); // a 即为 xor 卷积, or, and 同理
+ * fwtXor(a,-1); // 逆变换, a 即为 xor 卷积
+ * // or, and 卷积换成 fwtOr, fwtAnd
  * Time: O(n \log n)
  */
 #pragma once

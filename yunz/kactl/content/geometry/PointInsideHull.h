@@ -1,10 +1,8 @@
 /**
- * Description: 二分判断点 p 是否在凸包 l 内, 在内返回 true.
- * l 为逆时针凸包 (无重复点和共线点, 即 convexHull 的结果, 下标 0..n-1), 可以只有 1 或 2 个点.
- * 点在边界上时: strict 为 true 返回 false, strict 为 false 返回 true.
- * T 为 ll 时结果精确, 注意乘积溢出. 多次询问时每次 $O(\log n)$.
+ * Description: 判断点是否在凸包内. 凸包为 convexHull 的结果 (逆时针, 无共线点), 可以只有 1 或 2 个点.
+ * T 为 ll 时结果精确, 注意乘积溢出.
  * Usage: vector<Point> h=convexHull(pts);
- * bool a=inHull(h,p); // 严格在内部
+ * bool a=inHull(h,p); // 严格在内部, strict 默认 true
  * bool b=inHull(h,p,false); // 含边界
  * Time: O(\log n)
  */

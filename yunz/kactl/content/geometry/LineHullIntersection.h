@@ -1,22 +1,14 @@
 /**
- * Description: 直线与凸多边形求交. 多边形 poly 须为逆时针且无共线点 (如 convexHull 的结果), 下标 0..n-1.
- * lineHull(a, b, poly) 返回一对下标, 描述直线 ab ($a \neq b$) 与多边形的相交情况:
- *  \begin{itemize*}
- *    \item $(-1, -1)$ 不相交,
- *    \item $(i, -1)$ 只碰到顶点 $i$,
- *    \item $(i, i)$ 沿着边 $(i, i+1)$,
- *    \item $(i, j)$ 穿过边 $(i, i+1)$ 和 $(j, j+1)$.
- *  \end{itemize*}
- *  最后一种情形中若穿过顶点 $i$, 视为发生在边 $(i, i+1)$ 上.
- *  返回顺序与沿 a 到 b 方向依次碰到多边形的顺序一致. 下标 $i+1$ 按模 n 计算.
- * \texttt{extrVertex(poly, dir)} 返回在方向 dir 上投影最大 (最远) 的顶点下标.
- * 只用到叉积符号, T 为 ll 时结果精确.
+ * Description: 直线与凸多边形求交. 多边形为 convexHull 的结果 (逆时针, 无共线点), 下标 $i+1$ 按模 $n$ 计算.
+ * 直线穿过顶点 $i$ 时视为穿过边 $(i, i+1)$; 返回的两条边按沿 a 到 b 方向碰到的顺序.
+ * T 为 ll 时结果精确.
  * Usage: vector<Point> poly=convexHull(pts);
- * array<int,2> r=lineHull(a,b,poly);
+ * array<int,2> r=lineHull(a,b,poly); // 直线 ab, a 不等于 b
  * if(r[0]==-1){} // 不相交
  * else if(r[1]==-1){} // 只碰到顶点 r[0]
- * else if(r[0]==r[1]){} // 沿着边 r[0]
- * else{} // 穿过边 r[0] 和边 r[1]
+ * else if(r[0]==r[1]){} // 沿着边 r[0] 到 r[0]+1
+ * else{} // 穿过边 r[0] 到 r[0]+1 和边 r[1] 到 r[1]+1
+ * // 在方向 dir 上投影最大, 即最远的顶点下标
  * int i=extrVertex(poly,Point(1,0)); // x 最大的顶点
  * Time: O(\log n)
  */

@@ -1,12 +1,9 @@
 /**
- * Description: 扩展 Lucas, 求 $\binom{n}{m} \bmod P$, $P$ 不必是质数. exlucas(n, m, P) 在 $m < 0$ 或 $m > n$ 时返回 0, $P = 1$ 时返回 0.
- * 范围: $0 \le n, m \le 10^{18}$, $P \le 10^{18}$, 但 $P$ 分解后的每个质数幂 $p^k$ 不能太大 (约 $10^6$ 以内), 因为要枚举 $1..p^k$.
- * 做法: 把 $P$ 分解成 $p^k$ 的乘积; 对每个 $p^k$, facp(n, p, pk) 求 $n!$ 去掉所有因子 $p$ 后模 $p^k$ 的值,
- * Cpk 再乘上 $p^e$ ($e$ 是 $\binom{n}{m}$ 中 $p$ 的次数, 用 Legendre 公式); 与 $p$ 互质的数的逆元用欧拉定理 $a^{\varphi(p^k)-1}$;
- * 最后用 CRT 把各个 $p^k$ 的结果合并 (模数两两互质). 自带快速幂 pw, 不依赖其他文件.
- * $P$ 是质数且较小时直接用 Lucas 定理更快.
+ * Description: 扩展 Lucas, $P$ 不必是质数. $n, m, P \le 10^{18}$, 但 $P$ 的每个质数幂因子 $p^k$ 要在约 $10^6$ 以内.
+ * 自带 pw, 不依赖其他文件.
  * Usage: ll c = exlucas(n, m, P); // C(n, m) mod P
  * ll d = exlucas(10, 3, 1000); // 120
+ * // m < 0 或 m > n 时返回 0
  * Time: O(\sum p^k \log n)
  */
 #pragma once

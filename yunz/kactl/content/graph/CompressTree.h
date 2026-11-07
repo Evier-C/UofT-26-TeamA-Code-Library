@@ -1,26 +1,21 @@
 /**
- * Description: 虚树 (单调栈建法). 多次询问, 每次给出 $k$ 个关键点, 总和
- * 不大时, 只保留关键点, 它们两两的 LCA 和根 1, 建一棵点数不超过 $2k$
- * 的虚树, 在上面做树形 DP. 结构体 VTree, 全局对象 VT.
- * 需要用户在结构体外提供 (本文件只声明): 原树 (根为 1) 的全局 dfs 序
- * 数组 int dfn[] 和函数 int lca(int x,int y). 若用 HLD 结构体 H:
- * 把 H.dfn 复制到全局 dfn, lca 写成 return H.lca(x,y).
- * build(h,k): h[1..k] 为互不相同的关键点 (会被按 dfn 排序).
- * 结果: vt[u] 为虚树中 $u$ 的儿子 (父到子), 虚树边 $(u, v)$ 代表原树中
- * 一条链, 长度为 dep[v]$-$dep[u]. 用到的虚树点为 vs[1..vn], 根 1
- * 总在虚树中但不一定是关键点 (自己用数组标记关键点).
- * 每次 build 会清空用到的点的 vt, 不需要全局清空.
- * 对象很大, 必须是全局 (或 static) 变量; 第二个: 全局写 VTree VT2;
- * Usage: int dfn[N]; int lca(int x,int y){...} // 用户提供
+ * Description: 虚树: 关键点, 它们两两的 LCA 和根 1 (点数不超过 $2k$).
+ * 用户在结构体外提供原树 (根为 1) 的全局 dfn[] 和 lca(x,y).
+ * 对象必须是全局变量.
+ * Usage: int dfn[N]; // 用户提供: 原树 dfs 序
+ * int lca(int x,int y){...} // 用户提供
+ * // 用 HLD 结构体 H 时: dfn 复制 H.dfn, lca 返回 H.lca(x,y)
  * // 每次询问:
  * cin>>k;
  * for(int i=1;i<=k;i++){
- *   cin>>h[i];
- *   key[h[i]]=1;
+ *   cin>>h[i]; // 互不相同, build 会按 dfn 排序
+ *   key[h[i]]=1; // 根 1 不一定是关键点
  * }
- * VT.build(h,k);
- * dp(1); // 在 VT.vt 上做 DP, 点集为 VT.vs[1..VT.vn]
+ * VT.build(h,k); // 自动清空用到的点的 vt
+ * // VT.vt[u]: 虚树中 u 的儿子; 点集 VT.vs[1..VT.vn]
+ * dp(1); // 在 VT.vt 上做 DP
  * for(int i=1;i<=k;i++) key[h[i]]=0; // 清空标记
+ * VTree VT2; // 第二个对象 (全局)
  * Time: O(k \log k) 加 O(k) 次 lca
  */
 #pragma once

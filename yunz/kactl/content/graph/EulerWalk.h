@@ -1,24 +1,18 @@
 /**
- * Description: Hierholzer 求欧拉路径/回路 (每条边恰好走一次), 点 $1..n$,
- * 边按加入顺序编号 $1..m$, 有向图或无向图都可以, 允许重边和自环.
- * 结构体 Euler, 全局对象 EU.
- * init(n,dir): dir 为 1 有向, 0 无向. addE(u,v): 加一条边.
- * euler(): 有欧拉路径返回 1, 点序列在 path[1..m+1], 走过的边编号
- * 依次在 ep[1..m] ($ep[i]$ 连接 $path[i]$ 和 $path[i+1]$).
- * 存在条件: 无向图奇度点为 0 或 2 个 (2 个时从奇度点出发); 有向图所有点
- * 出度等于入度, 或恰有一个点出度比入度大 1 (起点) 且一个点入度比
- * 出度大 1; 并且所有边连通 (跑完后 len 不等于 $m+1$ 即不连通).
- * 不满足时返回 0. 要回路: 再判断 path[1] 等于 path[m+1].
- * 注意: dfs 递归深度可达 $m$, 要开大栈. N 点数, M 边数上限.
- * 对象很大, 必须是全局 (或 static) 变量; 第二个: 全局写 Euler EU2;
- * Usage: EU.init(n,0); // 无向图, 多组数据每组调用
+ * Description: Hierholzer 欧拉路径, 有向或无向, 允许重边和自环.
+ * 度数条件不满足或边不连通时 euler() 返回 0. 递归深度可达 $m$,
+ * 要开大栈. 对象必须是全局变量.
+ * Usage: EU.init(n,0); // 0 无向, 1 有向; 多组数据每组调用
  * for(int i=1;i<=m;i++){
  *   cin>>u>>v;
  *   EU.addE(u,v); // 第 i 条边
  * }
  * if(EU.euler()){
- *   for(int i=1;i<=m+1;i++) cout<<EU.path[i]<<' ';
+ *   for(int i=1;i<=m+1;i++) cout<<EU.path[i]<<' '; // 点序列
+ *   // EU.ep[i] 为第 i 步走的边, 连接 path[i] 和 path[i+1]
+ *   bool circuit=(EU.path[1]==EU.path[m+1]); // 是否回路
  * }
+ * Euler EU2; // 第二个对象 (全局)
  * Time: O(n+m)
  */
 #pragma once

@@ -1,28 +1,19 @@
 /**
- * Description: FHQ treap: 无旋平衡树, 只靠 split 和 merge, 节点 0 表示空.
- * 结构体 Treap, 全局对象 tr, 下面的函数和数组都是它的成员.
- * 两种用法, 不要混在同一棵树上:
- * 用法 1, 按值有序的可重集合, 根为 root:
- * insert(v) 插入一个 v; erase(v) 删除一个 v, 没有则不变;
- * getrank(v) 返回严格小于 v 的个数加 1; kth(k) 返回第 k 小, k 从 1 开始;
- * pre(v) 返回小于 v 的最大值; nxt(v) 返回大于 v 的最小值.
- * 用法 2, 按位置的序列 a[1..n], 支持区间翻转和区间和:
- * 用 root = merge(root, newnode(x)) 依次加到末尾建树;
- * reverse(l, r) 翻转 a[l..r]; rangeSum(l, r) 返回 a[l..r] 的和;
- * dfs(root, o) 按中序把当前序列放进 vector o.
- * 要加别的区间操作: 仿照 reverse, 先 split 出 [l, r] 这棵树 y, 改 y 再 merge 回去.
- * 注意: kth, pre, nxt 要保证答案存在; N 为插入总次数, 删掉的节点不回收;
- * 多组数据令 tr.tot = tr.root = 0. 对象必须是全局变量; 一个对象里可以有
- * 多棵树: 自己存多个根, 只要 N 够插入总数; 也可以在全局再写 Treap tr2;
+ * Description: FHQ treap, 两种用法: 按值的可重集合, 或按位置的序列, 支持区间翻转,
+ * 区间和. 不要混在同一棵树上. N 为插入总次数, 删掉的节点不回收;
+ * kth, pre, nxt 要保证答案存在; 对象必须是全局变量.
  * Usage: tr.tot = tr.root = 0; // 多组数据清空
- * // 用法 1
- * tr.insert(5); tr.insert(3); tr.insert(5); tr.erase(5);
- * int r = tr.getrank(5); // 2
- * ll v = tr.kth(1), p = tr.pre(5), q = tr.nxt(3); // 3, 3, 5
- * // 用法 2
+ * // 用法 1: 可重集合
+ * tr.insert(5); tr.insert(3); tr.insert(5);
+ * tr.erase(5); // 删一个 5, 没有则不变
+ * int r = tr.getrank(5); // 小于 5 的个数 + 1, 这里为 2
+ * ll v = tr.kth(1); // 第 1 小, 为 3
+ * ll p = tr.pre(5), q = tr.nxt(3); // 前驱 3, 后继 5
+ * // 用法 2: 序列 a[1..n], 位置从 1 开始
  * for (int i = 1; i <= n; i++)
  *   tr.root = tr.merge(tr.root, tr.newnode(a[i]));
- * tr.reverse(l, r); ll s = tr.rangeSum(l, r);
+ * tr.reverse(l, r); // 翻转 a[l..r]
+ * ll s = tr.rangeSum(l, r); // a[l..r] 的和
  * vector<ll> o; tr.dfs(tr.root, o); // o 为当前序列
  * Time: 每次操作期望 O(\log N)
  */

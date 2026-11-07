@@ -1,21 +1,14 @@
 /**
- * Description: 快速沃尔什变换 (FWT), 求位运算卷积 $c_k = \sum_{i \oplus j = k} a_i b_j$,
- * $\oplus$ 为 or, and, xor. 数组为 vector<ll>, 下标从 0 开始, 两个数组等长,
- * 长度 $n$ 必须是 2 的幂 (值域 $[0, 2^K)$ 就开 $n = 2^K$, 不足补 0).
- * 值用 ll 精确计算, 不取模 (注意结果别超过 long long).
- * \texttt{orConv / andConv / xorConv(a, b)}: 返回卷积结果, 长度 $n$, 不改原数组.
- * \texttt{fwtOr / fwtAnd / fwtXor(a, t)}: 原地变换, $t = 1$ 正变换, $t = -1$ 逆变换.
- * 含义: or 正变换即子集和 $\hat a_k = \sum_{i \subseteq k} a_i$; and 正变换即
- * 超集和 $\hat a_k = \sum_{i \supseteq k} a_i$; xor 正变换 $\hat a_k = \sum_i (-1)^{|i \cap k|} a_i$.
- * 正变换后逐点相乘再逆变换, 就是对应的卷积.
- * 取模版本: 每次加减后取模 (减法加 MOD), xor 逆变换的除以 2 改为乘
- * $inv2 = (MOD+1)/2$.
- * Usage: int n=1<<K; // 值域 [0,2^K)
- * vector<ll> a(n),b(n); // 填 a, b
+ * Description: 快速沃尔什变换, 求位运算卷积 $c_k = \sum_{i \oplus j = k} a_i b_j$.
+ * 用 ll 精确计算, 不取模, 注意别超过 long long. 取模版本: 加减后取模,
+ * xor 逆变换的除以 2 改为乘 $(MOD+1)/2$.
+ * Usage: int n=1<<K; // 值域 [0,2^K), 长度须为 2 的幂
+ * vector<ll> a(n),b(n); // 填 a, b, 两数组等长
  * vector<ll> c=xorConv(a,b); // c[k]=sum a[i]b[j], i xor j=k
  * vector<ll> d=orConv(a,b); // i or j=k
  * vector<ll> e=andConv(a,b); // i and j=k
  * fwtOr(a,1); // a 原地变为子集和, fwtOr(a,-1) 变回
+ * fwtAnd(b,1); // b 原地变为超集和, fwtAnd(b,-1) 变回
  * Time: O(n \log n)
  */
 #pragma once

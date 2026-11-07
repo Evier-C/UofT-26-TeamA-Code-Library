@@ -1,15 +1,12 @@
 /**
- * Description: 模质数 MOD 下的基本运算和组合数.
- * qpow(a, b) 返回 $a^b \bmod MOD$ ($a$ 可以为负, $b \ge 0$);
- * inv(a) 用费马小定理返回 $a^{MOD-2}$, 即 $a$ 的逆元, 要求 MOD 是质数且 $a$ 不是 MOD 的倍数;
- * init(n) 预处理 fac[i] $= i!$ 和 ifac[i] $= (i!)^{-1}$ ($0 \le i \le n$, $n < N$ 且 $n < $ MOD);
- * C(n, m) 返回 $\binom{n}{m} \bmod MOD$, $m < 0$ 或 $m > n$ 时返回 0, 要求 $n$ 不超过 init 的参数.
- * 加减法直接写 (a + b) \% MOD 和 (a - b + MOD) \% MOD.
- * 注意: 本文件的 inv 函数和 ModInverse 的 inv 数组同名, 不要同时复制.
- * Usage: init(1000000); // 只需调用一次, 参数取题目里 n 的最大值
- * ll c = C(5, 2); // 10
- * ll x = inv(3); // 3 的逆元
- * ll y = qpow(2, 100); // 2 的 100 次方模 MOD
+ * Description: 模质数 MOD 下的快速幂, 逆元, 组合数. MOD 必须是质数, init 的 $n < N$ 且 $n < $ MOD.
+ * inv 函数和 ModInverse 的 inv 数组同名, 不要同时复制.
+ * Usage: init(1000000); // 预处理 fac, ifac 到 n, 只需调用一次
+ * ll c = C(5, 2); // 10, m < 0 或 m > n 时为 0
+ * ll x = inv(3); // 3 的逆元, a 不能是 MOD 的倍数
+ * ll y = qpow(2, 100); // 2 的 100 次方, a 可以为负
+ * fac[i]; ifac[i]; // i 的阶乘, 阶乘的逆元
+ * ll s = (a + b) \% MOD, d = (a - b + MOD) \% MOD; // 加减
  * Time: init O(n), C O(1), qpow 和 inv O(\log MOD)
  */
 #pragma once

@@ -1,9 +1,7 @@
 /**
- * Description: 平面最近点对: 按 y 从小到大扫描, 用 set (按 x 排序) 维护 y 坐标在当前答案窗口内的点.
- * 输入 vector<Point> (下标 0..n-1, $n \ge 2$, 可有重复点, 此时答案为 0), 返回距离最近的两个点.
- * T 为 ll 时结果精确, 坐标约 $10^9$ 以内.
+ * Description: 平面最近点对, 可有重复点 (此时答案为 0). T 为 ll 时结果精确, 坐标约 $10^9$ 以内.
  * Usage: vector<Point> v; // v[0..n-1], n 至少为 2
- * pair<Point,Point> pq=closest(v);
+ * pair<Point,Point> pq=closest(v); // 最近的两个点
  * T d2=(pq.first-pq.second).len2(); // 最近距离的平方
  * double d=sqrt((double)d2); // 最近距离
  * Time: O(n \log n)

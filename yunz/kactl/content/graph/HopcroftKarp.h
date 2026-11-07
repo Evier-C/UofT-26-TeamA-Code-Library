@@ -1,23 +1,17 @@
 /**
  * Description: 二分图最大匹配 Hopcroft-Karp.
- * 全部状态都在结构体 HopcroftKarp 里, 已定义全局对象 HK; 数组很大,
- * 对象必须是全局 (或 static) 的. 第二个实例: 全局写 HopcroftKarp HK2;
- * 输入: 左部点 $1..n$, 右部点 $1..m$ (左右各自编号, 可以重号),
- * 先 HK.init(n,m), 再对每条边 HK.g[u].push\_back(v) (左 $u$ 连右 $v$).
- * 函数: hk() 返回最大匹配数. 结果: HK.mL[u] 为左部点 $u$ 匹配的右部点,
- * HK.mR[v] 为右部点 $v$ 匹配的左部点, 未匹配为 0.
- * 做法: 每轮 bfs 从左部未匹配点出发给左部点分层 (d[u]),
- * 再 dfs 沿层找一批不相交的最短增广路; 共 $O(\sqrt{V})$ 轮.
- * 注意: N 为左右部点数的上限. dfs 递归深度可达 $n$.
- * 最小点覆盖, 最大独立集见 MinimumVertexCover.h.
+ * 数组大, 对象必须是全局 (或 static) 的; 已定义 HK,
+ * 可再定义 HopcroftKarp HK2; 左部 $1..n$, 右部 $1..m$ 各自编号.
+ * N 为左右部点数上限; dfs 递归深度可达 $n$.
  * Usage: HK.init(n,m); // 每组数据先调用
  * for(int i=1;i<=k;i++){
  *   cin>>u>>v; // 左 u, 右 v
  *   HK.g[u].push_back(v);
  * }
  * cout<<HK.hk()<<endl; // 最大匹配数
- * for(int u=1;u<=n;u++) // 输出匹配边
+ * for(int u=1;u<=n;u++) // 左 u 匹配右 HK.mL[u], 0 为未匹配
  *   if(HK.mL[u]) cout<<u<<' '<<HK.mL[u]<<endl;
+ * // 右 v 匹配左 HK.mR[v], 0 为未匹配
  * Time: O(E \sqrt{V})
  */
 #pragma once

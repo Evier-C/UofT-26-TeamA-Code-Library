@@ -1,15 +1,15 @@
 /**
- * Description: 精确的极角类, 不用浮点数, 用于极角排序和极角扫描 (双指针).
- * 一个 Angle 是 int 向量 $(x,y)$ 再加上绕原点 $t$ 圈, 表示角度 $\theta + 2\pi t$,
- * 其中 $\theta \in [0, 2\pi)$ 是 $(x,y)$ 的极角 (从 x 轴正方向逆时针量).
- * 比较顺序: 先比 $t$, 再比 $\theta$; 方向相同的向量视为相等 (不比长度).
- * t90, t180, t360 分别返回加上 $\pi/2$, $\pi$, $2\pi$ 后的角.
- * segmentAngles(a,b): 两个点 (t=0) 看成从原点出发的方向, 返回覆盖线段 ab 的最小角区间 \{first, second\}.
- * a+b: 点 a 加向量 b, 圈数取与 a 相差不超过 $\pi$ 的那个. angleDiff(a,b): 从 a 转到 b 的角 (b 减 a).
- * 坐标绝对值不超过 $10^9$ (内部用 ll 乘法), 向量不能为 $(0,0)$.
+ * Description: 精确的极角 (int 向量 $(x,y)$ 再加 $t$ 圈), 用于极角排序和极角扫描.
+ * 比较时先比 $t$, 再比 $[0, 2\pi)$ 内的极角, 方向相同视为相等.
+ * 坐标绝对值不超过 $10^9$, 向量不能为 $(0,0)$.
  * Usage: vector<Angle> v; // v[0..n-1]
  * for(int i=0;i<n;i++)v.push_back(Angle(x[i],y[i]));
  * sort(v.begin(),v.end()); // 极角排序
+ * Angle a=v[0].t90(); // 加 pi/2, 另有 t180, t360
+ * Angle d=angleDiff(v[0],v[1]); // 从 v[0] 转到 v[1] 的角
+ * Angle s=v[0]+Angle(1,0); // 点加向量, 圈数取最近的
+ * // 覆盖线段 pq 的最小角区间, 从 first 逆时针到 second
+ * pair<Angle,Angle> r=segmentAngles(Angle(1,2),Angle(3,1));
  * // 双指针: 把每个角加一圈 (t360) 接在后面
  * for(int i=0;i<n;i++)v.push_back(v[i].t360());
  * for(int i=0,j=0;i<n;i++){

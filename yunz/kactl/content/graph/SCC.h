@@ -1,24 +1,19 @@
 /**
- * Description: Tarjan 求有向图强连通分量 (SCC), 点 $1..n$.
- * 结构体 SCC, 全局对象 S.
- * 输入: 有向边存在 S.g[u] 中 (u 到 v 则 S.g[u].push\_back(v)).
- * 对每个未访问的点 (dfn 为 0) 调用 tarjan(i).
- * 结果: scc[u] 为点 $u$ 所在分量编号 ($1..cnt$), sz[i] 为分量 $i$ 的
- * 点数, cnt 为分量个数. Tarjan 的编号是逆拓扑序: 缩点后的边总是
- * 从编号大的分量指向编号小的分量, 所以 $cnt, cnt-1, \dots, 1$ 就是
- * DAG 的拓扑序, 可以直接按这个顺序 DP.
- * shrink(n) 建缩点后的 DAG, 存在 h[1..cnt] 中 (可能有重边, 需要时去重).
- * 注意: 递归深度可达 $n$, 链状图要开大栈. N 为点数上限.
- * 对象很大, 必须是全局 (或 static) 变量; 要第二个就在全局写 SCC S2;
- * Usage: S.init(n); // 多组数据每组调用, 清空 g, h, dfn 等
+ * Description: Tarjan 强连通分量. 分量编号是逆拓扑序: 缩点后的边总是
+ * 从编号大的指向编号小的. 递归深度可达 $n$, 要开大栈.
+ * 对象必须是全局变量.
+ * Usage: S.init(n); // 多组数据每组调用
  * for(int i=1;i<=m;i++){
  *   cin>>u>>v;
- *   S.g[u].push_back(v);
+ *   S.g[u].push_back(v); // 有向边 u 到 v
  * }
  * for(int i=1;i<=n;i++) if(!S.dfn[i]) S.tarjan(i);
- * S.shrink(n); // 需要 DAG 时调用
+ * int id=S.scc[u]; // u 所在分量, 1..S.cnt
+ * int sz=S.sz[id]; // 分量大小
+ * S.shrink(n); // 缩点 DAG S.h[1..S.cnt], 可能有重边
  * for(int i=S.cnt;i>=1;i--) // 按拓扑序遍历分量
  *   for(int j:S.h[i]) ...; // 分量 i 到分量 j 的边
+ * SCC S2; // 第二个对象 (全局)
  * Time: O(n+m)
  */
 #pragma once

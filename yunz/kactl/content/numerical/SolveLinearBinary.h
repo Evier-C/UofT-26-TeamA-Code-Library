@@ -1,15 +1,11 @@
 /**
- * Description: 解异或方程组 (模 2 线性方程组): $n$ 个方程, $m$ 个 0/1 未知数,
- * 第 $i$ 个方程为 $a_{i1} x_1 \oplus \dots \oplus a_{im} x_m = a_{i,m+1}$.
- * 填全局 bitset 数组 (下标从 1 开始): a[i] 的第 $1..m$ 位为系数, 第 $m+1$ 位
- * 为右边常数. 调用 \texttt{gaussXor(n, m)}: 无解返回 $-1$; 否则返回秩 $r$,
- * 一组解在 $x[1..m]$ (自由元取 0), 解的个数为 $2^{m-r}$.
- * 用 bitset 整行异或, 比普通高斯消元快 64 倍. 需要 $m+1 < N$.
- * $a$ 会被破坏; 多组数据先把 a[1..n] 清空 (reset).
- * Usage: for(int i=1;i<=n;i++) a[i].reset(); // 清空
- * a[i][j]=1; // 第 i 个方程含 x_j
+ * Description: 解异或方程组 (模 2), $n$ 个方程 $m$ 个 0/1 未知数, 需要 $m+1 < N$.
+ * $a$ 会被破坏.
+ * Usage: for(int i=1;i<=n;i++) a[i].reset(); // 每组数据先清空
+ * a[i][j]=1; // 第 i 个方程含 x_j (j 从 1 到 m)
  * a[i][m+1]=1; // 第 i 个方程右边为 1
- * int r=gaussXor(n,m); // -1 无解, 否则解在 x[1..m]
+ * int r=gaussXor(n,m); // 秩, 无解为 -1
+ * // 有解时一组解在 x[1..m], 自由元取 0, 共 2^(m-r) 组
  * Time: O(nm \cdot \min(n,m) / 64)
  */
 #pragma once

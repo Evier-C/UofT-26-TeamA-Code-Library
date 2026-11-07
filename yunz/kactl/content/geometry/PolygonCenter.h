@@ -1,7 +1,6 @@
 /**
- * Description: 返回多边形 (实心均匀薄板) 的重心 (质心), 不是顶点的平均值.
- * 多边形为 vector<Point> (下标 0..n-1), 顺时针或逆时针均可, 可以是凹多边形; 面积不能为 0.
- * 要求 T 为 double.
+ * Description: 多边形 (实心均匀薄板) 的重心, 不是顶点的平均值.
+ * 顺时针或逆时针均可, 可以是凹的; 面积不能为 0. 要求 T 为 double.
  * Usage: vector<Point> v={Point(0,0),Point(2,0),Point(2,2),Point(0,2)};
  * Point c=polygonCenter(v); // (1,1)
  * Time: O(n)

@@ -1,22 +1,13 @@
 /**
- * Description: 李超树 LiChao, 全局对象 lc: 维护一堆直线或线段,
- * 查询某个整数 x 处的最大 y 值. x 取值于 [lo, hi), 动态开点,
- * 范围大如 $\pm 10^9$ 也不用离散化.
- * init(lo, hi): 设定 x 的范围并清空, 每组数据调用一次.
- * addLine(\{k, b\}): 插入直线 $y = kx + b$, 对所有 x 生效.
- * addSeg(\{k, b\}, x1, x2): 插入只在 $x \in [x_1, x_2)$ 上存在的线段, 左闭右开,
- * 超出 [lo, hi) 的部分自动忽略.
- * query(x): 返回所有覆盖 x 的线中 $kx + b$ 的最大值, 没有则返回 LLONG\_MIN.
- * 求最小值: 插入 $(-k, -b)$, 再把 query 的答案取负.
- * 注意: 要求 $|kx + b| < 9 \cdot 10^{18}$, $hi - lo < 9 \cdot 10^{18}$;
- * 节点数 M: 每条直线最多 1 个, 每条线段最多约 2 log C 个, C = hi - lo.
- * 默认 M = 4e6, 约 100MB; 只有直线时 M 取直线条数即可.
- * 对象必须是全局变量; 要第二棵就在全局再写 LiChao lc2;
- * Usage: lc.init(-1e9, 1e9 + 1); // x 的范围 [-1e9, 1e9]
+ * Description: 李超树: 插入直线或线段, 查询整数 x 处的最大值. x 取值于 [lo, hi).
+ * 要求 $|kx + b| < 9 \cdot 10^{18}$. 节点数 M: 每条直线 1 个, 每条线段约
+ * 2 log C 个; 默认 4e6, 约 100MB, 对象必须是全局变量.
+ * Usage: lc.init(-1e9, 1e9 + 1); // x 的范围, 每组数据调用
  * lc.addLine({2, 3}); // y = 2x + 3
  * lc.addSeg({-1, 10}, 0, 5); // y = -x + 10, 只在 x = 0..4 上
- * ll y = lc.query(x); // 若为 LLONG_MIN 表示没有线覆盖 x
- * // 求最小: lc.addLine({-k, -b}); ll mn = -lc.query(x);
+ * ll y = lc.query(x); // 最大值, 没有线覆盖 x 时为 LLONG_MIN
+ * // 求最小值: 插入 (-k, -b), 答案取负
+ * lc.addLine({-k, -b}); ll mn = -lc.query(x);
  * Time: 直线和查询 $O(\log C)$, 线段 $O(\log^2 C)$
  */
 #pragma once

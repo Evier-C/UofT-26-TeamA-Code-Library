@@ -1,8 +1,7 @@
 /**
  * Description:\\
 \begin{minipage}{75mm}
-返回点 p 到线段 se 的最短距离 (端点包含在线段内). s 与 e 可以重合, 此时为两点距离.
-p 在 se 外侧时取到端点的距离, 否则取到直线的距离. T 为 double 或 ll 均可.
+点到线段 (含端点) 的最短距离. s 与 e 可以重合. T 为 double 或 ll 均可.
 \end{minipage}
 \begin{minipage}{15mm}
 \vspace{-10mm}

@@ -1,26 +1,21 @@
 /**
- * Description: 后缀自动机 SAM. 字符集为小写字母, 字符以 0..25 传入. 根为 1, 状态数至多 2n-1.
- * 封装在 struct SAM 中, 全局对象为 sam. 数组很大, 对象必须开成全局或 static.
- * 每个状态 v 表示一组 endpos 相同的子串: len[v] 为其中最长串的长度,
- * fa[v] 为后缀链接, ch[v][c] 为转移, 0 表示没有转移.
- * sam.extend(c) 在串末尾加入字符 c. sam.calc() 需在全部 extend 之后调用:
- * 按 len 计数排序得到拓扑序 ord[1..tot], 逆序把 siz 累加到 fa,
- * 使 siz[v] 等于 v 的 endpos 大小, 即 v 中每个串在原串中的出现次数;
- * 返回本质不同子串个数 $\sum_{v>1} len_v-len_{fa_v}$.
- * 查询 t 的出现次数: 从根沿 ch 走 t, 走不动则为 0, 否则为终点的 siz.
- * 空间: ch 为 $2N \times 26$ 个 int, SAM::N 取 5e5 时约 104MB, 开多个实例时注意.
- * 新对象可直接用; 多组数据先 sam.init(), 它只清空用过的状态.
- * Usage: char s[SAM::N],t[SAM::N]; // 全局
+ * Description: 后缀自动机, 小写字母. 根为 1, 状态数至多 2n-1.
+ * 串长上限 SAM::N, ch 约 $52N$ 个 int, N 取 5e5 时约 104MB; 对象必须开在全局.
+ * Usage: char s[SAM::N],t[SAM::N]; // 全局, 从 1 开始
+ * SAM sam2; // 第二个实例也开在全局
  * scanf("\%s",s+1);
  * int n=strlen(s+1);
- * sam.init(); // 每组数据先清空
+ * sam.init(); // 每组数据先清空, 新对象可省
  * for(int i=1;i<=n;i++)sam.extend(s[i]-'a');
- * ll d=sam.calc(); // 本质不同子串数, 并求出 siz
- * // 查询 t[1..m] 的出现次数
+ * // 状态 v: sam.len[v] 为最长串长, sam.fa[v] 为
+ * // 后缀链接, sam.ch[v][c] 为转移, 0 表示无
+ * // 全部 extend 之后调用, 返回本质不同子串数
+ * ll d=sam.calc();
+ * // 同时求出 sam.siz[v]: v 中每个串的出现次数
+ * // t[1..m] 在 s 中的出现次数
  * int u=1;
  * for(int i=1;i<=m\&\&u;i++)u=sam.ch[u][t[i]-'a'];
  * int occ=u?sam.siz[u]:0;
- * // 第二个实例也开在全局: SAM sam2;
  * Time: O(26n)
  * Memory: O(26n)
  */

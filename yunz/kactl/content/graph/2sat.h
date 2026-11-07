@@ -1,23 +1,16 @@
 /**
- * Description: 2-SAT: $n$ 个布尔变量 (编号 $1..n$), 若干形如
- * ($x$ 取 $a$) 或 ($y$ 取 $b$) 的子句, 求一组满足所有子句的赋值.
- * 结构体 TwoSat, 全局对象 TS.
- * 建图: 点 $x$ 表示 $x$ 为真, 点 $x+n$ 表示 $x$ 为假. 子句 $p \lor q$
- * 连边 $\lnot p \to q$ 和 $\lnot q \to p$, 再用 Tarjan 求 SCC.
- * add(x,a,y,b): 加子句 ($x$ 取 $a$) 或 ($y$ 取 $b$), $a, b \in \{0, 1\}$.
- * 强制 $x$ 取 $a$: add(x,a,x,a). 两者不能同时为真: add(x,0,y,0).
- * solve(): 无解返回 0 (某个 $x$ 与 $x+n$ 在同一 SCC); 有解返回 1,
- * ans[x] 为 1 表示 $x$ 为真. 取法: 选 scc 编号小的那一边 (Tarjan 编号
- * 是逆拓扑序, 编号小的在拓扑序后面).
- * 注意: N 为变量数上限, 数组开 2N; 递归深度可达 $2n$, 要开大栈.
- * 对象很大, 必须是全局 (或 static) 变量; 第二个: 全局写 TwoSat TS2;
- * Usage: TS.init(n); // 多组数据每组调用
+ * Description: 2-SAT. N 为变量数上限 (数组开 2N). 递归深度可达 $2n$,
+ * 要开大栈. 对象必须是全局变量.
+ * Usage: TS.init(n); // 变量 1..n, 多组数据每组调用
  * for(int i=1;i<=m;i++){
- *   cin>>x>>a>>y>>b; // x 取 a 或 y 取 b
- *   TS.add(x,a,y,b);
+ *   cin>>x>>a>>y>>b; // a,b 为 0 或 1
+ *   TS.add(x,a,y,b); // 子句: x 取 a 或 y 取 b
  * }
+ * TS.add(x,1,x,1); // 强制 x 为真
+ * TS.add(x,0,y,0); // x 和 y 不能同时为真
  * bool ok=TS.solve(); // 0 表示无解
- * if(ok) for(int i=1;i<=n;i++) cout<<TS.ans[i]<<' ';
+ * if(ok) for(int i=1;i<=n;i++) cout<<TS.ans[i]<<' '; // 1 为真
+ * TwoSat TS2; // 第二个对象 (全局)
  * Time: O(n+m)
  */
 #pragma once

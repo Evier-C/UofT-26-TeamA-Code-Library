@@ -1,15 +1,10 @@
 /**
- * Description: 最长严格上升子序列 (LIS), 并求出一个具体的最长子序列.
- * 输入全局数组 a[1..n] ($n < N$), lis(n) 返回一个最长严格上升子序列的下标 (从小到大), 长度就是 size().
- * d[k] 为长度为 $k$ 的上升子序列的最小结尾值, 单调递增, 对每个 a[i] 二分出它能接在哪个长度后面;
- * pos[k] 为 d[k] 对应的下标, pre[i] 为以 $i$ 结尾时前一个元素的下标, 最后从 pos[len] 倒着走回去.
- * 最长不降子序列: 把 lower\_bound 改成 upper\_bound. 最长下降: 把 a 取相反数.
- * 只要长度不要方案时删掉 pos 和 pre. a 是 ll 时把 a 和 d 都改成 ll.
- * 多组数据不需要清空.
+ * Description: 最长严格上升子序列 ($n < N$). 最长不降: lower\_bound 改成 upper\_bound. a 为 ll 时 a 和 d 都改成 ll.
  * Usage: // 读入 n 和 a[1..n]
- * vector<int> id = lis(n);
+ * vector<int> id = lis(n); // 一个最长子序列的下标, 递增
  * int len = id.size(); // LIS 的长度
  * for(int i : id) cout << a[i] << ' '; // 输出子序列
+ * // 多组数据不用清空
  * Time: O(n \log n)
  */
 #pragma once
