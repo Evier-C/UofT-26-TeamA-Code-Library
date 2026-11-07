@@ -13,10 +13,10 @@
 #include "Point.h"
 
 int sideOf(Point s,Point e,Point p){
-	return sgn(cross(s,e,p));
+	return sgn(s.cross(e,p));
 }
 int sideOf(Point s,Point e,Point p,double lim){
-	double a=cross(s,e,p);
-	double l=len(e-s)*lim;
+	double a=s.cross(e,p);
+	double l=(e-s).len()*lim;
 	return (a>l)-(a<-l);
 }

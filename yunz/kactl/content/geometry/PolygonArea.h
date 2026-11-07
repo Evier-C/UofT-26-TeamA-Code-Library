@@ -16,7 +16,7 @@ T polygonArea2(vector<Point>&v){
 	int n=v.size();
 	T a=0;
 	for(int i=0;i<n;i++){
-		a+=cross(v[i],v[(i+1)%n]);
+		a+=v[i].cross(v[(i+1)%n]);
 	}
 	return a;
 }

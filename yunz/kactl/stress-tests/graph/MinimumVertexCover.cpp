@@ -8,14 +8,14 @@ int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
 
 long long checks=0;
 void test(int nn,int mm,int ne,bool br){
-	init(nn,mm);
+	HK.init(nn,mm);
 	vector<pair<int,int>>ed;
 	for(int k=0;k<ne;k++){
 		int a=rnd(1,nn),b=rnd(1,mm);
-		ed.push_back({a,b});g[a].push_back(b);
+		ed.push_back({a,b});HK.g[a].push_back(b);
 	}
 	vector<int>A,B;
-	int k=cover(A,B);
+	int k=VC.cover(HK,A,B);
 	assert((int)A.size()+(int)B.size()==k);
 	vector<int>inA(nn+1),inB(mm+1);
 	for(int x:A)assert(1<=x&&x<=nn&&!inA[x]),inA[x]=1;
@@ -24,18 +24,18 @@ void test(int nn,int mm,int ne,bool br){
 	// max independent set: visL true on left, visR false on right
 	int isz=0;
 	for(int u=1;u<=nn;u++){
-		assert(visL[u]==!inA[u]);
-		isz+=visL[u];
+		assert(VC.visL[u]==!inA[u]);
+		isz+=VC.visL[u];
 	}
 	for(int v=1;v<=mm;v++){
-		assert(visR[v]==(bool)inB[v]);
-		isz+=!visR[v];
+		assert(VC.visR[v]==(bool)inB[v]);
+		isz+=!VC.visR[v];
 	}
-	for(auto [a,b]:ed)assert(!(visL[a]&&!visR[b]));
+	for(auto [a,b]:ed)assert(!(VC.visL[a]&&!VC.visR[b]));
 	assert(isz==nn+mm-k);
 	// complement is an independent set (implied) and k is a matching
 	int got=0;
-	for(int u=1;u<=nn;u++)if(mL[u])got++;
+	for(int u=1;u<=nn;u++)if(HK.mL[u])got++;
 	assert(got==k);
 	if(br){ // brute force minimum vertex cover over all subsets
 		int tot=nn+mm,best=tot;

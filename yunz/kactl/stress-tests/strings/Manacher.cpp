@@ -4,7 +4,7 @@ typedef long long ll;
 #include "../../content/strings/Manacher.h"
 
 mt19937 rng(3);
-char s[N];
+char s[Manacher::N];
 ll checks=0;
 bool pal(int l,int r){
 	while(l<r)if(s[l++]!=s[r--])return 0;
@@ -13,7 +13,7 @@ bool pal(int l,int r){
 void test(int n,int al){
 	for(int i=1;i<=n;i++)s[i]='a'+rng()%al;
 	s[n+1]=0;
-	int len=manacher(s,n),best=0;
+	int len=MC.manacher(s,n),best=0;
 	for(int l=1;l<=n;l++)for(int r=l;r<=n;r++)
 		if(pal(l,r))best=max(best,r-l+1);
 	assert(len==best);checks++;
@@ -21,15 +21,15 @@ void test(int n,int al){
 	for(int i=1;i<=n;i++){
 		int k=0;
 		while(i-k-1>=1&&i+k+1<=n&&s[i-k-1]==s[i+k+1])k++;
-		assert(p[2*i]-1==2*k+1);checks++;
-		int K=2*i-p[2*i]; // (k-p[k])/2+1
+		assert(MC.p[2*i]-1==2*k+1);checks++;
+		int K=2*i-MC.p[2*i]; // (k-p[k])/2+1
 		assert(K/2+1==i-k);
 	}
 	for(int i=0;i<=n;i++){
 		int k=0;
 		while(i-k>=1&&i+1+k<=n&&s[i-k]==s[i+1+k])k++;
-		assert(p[2*i+1]-1==2*k);checks++;
-		assert((2*i+1-p[2*i+1])/2+1==i-k+1);
+		assert(MC.p[2*i+1]-1==2*k);checks++;
+		assert((2*i+1-MC.p[2*i+1])/2+1==i-k+1);
 	}
 }
 int main(){

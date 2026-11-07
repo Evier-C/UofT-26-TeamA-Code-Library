@@ -18,12 +18,12 @@
 vector<pair<Point,Point>>tangents(Point c1,double r1,
 		Point c2,double r2){
 	Point d=c2-c1;
-	double dr=r1-r2,d2=len2(d),h2=d2-dr*dr;
+	double dr=r1-r2,d2=d.len2(),h2=d2-dr*dr;
 	if(sgn(d2)==0||sgn(h2)<0)return {};
 	if(sgn(h2)==0)h2=0; // 相切, 只有一条
 	vector<pair<Point,Point>>out;
 	for(int s=-1;s<=1;s+=2){
-		Point v=(d*dr+perp(d)*(sqrt(h2)*s))/d2;
+		Point v=(d*dr+d.perp()*(sqrt(h2)*s))/d2;
 		out.push_back({c1+v*r1,c2+v*r2});
 	}
 	if(h2==0)out.pop_back();

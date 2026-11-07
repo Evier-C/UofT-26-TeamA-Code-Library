@@ -12,5 +12,5 @@
 #include "Point.h"
 
 bool onSegment(Point s,Point e,Point p){
-	return sgn(cross(p,s,e))==0&&sgn(dot(s-p,e-p))<=0;
+	return sgn(p.cross(s,e))==0&&sgn((s-p).dot(e-p))<=0;
 }

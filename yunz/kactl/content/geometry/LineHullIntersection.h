@@ -28,7 +28,7 @@ int extrVertex(vector<Point>&poly,Point dir){
 	int n=poly.size(),lo=0,hi=n;
 	// 比较顶点 i 和 j 在 dir 上的投影, j 更远时为 1
 	auto cmp=[&](int i,int j){
-		return sgn(cross(perp(dir),poly[i%n]-poly[j%n]));
+		return sgn(dir.perp().cross(poly[i%n]-poly[j%n]));
 	};
 	// i 是否为最远点
 	auto extr=[&](int i){
@@ -48,10 +48,10 @@ array<int,2>lineHull(Point a,Point b,vector<Point>&poly){
 	int n=poly.size();
 	// 顶点 i 在直线 ab 的哪一侧
 	auto cmpL=[&](int i){
-		return sgn(cross(a,poly[i],b));
+		return sgn(a.cross(poly[i],b));
 	};
-	int endA=extrVertex(poly,perp(a-b));
-	int endB=extrVertex(poly,perp(b-a));
+	int endA=extrVertex(poly,(a-b).perp());
+	int endB=extrVertex(poly,(b-a).perp());
 	if(cmpL(endA)<0||cmpL(endB)>0)return {-1,-1};
 	array<int,2>res;
 	for(int i=0;i<2;i++){

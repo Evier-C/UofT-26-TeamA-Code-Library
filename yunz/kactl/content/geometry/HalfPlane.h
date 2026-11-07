@@ -20,16 +20,16 @@
 struct Line{
 	Point s,e; // 有向直线 s 到 e, 保留左侧
 };
-double ang(Line l){return angle(l.e-l.s);}
+double ang(Line l){return (l.e-l.s).angle();}
 bool cmpLine(Line a,Line b){ // 按极角排序, 相同时靠左的在前
 	if(sgn(ang(a)-ang(b))!=0)return ang(a)<ang(b);
-	return sgn(cross(a.s,a.e,b.s))<0;
+	return sgn(a.s.cross(a.e,b.s))<0;
 }
 // p 不在 l 的严格左侧
-bool onRight(Line l,Point p){return sgn(cross(l.s,l.e,p))<=0;}
+bool onRight(Line l,Point p){return sgn(l.s.cross(l.e,p))<=0;}
 Point inter(Line a,Line b){ // 两直线交点, 要求不平行
 	Point u=a.e-a.s,v=b.e-b.s;
-	return a.s+u*(cross(v,b.s-a.s)/cross(v,u));
+	return a.s+u*(v.cross(b.s-a.s)/v.cross(u));
 }
 vector<Point>halfPlane(vector<Line>L){
 	sort(L.begin(),L.end(),cmpLine);
@@ -42,7 +42,7 @@ vector<Point>halfPlane(vector<Line>L){
 		while(h<t&&onRight(L[i],p[t-1]))t--;
 		while(h<t&&onRight(L[i],p[h]))h++;
 		// 与队尾反向平行, 交集为空
-		if(h<=t&&sgn(cross(L[i].e-L[i].s,q[t].e-q[t].s))==0){
+		if(h<=t&&sgn((L[i].e-L[i].s).cross(q[t].e-q[t].s))==0){
 			return {};
 		}
 		t++;

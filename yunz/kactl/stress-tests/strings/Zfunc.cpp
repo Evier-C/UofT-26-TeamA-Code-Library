@@ -4,7 +4,7 @@ typedef long long ll;
 #include "../../content/strings/Zfunc.h"
 
 mt19937 rng(2);
-char s[N],t[N];
+char s[Zfunc::N],t[Zfunc::N];
 ll checks=0;
 int lcp(char*a,int n,char*b,int m){
 	int k=0;
@@ -15,13 +15,13 @@ void test(int n,int m,int al){
 	for(int i=1;i<=n;i++)s[i]='a'+rng()%al;
 	for(int i=1;i<=m;i++)t[i]='a'+rng()%al;
 	s[n+1]=t[m+1]=0;
-	getz(s,n);
+	Z.getz(s,n);
 	for(int i=1;i<=n;i++){
-		assert(z[i]==lcp(s+i,n-i+1,s+1,n));checks++;
+		assert(Z.z[i]==lcp(s+i,n-i+1,s+1,n));checks++;
 	}
-	getz(t,m);exkmp(s,n,t,m);
+	Z.getz(t,m);Z.exkmp(s,n,t,m);
 	for(int i=1;i<=n;i++){
-		assert(ext[i]==lcp(s+i,n-i+1,t+1,m));checks++;
+		assert(Z.ext[i]==lcp(s+i,n-i+1,t+1,m));checks++;
 	}
 }
 int main(){

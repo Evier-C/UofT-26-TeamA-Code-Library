@@ -15,12 +15,12 @@ int main(){
 		Point c(0,0);
 		for(Point q:v)c=c+q;
 		c=c/(T)n+Point(0.0123,0.0456);
-		sort(v.begin(),v.end(),[&](Point a,Point b){return angle(a-c)<angle(b-c);});
+		sort(v.begin(),v.end(),[&](Point a,Point b){return (a-c).angle()<(b-c).angle();});
 		if(it%3==0)reverse(v.begin(),v.end());
 		long double A=0,sx=0,sy=0;
 		for(int i=0;i<n;i++){
 			Point a=v[i],b=v[(i+1)%n];
-			long double w=cross(a-c,b-c);
+			long double w=(a-c).cross(b-c);
 			A+=w;sx+=w*(c.x+a.x+b.x)/3;sy+=w*(c.y+a.y+b.y)/3;
 		}
 		if(fabsl(A)<1e-3*G)continue;

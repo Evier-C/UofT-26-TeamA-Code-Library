@@ -26,9 +26,9 @@ int main(){
 		pair<int,Point>r=lineInter(a,b,c,d);
 		// exact classification for integer points
 		if(t%4){
-			T cr=cross(b-a,d-c);
+			T cr=(b-a).cross(d-c);
 			if(cr!=0)assert(r.first==1);
-			else if(cross(b-a,c-a)==0)assert(r.first==-1);
+			else if((b-a).cross(c-a)==0)assert(r.first==-1);
 			else assert(r.first==0);
 		}
 		if(r.first==1){

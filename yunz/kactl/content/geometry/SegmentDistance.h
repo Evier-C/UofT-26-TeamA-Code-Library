@@ -19,7 +19,7 @@ p 在 se 外侧时取到端点的距离, 否则取到直线的距离. T 为 doub
 
 double segDist(Point s,Point e,Point p){
 	// 投影落在 s 外侧或 e 外侧时取端点距离
-	if(s==e||sgn(dot(p-s,e-s))<0)return len(p-s);
-	if(sgn(dot(p-e,s-e))<0)return len(p-e);
-	return fabs((double)cross(s,e,p))/len(e-s);
+	if(s==e||sgn((p-s).dot(e-s))<0)return (p-s).len();
+	if(sgn((p-e).dot(s-e))<0)return (p-e).len();
+	return fabs((double)s.cross(e,p))/(e-s).len();
 }

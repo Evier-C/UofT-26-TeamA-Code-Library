@@ -13,9 +13,9 @@ int oldInter(Point s1,Point e1,Point s2,Point e2,Point&r1,Point&r2){
 		return oldInter(s2,e2,s1,e1,r1,r2);
 	}
 	Point v1=e1-s1,v2=e2-s2,d=s2-s1;
-	T a=cross(v1,v2),a1=cross(v1,d),a2=cross(v2,d);
+	T a=v1.cross(v2),a1=v1.cross(d),a2=v2.cross(d);
 	if(a==0){
-		T b1=dot(s1,v1),c1=dot(e1,v1),b2=dot(s2,v1),c2=dot(e2,v1);
+		T b1=s1.dot(v1),c1=e1.dot(v1),b2=s2.dot(v1),c2=e2.dot(v1);
 		if(a1||a2||max(b1,min(b2,c2))>min(c1,max(b2,c2)))return 0;
 		r1=min(b2,c2)<b1?s1:(b2<c2?s2:e2);
 		r2=max(b2,c2)>c1?e1:(b2>c2?s2:e2);
@@ -26,7 +26,7 @@ int oldInter(Point s1,Point e1,Point s2,Point e2,Point&r1,Point&r2){
 	r1=s1-v1*a2/a;
 	return 1;
 }
-bool eq(Point a,Point b){return len(a-b)<1e-8;}
+bool eq(Point a,Point b){return (a-b).len()<1e-8;}
 mt19937 rng(4);
 int main(){
 	ll checks=0;

@@ -29,13 +29,13 @@ vector<Point>convexHull(vector<Point>p){
 	vector<Point>h(2*n);
 	// 要保留共线点, 两处改成严格小于 0, 全部共线时要特判
 	for(int i=0;i<n;i++){ // 下凸壳
-		while(k>=2&&sgn(cross(h[k-2],h[k-1],p[i]))<=0)k--;
+		while(k>=2&&sgn(h[k-2].cross(h[k-1],p[i]))<=0)k--;
 		h[k]=p[i];
 		k++;
 	}
 	int lo=k;
 	for(int i=n-2;i>=0;i--){ // 上凸壳
-		while(k>lo&&sgn(cross(h[k-2],h[k-1],p[i]))<=0)k--;
+		while(k>lo&&sgn(h[k-2].cross(h[k-1],p[i]))<=0)k--;
 		h[k]=p[i];
 		k++;
 	}

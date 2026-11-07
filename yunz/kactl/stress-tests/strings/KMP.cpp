@@ -4,19 +4,19 @@ typedef long long ll;
 #include "../../content/strings/KMP.h"
 
 mt19937 rng(1);
-char s[N],t[N];
+char s[KMP::N],t[KMP::N];
 ll checks=0;
 void test(int n,int m,int al){
 	for(int i=1;i<=n;i++)s[i]='a'+rng()%al;
 	for(int i=1;i<=m;i++)t[i]='a'+rng()%al;
 	s[n+1]=t[m+1]=0;
-	vector<int> occ=kmp(s,n,t,m);
+	vector<int> occ=K.kmp(s,n,t,m);
 	// nxt 暴力
 	if(m<=60)for(int i=1;i<=m;i++){
 		int best=0;
 		for(int L=1;L<i;L++)
 			if(!memcmp(t+1,t+i-L+1,L))best=L;
-		assert(nxt[i]==best);checks++;
+		assert(K.nxt[i]==best);checks++;
 	}
 	vector<int> bf;
 	for(int i=1;i+m-1<=n;i++)

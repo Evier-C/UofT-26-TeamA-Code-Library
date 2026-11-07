@@ -16,8 +16,8 @@ Point polygonCenter(vector<Point>&v){
 	double A=0; // 面积的两倍
 	for(int i=0;i<n;i++){
 		Point p=v[i],q=v[(i+1)%n];
-		res=res+(p+q)*cross(p,q);
-		A+=cross(p,q);
+		res=res+(p+q)*p.cross(q);
+		A+=p.cross(q);
 	}
 	return res/A/3;
 }

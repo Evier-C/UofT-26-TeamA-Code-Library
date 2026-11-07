@@ -13,7 +13,7 @@ int brute(vector<Point>&h,Point p){
 	if(m==2)return onSegment(h[0],h[1],p)?2:0;
 	bool bd=false;
 	for(int i=0;i<m;i++){
-		T c=cross(h[i],h[(i+1)%m],p);
+		T c=h[i].cross(h[(i+1)%m],p);
 		if(c<0)return 0;
 		if(c==0)bd=true;
 	}

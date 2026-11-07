@@ -19,17 +19,17 @@ pair<Point,double>mec(vector<Point>ps){
 	double r=0;
 	double E=1+1e-8; // 相对误差
 	for(int i=0;i<n;i++){
-		if(len(o-ps[i])<=r*E)continue;
+		if((o-ps[i]).len()<=r*E)continue;
 		o=ps[i];
 		r=0;
 		for(int j=0;j<i;j++){
-			if(len(o-ps[j])<=r*E)continue;
+			if((o-ps[j]).len()<=r*E)continue;
 			o=(ps[i]+ps[j])/2;
-			r=len(o-ps[i]);
+			r=(o-ps[i]).len();
 			for(int k=0;k<j;k++){
-				if(len(o-ps[k])<=r*E)continue;
+				if((o-ps[k]).len()<=r*E)continue;
 				o=ccCenter(ps[i],ps[j],ps[k]);
-				r=len(o-ps[i]);
+				r=(o-ps[i]).len();
 			}
 		}
 	}

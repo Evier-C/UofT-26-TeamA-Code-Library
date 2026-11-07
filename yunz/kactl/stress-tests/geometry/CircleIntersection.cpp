@@ -15,17 +15,17 @@ int main(){
 		pair<Point,Point>out;
 		bool ret=circleInter(a,b,ra,rb,out);
 		if(ret){
-			assert(fabs(len(out.first-a)-ra)<1e-9);
-			assert(fabs(len(out.second-a)-ra)<1e-9);
-			assert(fabs(len(out.first-b)-rb)<1e-9);
-			assert(fabs(len(out.second-b)-rb)<1e-9);
+			assert(fabs((out.first-a).len()-ra)<1e-9);
+			assert(fabs((out.second-a).len()-ra)<1e-9);
+			assert(fabs((out.first-b).len()-rb)<1e-9);
+			assert(fabs((out.second-b).len()-rb)<1e-9);
 		}
 		// brute: hill-climb a common point
 		auto func=[&](Point x){
-			double d1=len(x-a)-ra,d2=len(x-b)-rb;
+			double d1=(x-a).len()-ra,d2=(x-b).len()-rb;
 			return d1*d1+d2*d2;
 		};
-		Point start=(a+b)/2+perp(a-b);
+		Point start=(a+b)/2+(a-b).perp();
 		double cv=func(start);Point cp=start;
 		bool slow=false;
 		for(double jmp=100;jmp>1e-20&&!slow;jmp/=2){
@@ -40,9 +40,9 @@ int main(){
 			}
 		}
 		if(slow)continue; // hill-climbing is sometimes slow
-		if(fabs(len(cp-a)-ra)<1e-9&&fabs(len(cp-b)-rb)<1e-9){
+		if(fabs((cp-a).len()-ra)<1e-9&&fabs((cp-b).len()-rb)<1e-9){
 			assert(ret);
-			assert(len(out.first-cp)<1e-6||len(out.second-cp)<1e-6);
+			assert((out.first-cp).len()<1e-6||(out.second-cp).len()<1e-6);
 		}else assert(!ret);
 		checks++;
 	}

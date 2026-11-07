@@ -20,6 +20,7 @@
 Point linearTransformation(Point p0,Point p1,Point q0,
 		Point q1,Point r){
 	Point dp=p1-p0,dq=q1-q0;
-	Point num(cross(dp,dq),dot(dp,dq));
-	return q0+Point(cross(r-p0,num),dot(r-p0,num))/len2(dp);
+	Point num(dp.cross(dq),dp.dot(dq));
+	Point v=r-p0;
+	return q0+Point(v.cross(num),v.dot(num))/dp.len2();
 }

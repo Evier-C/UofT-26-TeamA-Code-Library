@@ -30,7 +30,7 @@ vector<Point>polygonCut(vector<Point>&poly,Point s,Point e){
 	for(int i=0;i<n;i++){
 		Point cur=poly[i];
 		Point prev=i?poly[i-1]:poly[n-1];
-		double a=cross(s,e,cur),b=cross(s,e,prev);
+		double a=s.cross(e,cur),b=s.cross(e,prev);
 		if((a<0)!=(b<0)){ // 边与直线相交, 加入交点
 			res.push_back(cur+(prev-cur)*(a/(a-b)));
 		}

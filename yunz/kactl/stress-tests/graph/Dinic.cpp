@@ -2,6 +2,7 @@
 using namespace std;
 typedef long long ll;
 #include "../../content/graph/Dinic.h"
+Dinic D2; // second global instance
 
 mt19937 rng(12345);
 int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
@@ -40,22 +41,26 @@ int bruteMatch(int L,int R,vector<pair<int,int>>&ed){
 long long checks=0;
 void testFlow(int nn,int mm,int maxc){
 	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
-	init(nn);
+	D.init(nn);
 	vector<array<ll,3>>E;vector<int>id;
 	vector<vector<ll>>c(nn+1,vector<ll>(nn+1,0));
 	for(int i=0;i<mm;i++){
 		int u=rnd(1,nn),v=rnd(1,nn);ll w=rnd(0,maxc);
-		E.push_back({u,v,w});id.push_back(add(u,v,w));
+		E.push_back({u,v,w});id.push_back(D.add(u,v,w));
 		if(u!=v)c[u][v]+=w;
 	}
-	ll f=dinic(s,t);
+	ll f=D.dinic(s,t);
 	assert(f==bruteFlow(nn,c,s,t));
+	// a second instance must not touch D
+	D2.init(nn);
+	for(auto&e:E)D2.add((int)e[0],(int)e[1],e[2]);
+	assert(D2.dinic(s,t)==f);
 	// per-edge flows: capacity and conservation
 	vector<ll>bal(nn+1,0);
 	for(int i=0;i<mm;i++){
-		ll fe=cap[id[i]^1];
+		ll fe=D.cap[id[i]^1];
 		assert(0<=fe&&fe<=E[i][2]);
-		assert(cap[id[i]]+fe==E[i][2]);
+		assert(D.cap[id[i]]+fe==E[i][2]);
 		bal[E[i][0]]-=fe;bal[E[i][1]]+=fe;
 	}
 	for(int v=1;v<=nn;v++){
@@ -63,31 +68,31 @@ void testFlow(int nn,int mm,int maxc){
 		else if(v==t)assert(bal[v]==f);
 		else assert(bal[v]==0);
 	}
-	// min cut from dep[]
-	assert(dep[s]&&!dep[t]);
+	// min cut from D.dep[]
+	assert(D.dep[s]&&!D.dep[t]);
 	ll cut=0;
 	for(int i=0;i<mm;i++){
 		int u=E[i][0],v=E[i][1];
-		if(dep[u]&&!dep[v])cut+=E[i][2],assert(cap[id[i]]==0);
-		if(!dep[u]&&dep[v])assert(cap[id[i]^1]==0);
+		if(D.dep[u]&&!D.dep[v])cut+=E[i][2],assert(D.cap[id[i]]==0);
+		if(!D.dep[u]&&D.dep[v])assert(D.cap[id[i]^1]==0);
 	}
 	assert(cut==f);
 	checks++;
 }
 void testMatch(int L,int R,int mm){
 	int s=L+R+1,t=L+R+2;
-	init(L+R+2);
-	for(int i=1;i<=L;i++)add(s,i,1);
-	for(int j=1;j<=R;j++)add(L+j,t,1);
+	D.init(L+R+2);
+	for(int i=1;i<=L;i++)D.add(s,i,1);
+	for(int j=1;j<=R;j++)D.add(L+j,t,1);
 	vector<pair<int,int>>ed;vector<int>id;
 	for(int k=0;k<mm;k++){
 		int a=rnd(1,L),b=rnd(1,R);
-		ed.push_back({a,b});id.push_back(add(a,L+b,1));
+		ed.push_back({a,b});id.push_back(D.add(a,L+b,1));
 	}
-	ll f=dinic(s,t);
+	ll f=D.dinic(s,t);
 	if(R<=12)assert(f==bruteMatch(L,R,ed));
 	vector<int>uL(L+1),uR(R+1);int got=0;
-	for(int k=0;k<mm;k++)if(cap[id[k]]==0){
+	for(int k=0;k<mm;k++)if(D.cap[id[k]]==0){
 		auto[a,b]=ed[k];
 		assert(!uL[a]&&!uR[b]);uL[a]=uR[b]=1;got++;
 	}

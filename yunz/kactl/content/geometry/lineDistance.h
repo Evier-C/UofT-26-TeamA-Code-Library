@@ -18,5 +18,5 @@ T 为 ll 时也可用 (返回 double).
 #include "Point.h"
 
 double lineDist(Point a,Point b,Point p){
-	return cross(a,b,p)/len(b-a);
+	return a.cross(b,p)/(b-a).len();
 }

@@ -13,12 +13,12 @@ int main(){
 			auto g=[&](){return Point((int)(rng()%21)-10,(int)(rng()%21)-10);};
 			A=g(),B=g(),C=g();
 		}else A=Point(rr(-10,10),rr(-10,10)),B=Point(rr(-10,10),rr(-10,10)),C=Point(rr(-10,10),rr(-10,10));
-		if(fabs(cross(A,B,C))<1e-2)continue;
+		if(fabs(A.cross(B,C))<1e-2)continue;
 		double r=ccRadius(A,B,C);Point o=ccCenter(A,B,C);
 		// brute: center is equidistant from the three points
-		assert(fabs(len(o-A)-r)<1e-6*max(1.0,r));
-		assert(fabs(len(o-B)-r)<1e-6*max(1.0,r));
-		assert(fabs(len(o-C)-r)<1e-6*max(1.0,r));
+		assert(fabs((o-A).len()-r)<1e-6*max(1.0,r));
+		assert(fabs((o-B).len()-r)<1e-6*max(1.0,r));
+		assert(fabs((o-C).len()-r)<1e-6*max(1.0,r));
 		checks+=3;
 	}
 	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;

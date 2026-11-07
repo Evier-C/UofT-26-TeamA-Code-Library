@@ -20,7 +20,7 @@ bool inPolygon(vector<Point>&p,Point a,bool strict=true){
 		Point q=p[(i+1)%n];
 		if(onSegment(p[i],q,a))return !strict;
 		// 射线法: 向右的水平射线与边相交的次数
-		cnt^=((a.y<p[i].y)-(a.y<q.y))*cross(a,p[i],q)>0;
+		cnt^=((a.y<p[i].y)-(a.y<q.y))*a.cross(p[i],q)>0;
 	}
 	return cnt;
 }

@@ -18,9 +18,10 @@ ccCenter 返回该圆的圆心. 要求 T 为 double, 三点不共线 (否则除�
 #include "Point.h"
 
 double ccRadius(Point A,Point B,Point C){
-	return len(B-A)*len(C-B)*len(A-C)/fabs(cross(B-A,C-A))/2;
+	double a=(C-B).len(),b=(A-C).len(),c=(B-A).len();
+	return a*b*c/fabs((B-A).cross(C-A))/2; // abc/(4S)
 }
 Point ccCenter(Point A,Point B,Point C){
 	Point b=C-A,c=B-A;
-	return A+perp(b*len2(c)-c*len2(b))/cross(b,c)/2;
+	return A+(b*c.len2()-c*b.len2()).perp()/b.cross(c)/2;
 }

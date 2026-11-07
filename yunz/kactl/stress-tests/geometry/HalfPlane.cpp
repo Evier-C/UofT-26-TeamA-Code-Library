@@ -40,11 +40,11 @@ int main(){
 			nonempty++;
 			// every vertex is inside every half-plane
 			for(Point v:got)for(Line l:L)
-				assert(cross(l.s,l.e,v)/len(l.e-l.s)>-1e-6*B);
+				assert(l.s.cross(l.e,v)/(l.e-l.s).len()>-1e-6*B);
 			// convex
 			int m=got.size();
 			for(int i=0;i<m;i++)
-				assert(cross(got[i],got[(i+1)%m],got[(i+2)%m])>-1e-6*B*B);
+				assert(got[i].cross(got[(i+1)%m],got[(i+2)%m])>-1e-6*B*B);
 		}
 		checks++;
 	}

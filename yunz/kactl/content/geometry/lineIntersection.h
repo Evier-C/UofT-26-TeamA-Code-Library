@@ -19,12 +19,12 @@ T 为 ll 时若交点不是整点则结果错误; 中间有三个坐标的乘积
 #include "Point.h"
 
 pair<int,Point>lineInter(Point s1,Point e1,Point s2,Point e2){
-	T d=cross(e1-s1,e2-s2);
+	T d=(e1-s1).cross(e2-s2);
 	if(sgn(d)==0){ // 平行, 再判断是否重合
-		int same=sgn(cross(s1,e1,s2))==0;
+		int same=sgn(s1.cross(e1,s2))==0;
 		return {-same,Point(0,0)};
 	}
-	T p=cross(s2,e1,e2);
-	T q=cross(s2,e2,s1);
+	T p=s2.cross(e1,e2);
+	T q=s2.cross(e2,s1);
 	return {1,(s1*p+e1*q)/d};
 }

@@ -14,15 +14,15 @@
 T hullDiameter(vector<Point>&h){
 	int n=h.size();
 	if(n==1)return 0;
-	if(n==2)return len2(h[0]-h[1]);
+	if(n==2)return (h[0]-h[1]).len2();
 	T res=0;
 	int j=1;
 	for(int i=0;i<n;i++){
 		Point a=h[i],b=h[(i+1)%n];
 		// h[j+1] 离边 ab 更远时移动 j
-		while(sgn(cross(b-a,h[(j+1)%n]-h[j]))>0)j=(j+1)%n;
-		res=max(res,len2(a-h[j]));
-		res=max(res,len2(b-h[j]));
+		while(sgn((b-a).cross(h[(j+1)%n]-h[j]))>0)j=(j+1)%n;
+		res=max(res,(a-h[j]).len2());
+		res=max(res,(b-h[j]).len2());
 	}
 	return res;
 }

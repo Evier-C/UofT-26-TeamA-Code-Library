@@ -14,9 +14,9 @@ int segmentIntersection(Point s1,Point e1,Point s2,Point e2,Point&r1,Point&r2){
 		return segmentIntersection(s2,e2,s1,e1,r1,r2);
 	}
 	Point v1=e1-s1,v2=e2-s2,d=s2-s1;
-	T a=cross(v1,v2),a1=cross(v1,d),a2=cross(v2,d);
+	T a=v1.cross(v2),a1=v1.cross(d),a2=v2.cross(d);
 	if(a==0){
-		T b1=dot(s1,v1),c1=dot(e1,v1),b2=dot(s2,v1),c2=dot(e2,v1);
+		T b1=s1.dot(v1),c1=e1.dot(v1),b2=s2.dot(v1),c2=e2.dot(v1);
 		if(a1||a2||max(b1,min(b2,c2))>min(c1,max(b2,c2)))return 0;
 		r1=min(b2,c2)<b1?s1:(b2<c2?s2:e2);
 		r2=max(b2,c2)>c1?e1:(b2>c2?s2:e2);
@@ -49,7 +49,7 @@ int main(){
 			Point r1,r2;
 			int j=(i+1)%N;
 			int qu=segmentIntersection(farp,farq,ps[i],ps[j],r1,r2);
-			if(qu&&cross(q-p,ps[j]-ps[i])==0){ // parallel
+			if(qu&&(q-p).cross(ps[j]-ps[i])==0){ // parallel
 				if(N!=2)assert(r.first==i||r.second==i);
 				any=1;
 				if(iter==0)gen=10;
@@ -89,7 +89,7 @@ int main(){
 			assert(hits[0].second!=hits[1].second);
 			assert(hits[0].second==r.first||hits[0].second==r.second);
 			assert(hits[1].second==r.first||hits[1].second==r.second);
-			double dist0=dot(hits[0].first-p,delta),dist1=dot(hits[1].first-p,delta);
+			double dist0=(hits[0].first-p).dot(delta),dist1=(hits[1].first-p).dot(delta);
 			if(hits[0].second==r.first)assert(dist0<=dist1);
 			else assert(dist0>=dist1);
 		}
@@ -109,8 +109,8 @@ int main(){
 		if(dir==Point(0,0))continue;
 		int i=extrVertex(ps,dir);
 		T best=-1e18;
-		for(Point v:ps)best=max(best,dot(v,dir));
-		assert(dot(ps[i],dir)==best);
+		for(Point v:ps)best=max(best,v.dot(dir));
+		assert(ps[i].dot(dir)==best);
 		checks++;
 	}
 	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;

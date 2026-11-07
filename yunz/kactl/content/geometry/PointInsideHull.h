@@ -26,5 +26,5 @@ bool inHull(vector<Point>&l,Point p,bool strict=true){
 		if(sideOf(l[0],l[c],p)>0)b=c;
 		else a=c;
 	}
-	return sgn(cross(l[a],l[b],p))<r;
+	return sgn(l[a].cross(l[b],p))<r;
 }

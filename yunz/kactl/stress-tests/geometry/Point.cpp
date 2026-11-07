@@ -24,23 +24,23 @@ int main(){
 			Point q=a/k;
 			assert(near(q.x,(ld)a.x/k)&&near(q.y,(ld)a.y/k));
 		}
-		assert(near(dot(a,b),real(conj(A)*B)));
-		assert(near(cross(a,b),imag(conj(A)*B)));
-		assert(near(cross(a,b,c),imag(conj(B-A)*(Cc-A))));
-		assert(near(len2(a),norm(A)));
-		assert(near(len(a),abs(A)));
-		Point p=perp(a);
+		assert(near(a.dot(b),real(conj(A)*B)));
+		assert(near(a.cross(b),imag(conj(A)*B)));
+		assert(near(a.cross(b,c),imag(conj(B-A)*(Cc-A))));
+		assert(near(a.len2(),norm(A)));
+		assert(near(a.len(),abs(A)));
+		Point p=a.perp();
 		assert(near(p.x,real(A*C(0,1)))&&near(p.y,imag(A*C(0,1))));
 		ld t=(ld)rd(-1000,1000)/100;
-		Point r=rotate(a,t);C R=A*polar((ld)1,t);
+		Point r=a.rotate(t);C R=A*polar((ld)1,t);
 		assert(fabsl(r.x-real(R))<1e-9&&fabsl(r.y-imag(R))<1e-9);
 		// == and < agree with exact comparison on integer points
 		assert((a==b)==(a.x==b.x&&a.y==b.y));
 		assert((a<b)==(make_pair(a.x,a.y)<make_pair(b.x,b.y)));
 		if(!(a==Point(0,0))){
-			assert(near(angle(a),arg(A)));
-			Point u=unit(a);
-			assert(near(len(u),1)&&fabs(cross(u,a))<1e-9&&dot(u,a)>0);
+			assert(near(a.angle(),arg(A)));
+			Point u=a.unit();
+			assert(near(u.len(),1)&&fabs(u.cross(a))<1e-9&&u.dot(a)>0);
 		}
 		checks+=14;
 	}

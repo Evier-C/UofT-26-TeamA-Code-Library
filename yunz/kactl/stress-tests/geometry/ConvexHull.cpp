@@ -10,9 +10,9 @@ pair<vector<int>,vector<int>>ulHull(vector<Point>&S){
 	sort(Q.begin(),Q.end(),[&S](int a,int b){
 		return make_pair(S[a].x,S[a].y)<make_pair(S[b].x,S[b].y);});
 	for(int it:Q){
-		while(U.size()>1&&cross(S[U[U.size()-2]],S[it],S[U.back()])<=0)U.pop_back();
+		while(U.size()>1&&(S[U[U.size()-2]]).cross(S[it],S[U.back()])<=0)U.pop_back();
 		U.push_back(it);
-		while(L.size()>1&&cross(S[L[L.size()-2]],S[it],S[L.back()])>=0)L.pop_back();
+		while(L.size()>1&&(S[L[L.size()-2]]).cross(S[it],S[L.back()])>=0)L.pop_back();
 		L.push_back(it);
 	}
 	return {U,L};
@@ -41,8 +41,8 @@ int main(){
 		assert(res[0]==*min_element(pts.begin(),pts.end()));
 		if(m>=3){
 			for(int i=0;i<m;i++){
-				assert(cross(res[i],res[(i+1)%m],res[(i+2)%m])>0);
-				for(Point p:pts)assert(cross(res[i],res[(i+1)%m],p)>=0);
+				assert(res[i].cross(res[(i+1)%m],res[(i+2)%m])>0);
+				for(Point p:pts)assert(res[i].cross(res[(i+1)%m],p)>=0);
 			}
 		}
 		checks+=2;

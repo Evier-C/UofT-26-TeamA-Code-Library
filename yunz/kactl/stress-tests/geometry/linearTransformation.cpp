@@ -11,14 +11,14 @@ int main(){
 	for(int t=0;t<500000;t++){
 		auto g=[&](){return Point(rr(-10,10),rr(-10,10));};
 		Point p0=g(),p1=g(),q0=g(),q1=g(),r=g();
-		if(len(p1-p0)<1e-3)continue;
+		if((p1-p0).len()<1e-3)continue;
 		Point r2=linearTransformation(p0,p1,q0,q1,r);
 		// brute: z -> q0+(z-p0)*(q1-q0)/(p1-p0) in complex numbers
 		C P0(p0.x,p0.y),P1(p1.x,p1.y),Q0(q0.x,q0.y),Q1(q1.x,q1.y),R(r.x,r.y);
 		C W=Q0+(R-P0)*(Q1-Q0)/(P1-P0);
 		assert(abs(W-C(r2.x,r2.y))<1e-6);
 		Point a=linearTransformation(p0,p1,q0,q1,p0),b=linearTransformation(p0,p1,q0,q1,p1);
-		assert(len(a-q0)<1e-6&&len(b-q1)<1e-6);
+		assert((a-q0).len()<1e-6&&(b-q1).len()<1e-6);
 		checks+=2;
 	}
 	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;

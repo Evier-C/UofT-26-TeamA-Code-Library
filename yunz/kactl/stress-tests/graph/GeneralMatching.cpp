@@ -2,6 +2,7 @@
 using namespace std;
 typedef long long ll;
 #include "../../content/graph/GeneralMatching.h"
+Blossom BM2; // second global instance
 
 mt19937 rng(31337);
 int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
@@ -43,20 +44,23 @@ int tutte(int nn,vector<pair<int,int>>&ed){
 }
 long long checks=0;
 void test(int nn,int ne,int mode){
-	init(nn);
+	BM.init(nn);
 	vector<vector<int>>adj(nn+1,vector<int>(nn+1,0));
 	vector<pair<int,int>>ed;
 	for(int k=0;k<ne;k++){
 		int u=rnd(1,nn),v=rnd(1,nn);
-		add(u,v);adj[u][v]=adj[v][u]=1;ed.push_back({u,v});
+		BM.add(u,v);adj[u][v]=adj[v][u]=1;ed.push_back({u,v});
 	}
-	int res=solve();
+	int res=BM.solve();
+	BM2.init(nn);
+	for(auto [u,v]:ed)BM2.add(u,v);
+	assert(BM2.solve()==res);
 	if(mode==0)assert(res==brute(nn,adj));
 	if(mode==1)assert(res==tutte(nn,ed));
 	int got=0;
-	for(int u=1;u<=nn;u++)if(mt[u]){
-		int v=mt[u];
-		assert(v!=u&&adj[u][v]&&mt[v]==u);
+	for(int u=1;u<=nn;u++)if(BM.mt[u]){
+		int v=BM.mt[u];
+		assert(v!=u&&adj[u][v]&&BM.mt[v]==u);
 		if(v>u)got++;
 	}
 	assert(got==res);
@@ -77,9 +81,9 @@ int main(){
 	}
 	for(int it=0;it<5;it++)test(1000,rnd(1000,99000),2);
 	// odd cycles chained: triangles sharing vertices
-	init(999);
-	for(int i=1;i+2<=999;i+=2)add(i,i+1),add(i+1,i+2),add(i,i+2);
-	assert(solve()==499);checks++;
+	BM.init(999);
+	for(int i=1;i+2<=999;i+=2)BM.add(i,i+1),BM.add(i+1,i+2),BM.add(i,i+2);
+	assert(BM.solve()==499);checks++;
 	cout<<"checks: "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
 }

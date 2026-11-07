@@ -22,8 +22,8 @@
 #include "OnSegment.h"
 
 vector<Point>segInter(Point a,Point b,Point c,Point d){
-	T oa=cross(c,d,a),ob=cross(c,d,b);
-	T oc=cross(a,b,c),od=cross(a,b,d);
+	T oa=c.cross(d,a),ob=c.cross(d,b);
+	T oc=a.cross(b,c),od=a.cross(b,d);
 	// 交点唯一且不是端点
 	if(sgn(oa)*sgn(ob)<0&&sgn(oc)*sgn(od)<0)
 		return {(a*ob-b*oa)/(ob-oa)};

@@ -8,44 +8,44 @@ ll rnd(ll l,ll r){return uniform_int_distribution<ll>(l,r)(rng);}
 
 // brute force: dp over left vertices, mask of used right vertices
 ll brute(){
-	vector<ll>dp(1<<m,LLONG_MAX);dp[0]=0;
-	for(int i=1;i<=n;i++){
-		vector<ll>nd(1<<m,LLONG_MAX);
-		for(int s=0;s<(1<<m);s++)if(dp[s]!=LLONG_MAX)
-			for(int j=1;j<=m;j++)if(!(s>>(j-1)&1))
-				nd[s|1<<(j-1)]=min(nd[s|1<<(j-1)],dp[s]+a[i][j]);
+	vector<ll>dp(1<<K.m,LLONG_MAX);dp[0]=0;
+	for(int i=1;i<=K.n;i++){
+		vector<ll>nd(1<<K.m,LLONG_MAX);
+		for(int s=0;s<(1<<K.m);s++)if(dp[s]!=LLONG_MAX)
+			for(int j=1;j<=K.m;j++)if(!(s>>(j-1)&1))
+				nd[s|1<<(j-1)]=min(nd[s|1<<(j-1)],dp[s]+K.a[i][j]);
 		dp=nd;
 	}
 	return *min_element(dp.begin(),dp.end());
 }
 long long checks=0;
 void check(ll c){ // assignment valid, sums to c, dual certificate
-	vector<int>usedR(m+1);ll s=0;
-	for(int i=1;i<=n;i++){
-		assert(1<=ans[i]&&ans[i]<=m&&!usedR[ans[i]]);
-		usedR[ans[i]]=1;s+=a[i][ans[i]];
+	vector<int>usedR(K.m+1);ll s=0;
+	for(int i=1;i<=K.n;i++){
+		assert(1<=K.ans[i]&&K.ans[i]<=K.m&&!usedR[K.ans[i]]);
+		usedR[K.ans[i]]=1;s+=K.a[i][K.ans[i]];
 	}
 	assert(s==c);
 	ll dual=0;
-	for(int i=1;i<=n;i++)dual+=u[i];
-	for(int j=1;j<=m;j++)dual+=v[j],assert(v[j]<=0);
-	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)assert(u[i]+v[j]<=a[i][j]);
+	for(int i=1;i<=K.n;i++)dual+=K.u[i];
+	for(int j=1;j<=K.m;j++)dual+=K.v[j],assert(K.v[j]<=0);
+	for(int i=1;i<=K.n;i++)for(int j=1;j<=K.m;j++)assert(K.u[i]+K.v[j]<=K.a[i][j]);
 	assert(dual==c);
 }
 void test(int nn,int mm,ll lo,ll hi,bool br){
-	n=nn;m=mm;
-	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)a[i][j]=rnd(lo,hi);
-	ll c=km();
+	K.n=nn;K.m=mm;
+	for(int i=1;i<=K.n;i++)for(int j=1;j<=K.m;j++)K.a[i][j]=rnd(lo,hi);
+	ll c=K.km();
 	if(br)assert(c==brute());
 	check(c);
 	checks++;
 }
 // max weight perfect matching by negation, vs permutations
 void testMax(int k){
-	n=m=k;
+	K.n=K.m=k;
 	vector<vector<ll>>w(k+1,vector<ll>(k+1));
-	for(int i=1;i<=k;i++)for(int j=1;j<=k;j++)w[i][j]=rnd(-100,100),a[i][j]=-w[i][j];
-	ll best=-km();
+	for(int i=1;i<=k;i++)for(int j=1;j<=k;j++)w[i][j]=rnd(-100,100),K.a[i][j]=-w[i][j];
+	ll best=-K.km();
 	vector<int>pm(k);iota(pm.begin(),pm.end(),1);
 	ll ref=LLONG_MIN;
 	do{
@@ -55,19 +55,19 @@ void testMax(int k){
 	}while(next_permutation(pm.begin(),pm.end()));
 	assert(best==ref);
 	ll s=0;
-	for(int i=1;i<=k;i++)s+=w[i][ans[i]];
+	for(int i=1;i<=k;i++)s+=w[i][K.ans[i]];
 	assert(s==best);
 	checks++;
 }
 // max weight matching, vertices may stay unmatched: -max(w,0), pad 0
 void testMaxAny(int L,int R){
 	vector<vector<ll>>w(L+1,vector<ll>(R+1));
-	n=m=max(L,R);
-	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)a[i][j]=0;
+	K.n=K.m=max(L,R);
+	for(int i=1;i<=K.n;i++)for(int j=1;j<=K.m;j++)K.a[i][j]=0;
 	for(int i=1;i<=L;i++)for(int j=1;j<=R;j++){
-		w[i][j]=rnd(-50,50);a[i][j]=-max(w[i][j],0LL);
+		w[i][j]=rnd(-50,50);K.a[i][j]=-max(w[i][j],0LL);
 	}
-	ll best=-km();
+	ll best=-K.km();
 	// brute: dp over left, each left may skip
 	vector<ll>dp(1<<R,LLONG_MIN);dp[0]=0;
 	for(int i=1;i<=L;i++){
@@ -82,10 +82,10 @@ void testMaxAny(int L,int R){
 }
 // missing edges with cost 1e12, compare with brute
 void testMissing(){
-	n=rnd(1,6);m=rnd(n,7);
-	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)
-		a[i][j]=rnd(0,2)?rnd(-1000,1000):(ll)1e12;
-	ll c=km();
+	K.n=rnd(1,6);K.m=rnd(K.n,7);
+	for(int i=1;i<=K.n;i++)for(int j=1;j<=K.m;j++)
+		K.a[i][j]=rnd(0,2)?rnd(-1000,1000):(ll)1e12;
+	ll c=K.km();
 	assert(c==brute());
 	check(c);
 	checks++;

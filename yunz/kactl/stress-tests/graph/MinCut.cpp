@@ -20,28 +20,28 @@ ll bruteCut(int nn,vector<array<ll,3>>&E,int s,int t){
 long long checks=0;
 void test(int nn,int mm,int maxc,bool brute){
 	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
-	init(nn);
+	D.init(nn);
 	vector<array<ll,3>>E;map<int,int>idx;
 	for(int i=0;i<mm;i++){
 		int u=rnd(1,nn),v=rnd(1,nn);ll w=rnd(0,maxc);
-		E.push_back({u,v,w});idx[add(u,v,w)]=i;
+		E.push_back({u,v,w});idx[D.add(u,v,w)]=i;
 	}
-	ll f=dinic(s,t);
+	ll f=D.dinic(s,t);
 	if(brute)assert(f==bruteCut(nn,E,s,t));
-	vector<int>cut=minCut();
+	vector<int>cut=minCut(D);
 	ll sum=0;set<int>inCut;
 	for(int e:cut){
 		assert(idx.count(e));
 		int i=idx[e];
-		assert(to[e^1]==E[i][0]&&to[e]==E[i][1]);
-		assert(dep[E[i][0]]&&!dep[E[i][1]]);
-		assert(cap[e]==0&&cap[e^1]==E[i][2]);
-		sum+=cap[e^1];inCut.insert(i);
+		assert(D.to[e^1]==E[i][0]&&D.to[e]==E[i][1]);
+		assert(D.dep[E[i][0]]&&!D.dep[E[i][1]]);
+		assert(D.cap[e]==0&&D.cap[e^1]==E[i][2]);
+		sum+=D.cap[e^1];inCut.insert(i);
 	}
 	assert(sum==f);
 	// all S to T edges are listed, and removing them disconnects s, t
 	for(int i=0;i<mm;i++)
-		if(dep[E[i][0]]&&!dep[E[i][1]])assert(inCut.count(i));
+		if(D.dep[E[i][0]]&&!D.dep[E[i][1]])assert(inCut.count(i));
 	vector<vector<int>>g(nn+1);
 	for(int i=0;i<mm;i++)if(!inCut.count(i))g[E[i][0]].push_back(E[i][1]);
 	vector<int>vis(nn+1);vector<int>st={s};vis[s]=1;

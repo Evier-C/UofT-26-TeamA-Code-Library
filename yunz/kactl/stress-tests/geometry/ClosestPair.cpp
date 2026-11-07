@@ -6,7 +6,7 @@ typedef long long ll;
 mt19937 rng(21);
 T brute(vector<Point>&ps){
 	T best=LLONG_MAX;int n=ps.size();
-	for(int i=0;i<n;i++)for(int j=i+1;j<n;j++)best=min(best,len2(ps[i]-ps[j]));
+	for(int i=0;i<n;i++)for(int j=i+1;j<n;j++)best=min(best,(ps[i]-ps[j]).len2());
 	return best;
 }
 int main(){
@@ -18,7 +18,7 @@ int main(){
 		vector<Point>ps;
 		for(int i=0;i<n;i++)ps.emplace_back((int)(rng()%maxx)+bx,(int)(rng()%maxy)+by);
 		pair<Point,Point>pa=closest(ps);
-		assert(len2(pa.first-pa.second)==brute(ps));
+		assert((pa.first-pa.second).len2()==brute(ps));
 		// the two points are input points
 		assert(count(ps.begin(),ps.end(),pa.first)&&count(ps.begin(),ps.end(),pa.second));
 		checks++;
@@ -34,7 +34,7 @@ int main(){
 		}
 		pair<Point,Point>pa=closest(ps);
 		T b=brute(ps);
-		assert(fabs(len2(pa.first-pa.second)-b)<=1e-9*max((T)1,b));
+		assert(fabs((pa.first-pa.second).len2()-b)<=1e-9*max((T)1,b));
 		checks++;
 	}
 	cout<<"Tests passed! ("<<checks<<" checks)"<<endl;

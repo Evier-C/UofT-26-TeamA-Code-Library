@@ -2,6 +2,7 @@
 using namespace std;
 typedef long long ll;
 #include "../../content/graph/MinCostMaxFlow.h"
+#include "../../content/graph/Dinic.h" // both in one program
 
 mt19937 rng(4242);
 int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
@@ -34,13 +35,13 @@ pair<ll,ll>brute(int nn,vector<E>&es,int s,int t){
 // variant from the Description: min cost flow of any amount
 pair<ll,ll>mcmfStop(int s,int t){
 	ll flow=0,c=0;
-	while(spfa(s,t)&&dis[t]<0){
-		ll f=fl[t];
+	while(MF.spfa(s,t)&&MF.dis[t]<0){
+		ll f=MF.fl[t];
 		flow+=f;
-		c+=f*dis[t];
-		for(int v=t;v!=s;v=to[pre[v]^1]){
-			cap[pre[v]]-=f;
-			cap[pre[v]^1]+=f;
+		c+=f*MF.dis[t];
+		for(int v=t;v!=s;v=MF.to[MF.pre[v]^1]){
+			MF.cap[MF.pre[v]]-=f;
+			MF.cap[MF.pre[v]^1]+=f;
 		}
 	}
 	return {flow,c};
@@ -50,11 +51,11 @@ void testAny(int nn,int mm){
 	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
 	vector<ll>p(nn+1);
 	for(int v=1;v<=nn;v++)p[v]=rnd(-5,5);
-	vector<E>es;init(nn);
+	vector<E>es;MF.init(nn);
 	for(int i=0;i<mm;i++){
 		int u=rnd(1,nn),v=rnd(1,nn);
 		ll c=rnd(0,2),w=rnd(0,5)+p[u]-p[v];
-		es.push_back({u,v,c,w});add(u,v,c,w);
+		es.push_back({u,v,c,w});MF.add(u,v,c,w);
 	}
 	auto r=mcmfStop(s,t);
 	brute(nn,es,s,t);
@@ -66,14 +67,18 @@ void test(int nn,int mm,int maxc,int maxw,bool br){
 	vector<ll>p(nn+1);
 	for(int v=1;v<=nn;v++)p[v]=rnd(-maxw,maxw);
 	vector<E>es;vector<int>id;
-	init(nn);
+	MF.init(nn);
 	for(int i=0;i<mm;i++){
 		int u=rnd(1,nn),v=rnd(1,nn);
 		// cost = base + p[u] - p[v], so no negative cycle
 		ll c=rnd(0,maxc),w=rnd(0,maxw)+p[u]-p[v];
-		es.push_back({u,v,c,w});id.push_back(add(u,v,c,w));
+		es.push_back({u,v,c,w});id.push_back(MF.add(u,v,c,w));
 	}
-	auto [f,co]=mcmf(s,t);
+	D.init(nn);
+	for(auto&e:es)D.add(e.u,e.v,e.c);
+	ll df=D.dinic(s,t);
+	auto [f,co]=MF.mcmf(s,t);
+	assert(f==df);
 	if(br){
 		auto b=brute(nn,es,s,t);
 		assert(b.first==f&&b.second==co);
@@ -81,28 +86,28 @@ void test(int nn,int mm,int maxc,int maxw,bool br){
 	// per-edge flows
 	vector<ll>bal(nn+1,0);ll sc=0;
 	for(int i=0;i<mm;i++){
-		ll fe=cap[id[i]^1];
-		assert(0<=fe&&fe<=es[i].c&&cap[id[i]]+fe==es[i].c);
+		ll fe=MF.cap[id[i]^1];
+		assert(0<=fe&&fe<=es[i].c&&MF.cap[id[i]]+fe==es[i].c);
 		bal[es[i].u]-=fe;bal[es[i].v]+=fe;sc+=fe*es[i].w;
 	}
 	for(int v=1;v<=nn;v++)
 		assert(bal[v]==(v==s?-f:v==t?f:0));
 	assert(sc==co);
-	// max: t unreachable; min cut from dis[] equals flow
-	assert(dis[s]<INF&&!(dis[t]<INF));
+	// max: t unreachable; min cut from MF.dis[] equals flow
+	assert(MF.dis[s]<MF.INF&&!(MF.dis[t]<MF.INF));
 	ll cut=0;
 	for(int i=0;i<mm;i++){
-		bool a=dis[es[i].u]<INF,b=dis[es[i].v]<INF;
-		if(a&&!b)cut+=es[i].c,assert(cap[id[i]]==0);
-		if(!a&&b)assert(cap[id[i]^1]==0);
+		bool a=MF.dis[es[i].u]<MF.INF,b=MF.dis[es[i].v]<MF.INF;
+		if(a&&!b)cut+=es[i].c,assert(MF.cap[id[i]]==0);
+		if(!a&&b)assert(MF.cap[id[i]^1]==0);
 	}
 	assert(cut==f);
 	// min cost: no negative cycle in residual graph (Bellman-Ford)
 	vector<ll>d(nn+1,0);
 	for(int it=0;it<=nn;it++){
 		bool ch=false;
-		for(int e=2;e<=cnt;e++)if(cap[e]&&d[to[e^1]]+cost[e]<d[to[e]])
-			d[to[e]]=d[to[e^1]]+cost[e],ch=true;
+		for(int e=2;e<=MF.cnt;e++)if(MF.cap[e]&&d[MF.to[e^1]]+MF.cost[e]<d[MF.to[e]])
+			d[MF.to[e]]=d[MF.to[e^1]]+MF.cost[e],ch=true;
 		if(!ch)break;
 		assert(it<nn);
 	}
@@ -112,14 +117,14 @@ void test(int nn,int mm,int maxc,int maxw,bool br){
 void testAssign(int k){
 	vector<vector<ll>>w(k+1,vector<ll>(k+1));
 	int L=k,s=2*k+1,t=2*k+2;
-	init(2*k+2);
+	MF.init(2*k+2);
 	vector<array<int,3>>id;
-	for(int i=1;i<=k;i++)add(s,i,1,0),add(L+i,t,1,0);
+	for(int i=1;i<=k;i++)MF.add(s,i,1,0),MF.add(L+i,t,1,0);
 	for(int i=1;i<=k;i++)for(int j=1;j<=k;j++){
 		w[i][j]=rnd(-50,50);
-		id.push_back({add(i,L+j,1,w[i][j]),i,j});
+		id.push_back({MF.add(i,L+j,1,w[i][j]),i,j});
 	}
-	auto [f,co]=mcmf(s,t);
+	auto [f,co]=MF.mcmf(s,t);
 	assert(f==k);
 	vector<int>perm(k);iota(perm.begin(),perm.end(),1);
 	ll best=LLONG_MAX;
@@ -130,7 +135,7 @@ void testAssign(int k){
 	}while(next_permutation(perm.begin(),perm.end()));
 	assert(best==co);
 	vector<int>uR(k+1);ll c=0;int got=0;
-	for(auto [e,i,j]:id)if(cap[e]==0)assert(!uR[j]),uR[j]=1,c+=w[i][j],got++;
+	for(auto [e,i,j]:id)if(MF.cap[e]==0)assert(!uR[j]),uR[j]=1,c+=w[i][j],got++;
 	assert(got==k&&c==co);
 	checks++;
 }

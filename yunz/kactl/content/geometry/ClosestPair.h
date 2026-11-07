@@ -4,7 +4,7 @@
  * T 为 ll 时结果精确, 坐标约 $10^9$ 以内.
  * Usage: vector<Point> v; // v[0..n-1], n 至少为 2
  * pair<Point,Point> pq=closest(v);
- * T d2=len2(pq.first-pq.second); // 最近距离的平方
+ * T d2=(pq.first-pq.second).len2(); // 最近距离的平方
  * double d=sqrt((double)d2); // 最近距离
  * Time: O(n \log n)
  */
@@ -28,8 +28,8 @@ pair<Point,Point>closest(vector<Point>v){
 		}
 		auto lo=S.lower_bound(p-d),hi=S.upper_bound(p+d);
 		for(auto it=lo;it!=hi;it++){
-			if(len2(*it-p)<best){
-				best=len2(*it-p);
+			if((*it-p).len2()<best){
+				best=(*it-p).len2();
 				ret={*it,p};
 			}
 		}

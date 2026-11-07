@@ -12,7 +12,7 @@ int main(){
 		vector<Point>ps;
 		for(int i=0;i<N;i++)ps.emplace_back((int)(rng()%G)-G/2,(int)(rng()%G)-G/2);
 		T r1=0;
-		for(int i=0;i<N;i++)for(int j=0;j<i;j++)r1=max(r1,len2(ps[i]-ps[j]));
+		for(int i=0;i<N;i++)for(int j=0;j<i;j++)r1=max(r1,(ps[i]-ps[j]).len2());
 		vector<Point>h=convexHull(ps);
 		assert(hullDiameter(h)==r1);
 		checks++;

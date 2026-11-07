@@ -23,7 +23,7 @@ bool simple(vector<Point>&p){
 		if(j==i2||i==j2){ // adjacent edges may only share the vertex
 			Point sh=j==i2?p[j]:p[i];
 			Point o1=j==i2?p[i]:p[i2],o2=j==i2?p[j2]:p[j];
-			if(cr(sh,o1,o2)==0&&dot(o1-sh,o2-sh)>0)return false;
+			if(cr(sh,o1,o2)==0&&(o1-sh).dot(o2-sh)>0)return false;
 			continue;
 		}
 		if(segTouch(p[i],p[i2],p[j],p[j2]))return false;
@@ -40,7 +40,7 @@ vector<Point>genPoly(int n,int G){
 		Point c(0,0);
 		for(Point q:p)c=c+q;
 		c=c/(T)p.size()+Point(0.0123,0.0456);
-		sort(p.begin(),p.end(),[&](Point a,Point b){return angle(a-c)<angle(b-c);});
+		sort(p.begin(),p.end(),[&](Point a,Point b){return (a-c).angle()<(b-c).angle();});
 		if(rng()%2)reverse(p.begin(),p.end());
 		if(simple(p))return p;
 	}
@@ -50,7 +50,7 @@ int brute(vector<Point>&p,Point a){
 	int n=p.size();
 	for(int i=0;i<n;i++)if(onSeg(p[i],p[(i+1)%n],a))return 2;
 	long double s=0;
-	for(int i=0;i<n;i++)s+=atan2l(cross(p[i]-a,p[(i+1)%n]-a),dot(p[i]-a,p[(i+1)%n]-a));
+	for(int i=0;i<n;i++)s+=atan2l((p[i]-a).cross(p[(i+1)%n]-a),(p[i]-a).dot(p[(i+1)%n]-a));
 	return fabsl(s)>3;
 }
 int main(){
