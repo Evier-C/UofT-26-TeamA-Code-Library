@@ -1,6 +1,6 @@
 /**
- * Description: 通用懒标记线段树, 下标 [0, n), n >= 1. 换用途只改 T, U, f, g, h 和单位元,
- * 写法见下方懒标记写法. 默认: 区间加, 查区间和与最大值.
+ * Description: 懒标记线段树, 下标 [0, n), n >= 1. 默认: 区间加, 查区间和与最大值.
+ * 换用途只改 T, U, idT, idU, f 和 Seg 里的 app, push, 写法见下方懒标记写法.
  * Usage: vector<T> a(n, {x, x, 1}); Seg s(a);
  * s.update(l, r, {v}); T q = s.query(l, r); // 都是 [l, r)
  * Time: O(\log N)
@@ -14,10 +14,6 @@ const U idU = {0};
 T f(T a, T b) {
 	return {a.sum + b.sum, max(a.mx, b.mx), a.len + b.len};
 }
-T h(U u, T a) {
-	return {a.sum + u.add * a.len, a.mx + u.add, a.len};
-}
-U g(U u, U v) { return {u.add + v.add}; } // 先 v 后 u
 
 struct Seg {
 	int n; vector<T> t; vector<U> d;
@@ -30,10 +26,12 @@ struct Seg {
 		build(2 * x, l, m, a), build(2 * x + 1, m, r, a);
 		t[x] = f(t[2 * x], t[2 * x + 1]);
 	}
-	void app(int x, U u) {
-		t[x] = h(u, t[x]), d[x] = g(u, d[x]);
+	void app(int x, U u) { // 整段 x 打上标记 u
+		t[x].sum += u.add * t[x].len, t[x].mx += u.add;
+		d[x].add += u.add;
 	}
-	void push(int x) {
+	void push(int x) { // 有标记才下传给两个儿子
+		if (!d[x].add) return;
 		app(2 * x, d[x]), app(2 * x + 1, d[x]), d[x] = idU;
 	}
 	void update(int L, int R, U u) { upd(L, R, u, 1, 0, n); }
