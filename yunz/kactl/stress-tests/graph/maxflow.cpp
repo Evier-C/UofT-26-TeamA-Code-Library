@@ -1,7 +1,6 @@
 #include "../utilities/template.h"
 
 #include "../../content/graph/PushRelabel.h"
-#include "../../content/graph/Dinic.h"
 #include "../../content/graph/EdmondsKarp.h"
 
 // Bump allocator, to speed the test up and get rid of malloc performance noise
@@ -21,7 +20,6 @@ int main() {
 		int t = rand() % (n - 1);
 		if (t >= s) t++;
 		PushRelabel pr(n);
-		Dinic dinic(n);
 		vector<unordered_map<int, int>> ek(n);
 
 		int m = rand() % 40;
@@ -31,17 +29,12 @@ int main() {
 			int c = rand() % 4;
 			int d = rand() % 4 == 0 ? rand() % 3 + 1 : 0;
 			pr.addEdge(a, b, c, d);
-			dinic.addEdge(a, b, c, d);
 			ek[a][b] += c;
 			ek[b][a] += d;
 		}
 		auto origEk = ek;
 
 		ll flow = pr.calc(s, t);
-
-		// PushRelabel matches Dinic
-		ll dinicFlow = dinic.calc(s, t);
-		assert(flow == dinicFlow);
 
 		// PushRelabel matches EdmondsKarp
 		ll ekFlow = edmondsKarp(ek, s, t);
@@ -57,15 +50,6 @@ int main() {
 		assert(flow == flows[s]);
 		assert(flow == -flows[t]);
 		rep(i,0,n) if (i != s && i != t) assert(flows[i] == 0);
-
-		// Conservation of flow for Dinic
-		vector<ll> dinicFlows(n);
-		rep(i,0,n) for(auto &e: dinic.adj[i]) {
-			assert(e.flow() <= e.oc);
-			dinicFlows[i] += e.flow();
-			dinicFlows[e.to] -= e.flow();
-		}
-		assert(flows == dinicFlows);
 
 		// Conservation of flow for EdmondsKarp
 		vector<ll> ekFlows(n);

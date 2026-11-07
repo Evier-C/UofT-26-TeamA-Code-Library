@@ -1,207 +1,113 @@
-#include "../utilities/template.h"
-
-// #include "mcmf3.h"
-// #include "mcmf4.h"
-// #include "mcmfold.h"
-// #include "mcmfnew.h"
-#include <bits/extc++.h>
-#define setpi dummy(){} bool setpi
-#undef assert
-#define assert(x) return x
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/graph/MinCostMaxFlow.h"
-#undef assert
-#undef setpi
-#include <cassert>
-#include "MinCostMaxFlow2.h"
 
-struct MCMF2 {
-	vector<vector<FlowEdge>> g;
-	MCMF2(int n) : g(n) {}
-	void addEdge(int s, int t, Flow c, Flow cost = 0) {
-		flow_add_edge(g, s, t, c, cost);
+mt19937 rng(4242);
+int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
+
+struct E{int u,v;ll c,w;};
+// brute force: enumerate every integer flow on every edge
+pair<ll,ll>brute(int nn,vector<E>&es,int s,int t){
+	int m=es.size();
+	vector<ll>f(m,0);
+	pair<ll,ll>best={-1,0};
+	while(true){
+		vector<ll>bal(nn+1,0);ll co=0;
+		for(int i=0;i<m;i++)bal[es[i].u]-=f[i],bal[es[i].v]+=f[i],co+=f[i]*es[i].w;
+		bool ok=true;
+		for(int v=1;v<=nn;v++)if(v!=s&&v!=t&&bal[v])ok=false;
+		if(ok){
+			ll val=bal[t];
+			if(val>best.first||(val==best.first&&co<best.second))best={val,co};
+		}
+		int i=0;
+		while(i<m&&f[i]==es[i].c)f[i]=0,i++;
+		if(i==m)break;
+		f[i]++;
 	}
-	pair<ll, ll> maxflow(int s, int t) {
-		return min_cost_max_flow(g, s, t);
-	}
-	void setpi(int s) {}
-};
-
-// typedef MCMF2 MCMF;
-
-#if 1
-static size_t i;
-#else
-static char buf[450 << 20];
-static size_t i = sizeof buf;
-void* operator new(size_t s) {
-	assert(s < i);
-	return (void*)&buf[i -= s];
+	return best;
 }
-void operator delete(void*) noexcept {}
-#endif
-
-typedef vector<ll> vd;
-bool zero(ll x) { return x == 0; }
-ll MinCostMatching(const vector<vd>& cost, vi& L, vi& R) {
-	int n = sz(cost), mated = 0;
-	vd dist(n), u(n), v(n);
-	vi dad(n), seen(n);
-
-	/// construct dual feasible solution
-	rep(i,0,n) {
-		u[i] = cost[i][0];
-		rep(j,1,n) u[i] = min(u[i], cost[i][j]);
+long long checks=0;
+void test(int nn,int mm,int maxc,int maxw,bool br){
+	int s=rnd(1,nn),t=rnd(1,nn-1);if(t>=s)t++;
+	vector<ll>p(nn+1);
+	for(int v=1;v<=nn;v++)p[v]=rnd(-maxw,maxw);
+	vector<E>es;vector<int>id;
+	init(nn);
+	for(int i=0;i<mm;i++){
+		int u=rnd(1,nn),v=rnd(1,nn);
+		// cost = base + p[u] - p[v], so no negative cycle
+		ll c=rnd(0,maxc),w=rnd(0,maxw)+p[u]-p[v];
+		es.push_back({u,v,c,w});id.push_back(add(u,v,c,w));
 	}
-	rep(j,0,n) {
-		v[j] = cost[0][j] - u[0];
-		rep(i,1,n) v[j] = min(v[j], cost[i][j] - u[i]);
+	auto [f,co]=mcmf(s,t);
+	if(br){
+		auto b=brute(nn,es,s,t);
+		assert(b.first==f&&b.second==co);
 	}
-
-	/// find primal solution satisfying complementary slackness
-	L = vi(n, -1);
-	R = vi(n, -1);
-	rep(i,0,n) rep(j,0,n) {
-		if (R[j] != -1) continue;
-		if (zero(cost[i][j] - u[i] - v[j])) {
-			L[i] = j;
-			R[j] = i;
-			mated++;
-			break;
-		}
+	// per-edge flows
+	vector<ll>bal(nn+1,0);ll sc=0;
+	for(int i=0;i<mm;i++){
+		ll fe=cap[id[i]^1];
+		assert(0<=fe&&fe<=es[i].c&&cap[id[i]]+fe==es[i].c);
+		bal[es[i].u]-=fe;bal[es[i].v]+=fe;sc+=fe*es[i].w;
 	}
-
-	for (; mated < n; mated++) { // until solution is feasible
-		int s = 0;
-		while (L[s] != -1) s++;
-		fill(all(dad), -1);
-		fill(all(seen), 0);
-		rep(k,0,n)
-			dist[k] = cost[s][k] - u[s] - v[k];
-
-		int j = 0;
-		for (;;) { /// find closest
-			j = -1;
-			rep(k,0,n){
-				if (seen[k]) continue;
-				if (j == -1 || dist[k] < dist[j]) j = k;
-			}
-			seen[j] = 1;
-			int i = R[j];
-			if (i == -1) break;
-			rep(k,0,n) { /// relax neighbors
-				if (seen[k]) continue;
-				auto new_dist = dist[j] + cost[i][k] - u[i] - v[k];
-				if (dist[k] > new_dist) {
-					dist[k] = new_dist;
-					dad[k] = j;
-				}
-			}
-		}
-
-		/// update dual variables
-		rep(k,0,n) {
-			if (k == j || !seen[k]) continue;
-			auto w = dist[k] - dist[j];
-			v[k] += w, u[R[k]] -= w;
-		}
-		u[s] += dist[j];
-
-		/// augment along path
-		while (dad[j] >= 0) {
-			int d = dad[j];
-			R[j] = R[d];
-			L[R[j]] = j;
-			j = d;
-		}
-		R[j] = s;
-		L[s] = j;
+	for(int v=1;v<=nn;v++)
+		assert(bal[v]==(v==s?-f:v==t?f:0));
+	assert(sc==co);
+	// max: t unreachable; min cut from dis[] equals flow
+	assert(dis[s]<INF&&!(dis[t]<INF));
+	ll cut=0;
+	for(int i=0;i<mm;i++){
+		bool a=dis[es[i].u]<INF,b=dis[es[i].v]<INF;
+		if(a&&!b)cut+=es[i].c,assert(cap[id[i]]==0);
+		if(!a&&b)assert(cap[id[i]^1]==0);
 	}
-
-	auto value = vd(1)[0];
-	rep(i,0,n) value += cost[i][L[i]];
-	return value;
+	assert(cut==f);
+	// min cost: no negative cycle in residual graph (Bellman-Ford)
+	vector<ll>d(nn+1,0);
+	for(int it=0;it<=nn;it++){
+		bool ch=false;
+		for(int e=2;e<=cnt;e++)if(cap[e]&&d[to[e^1]]+cost[e]<d[to[e]])
+			d[to[e]]=d[to[e^1]]+cost[e],ch=true;
+		if(!ch)break;
+		assert(it<nn);
+	}
+	checks++;
 }
-
-void testPerf() {
-	srand(2);
-	int N = 500, E = 10000, CAPS = 100, COSTS = 100000;
-	MCMF mcmf(N);
-	int s = 0, t = 1;
-	rep(i,0,E) {
-		int a = rand() % N;
-		int b = rand() % N;
-		int cap = rand() % CAPS;
-		int cost = rand() % COSTS;
-		if (a == b) continue;
-		mcmf.addEdge(a, b, cap, cost);
-		// ::cap[a][b] = cap;
-		// ::cost[a][b] = cost;
+// min cost perfect assignment vs permutations
+void testAssign(int k){
+	vector<vector<ll>>w(k+1,vector<ll>(k+1));
+	int L=k,s=2*k+1,t=2*k+2;
+	init(2*k+2);
+	vector<array<int,3>>id;
+	for(int i=1;i<=k;i++)add(s,i,1,0),add(L+i,t,1,0);
+	for(int i=1;i<=k;i++)for(int j=1;j<=k;j++){
+		w[i][j]=rnd(-50,50);
+		id.push_back({add(i,L+j,1,w[i][j]),i,j});
 	}
-	auto pa = mcmf.maxflow(s, t);
-	cout << pa.first << ' ' << pa.second << endl;
+	auto [f,co]=mcmf(s,t);
+	assert(f==k);
+	vector<int>perm(k);iota(perm.begin(),perm.end(),1);
+	ll best=LLONG_MAX;
+	do{
+		ll c=0;
+		for(int i=1;i<=k;i++)c+=w[i][perm[i-1]];
+		best=min(best,c);
+	}while(next_permutation(perm.begin(),perm.end()));
+	assert(best==co);
+	vector<int>uR(k+1);ll c=0;int got=0;
+	for(auto [e,i,j]:id)if(cap[e]==0)assert(!uR[j]),uR[j]=1,c+=w[i][j],got++;
+	assert(got==k&&c==co);
+	checks++;
 }
-
-void testMatching() {
-	rep(it,0,100000) {
-		size_t last = ::i;
-		int N = rand() % 10, M = rand() % 10;
-		int NM = max(N, M);
-		vector<vd> co(NM, vd(NM));
-		rep(i,0,N) rep(j,0,M) co[i][j] = (rand() % 10) + 2;
-		vi L, R;
-		ll v = MinCostMatching(co, L, R);
-		int S = N+M, T = N+M+1;
-		MCMF mcmf(N+M+2);
-		rep(i,0,N) mcmf.addEdge(S, i, 1, 0);
-		rep(i,0,M) mcmf.addEdge(N+i, T, 1, 0);
-		rep(i,0,N) rep(j,0,M) mcmf.addEdge(i, N+j, 1, co[i][j] - 2);
-		mcmf.setpi(S);
-		auto pa = mcmf.maxflow(S, T);
-		assert(pa.first == min(N, M));
-		assert(pa.second == v - 2 * pa.first);
-		::i = last;
-	}
-}
-
-void testNeg() {
-	const int ITS = 1000000;
-	int ed[100][100];
-	int negs = 0;
-	rep(it,0,ITS) {
-		size_t lasti = ::i;
-		int N = rand() % 7 + 2;
-		int M = rand() % 17;
-		int S = 0, T = 1;
-		MCMF mcmf(N);
-		MCMF2 mcmf2(N);
-		rep(i,0,N) rep(j,0,N) ed[i][j] = 0;
-		bool anyneg = false;
-		rep(eid,0,M) {
-			int i = rand() % N, j = rand() % N;
-			if (i != j && !ed[i][j]) {
-				ed[i][j] = 1;
-				int fl = rand() % 50;
-				int co = rand() % 11 - 3;
-				mcmf.addEdge(i, j, fl, co);
-				mcmf2.addEdge(i, j, fl, co);
-				if (co < 0) anyneg = true;
-			}
-		}
-		negs += anyneg;
-		if (anyneg || rand() % 3 == 0) {
-			if (!mcmf.setpi(S))  // has negative loops
-				continue;
-		}
-		auto pa = mcmf.maxflow(S, T);
-		auto pa2 = mcmf2.maxflow(S, T);
-		assert(pa == pa2);
-		::i = lasti;
-	}
-	// cerr << negs << "/" << ITS << " graphs with negative edge costs" << endl;
+int main(){
+	for(int it=0;it<30000;it++)test(rnd(2,5),rnd(0,6),2,5,true);
+	for(int it=0;it<2000;it++)test(rnd(2,4),rnd(0,8),1,10,true);
+	for(int it=0;it<3000;it++)test(rnd(2,30),rnd(0,150),rnd(1,20),100,false);
+	for(int it=0;it<20;it++)test(rnd(100,300),rnd(500,3000),1000,1000000,false);
+	for(int it=0;it<3000;it++)testAssign(rnd(1,7));
+	cout<<"checks: "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
-}
-
-int main() {
-	testMatching();
-	testNeg();
 }

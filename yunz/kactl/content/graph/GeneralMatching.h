@@ -1,56 +1,75 @@
 /**
- * Author: Simon Lindholm
- * Date: 2016-12-09
- * License: CC0
- * Source: http://www.mimuw.edu.pl/~mucha/pub/mucha_sankowski_focs04.pdf
- * Description: 一般图最大匹配 (随机化, 基于 Tutte 矩阵求逆).
- * 失败概率为 $N / mod$.
- * Usage: vector<pii> ed{{a, b}}; // 点编号 0..N-1 的无向边
- * vector<pii> m = generalMatching(N, ed); // 匹配边
- * Time: O(N^3)
- * Status: not very well tested
+ * Description: 一般图最大匹配, 带花树 (Edmonds blossom). 点编号 $1..n$.
+ * 对每个未匹配点 bfs 找增广路, 遇到奇环就缩成一朵花 (并查集 fa).
+ * vis 为 1 表示偶点 (可入队), 为 2 表示奇点. 返回匹配数,
+ * mt[u] 为 $u$ 匹配的点, 未匹配为 0.
+ * Usage: init(n); // 多组数据每次调用
+ * add(u,v); // 无向边
+ * int res=solve();
+ * for(int u=1;u<=n;u++) if(mt[u]>u) cout<<u<<' '<<mt[u]<<endl;
+ * Time: O(n^3)
  */
 #pragma once
 
-#include "../numerical/MatrixInverse-mod.h"
-
-vector<pii>generalMatching(int N,vector<pii>&ed){
-	vector<vector<ll>>mat(N,vector<ll>(N)),A;
-	for(pii pa:ed){
-		int a=pa.first,b=pa.second,r=rand()%mod;
-		mat[a][b]=r,mat[b][a]=(mod-r)%mod;
+const int N=1005,M=2e5+5; // 点数; 边数, 每条边存两次
+int n,cnt,head[N],nxt[M],to[M];
+int mt[N],pre[N],fa[N],vis[N],dfn[N],tim;
+queue<int>q;
+void init(int _n){
+	n=_n;cnt=0;tim=0;
+	for(int i=0;i<=n;i++)head[i]=mt[i]=dfn[i]=0;
+}
+void add(int u,int v){
+	to[++cnt]=v;nxt[cnt]=head[u];head[u]=cnt;
+	to[++cnt]=u;nxt[cnt]=head[v];head[v]=cnt;
+}
+int find(int x){return fa[x]==x?x:fa[x]=find(fa[x]);}
+int lca(int x,int y){ // 两个偶点在交错树上的最近公共花
+	tim++;x=find(x);y=find(y);
+	while(dfn[x]!=tim){
+		dfn[x]=tim;
+		x=find(pre[mt[x]]);
+		if(y)swap(x,y);
 	}
-
-	int r=matInv(A=mat),M=2*N-r,fi,fj;
-	assert(r%2==0);
-
-	if(M!=N)do{
-		mat.resize(M,vector<ll>(M));
-		rep(i,0,N){
-			mat[i].resize(M);
-			rep(j,N,M){
-				int r=rand()%mod;
-				mat[i][j]=r,mat[j][i]=(mod-r)%mod;
+	return x;
+}
+void blossom(int x,int y,int w){ // 把 x 到花根 w 的路径缩进花
+	while(find(x)!=w){
+		pre[x]=y;y=mt[x];
+		if(vis[y]==2)vis[y]=1,q.push(y); // 花里的奇点变成偶点
+		if(find(x)==x)fa[x]=w;
+		if(find(y)==y)fa[y]=w;
+		x=pre[y];
+	}
+}
+bool aug(int s){ // 从未匹配点 s 找增广路
+	for(int i=1;i<=n;i++)fa[i]=i,vis[i]=pre[i]=0;
+	while(!q.empty())q.pop();
+	q.push(s);vis[s]=1;
+	while(!q.empty()){
+		int u=q.front();q.pop();
+		for(int e=head[u];e;e=nxt[e]){
+			int v=to[e];
+			if(find(u)==find(v)||vis[v]==2)continue;
+			if(!vis[v]){
+				vis[v]=2;pre[v]=u;
+				if(!mt[v]){ // 找到增广路, 沿 pre 翻转
+					for(int x=v,y;x;x=y){
+						y=mt[pre[x]];mt[x]=pre[x];mt[pre[x]]=x;
+					}
+					return true;
+				}
+				vis[mt[v]]=1;q.push(mt[v]);
+			}else{ // u, v 都是偶点, 出现奇环
+				int w=lca(u,v);
+				blossom(u,v,w);blossom(v,u,w);
 			}
 		}
-	}while(matInv(A=mat)!=M);
-
-	vi has(M,1);vector<pii>ret;
-	rep(it,0,M/2){
-		rep(i,0,M)if(has[i])
-			rep(j,i+1,M)if(A[i][j]&&mat[i][j]){
-				fi=i;fj=j;goto done;
-		}assert(0);done:
-		if(fj<N)ret.emplace_back(fi,fj);
-		has[fi]=has[fj]=0;
-		rep(sw,0,2){
-			ll a=modpow(A[fi][fj],mod-2);
-			rep(i,0,M)if(has[i]&&A[i][fj]){
-				ll b=A[i][fj]*a%mod;
-				rep(j,0,M)A[i][j]=(A[i][j]-A[fi][j]*b)%mod;
-			}
-			swap(fi,fj);
-		}
 	}
-	return ret;
+	return false;
+}
+int solve(){
+	int res=0;
+	for(int i=1;i<=n;i++)if(!mt[i]&&aug(i))res++;
+	return res;
 }

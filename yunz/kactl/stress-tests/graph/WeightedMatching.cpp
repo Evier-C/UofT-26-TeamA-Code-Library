@@ -1,52 +1,98 @@
-#include "../utilities/template.h"
-#include "../utilities/utils.h"
-#include "../utilities/random.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/graph/WeightedMatching.h"
-#include <bits/extc++.h> /// include-line, keep-include
-#include "../../content/graph/MinCostMaxFlow.h"
 
-void test(int N, int mxCost, int iters) {
-	for (int it = 0; it < iters; it++) {
-		int n = randRange(0, N), m = randRange(0, N);
-		if (n > m)
-			swap(n, m);
+mt19937 rng(2024);
+ll rnd(ll l,ll r){return uniform_int_distribution<ll>(l,r)(rng);}
 
-		MCMF mcmf(n + m + 2);
-		int s = 0;
-		int t = 1;
-		for (int i = 0; i < n; i++)
-			mcmf.addEdge(s, i + 2, 1, 0);
-		for (int i = 0; i < m; i++)
-			mcmf.addEdge(2 + n + i, t, 1, 0);
-
-		vector<vi> cost(n, vi(m));
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				cost[i][j] = randRange(-mxCost, mxCost);
-				mcmf.addEdge(i + 2, 2 + n + j, 1, cost[i][j]);
-			}
-		}
-		mcmf.setpi(s);
-		auto maxflow = mcmf.maxflow(s, t);
-		auto matching = hungarian(cost);
-		assert(maxflow.first == n);
-		assert(maxflow.second == matching.first);
-		int matchSum = 0;
-		set<int> used;
-		for (int i = 0; i < n; i++) {
-			matchSum += cost[i][matching.second[i]];
-			assert(used.count(matching.second[i]) == 0);
-			used.insert(matching.second[i]);
-		}
-		assert(matchSum == matching.first);
-		return;
+// brute force: dp over left vertices, mask of used right vertices
+ll brute(){
+	vector<ll>dp(1<<m,LLONG_MAX);dp[0]=0;
+	for(int i=1;i<=n;i++){
+		vector<ll>nd(1<<m,LLONG_MAX);
+		for(int s=0;s<(1<<m);s++)if(dp[s]!=LLONG_MAX)
+			for(int j=1;j<=m;j++)if(!(s>>(j-1)&1))
+				nd[s|1<<(j-1)]=min(nd[s|1<<(j-1)],dp[s]+a[i][j]);
+		dp=nd;
 	}
+	return *min_element(dp.begin(),dp.end());
 }
-signed main() {
-	test(25, 5, 1000);
-	test(100, 1000, 100);
-	test(100, 1, 50);
-	test(5, 5, 10000);
-	cout << "Tests passed!" << endl;
+long long checks=0;
+void check(ll c){ // assignment valid, sums to c, dual certificate
+	vector<int>usedR(m+1);ll s=0;
+	for(int i=1;i<=n;i++){
+		assert(1<=ans[i]&&ans[i]<=m&&!usedR[ans[i]]);
+		usedR[ans[i]]=1;s+=a[i][ans[i]];
+	}
+	assert(s==c);
+	ll dual=0;
+	for(int i=1;i<=n;i++)dual+=u[i];
+	for(int j=1;j<=m;j++)dual+=v[j],assert(v[j]<=0);
+	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)assert(u[i]+v[j]<=a[i][j]);
+	assert(dual==c);
+}
+void test(int nn,int mm,ll lo,ll hi,bool br){
+	n=nn;m=mm;
+	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)a[i][j]=rnd(lo,hi);
+	ll c=km();
+	if(br)assert(c==brute());
+	check(c);
+	checks++;
+}
+// max weight perfect matching by negation, vs permutations
+void testMax(int k){
+	n=m=k;
+	vector<vector<ll>>w(k+1,vector<ll>(k+1));
+	for(int i=1;i<=k;i++)for(int j=1;j<=k;j++)w[i][j]=rnd(-100,100),a[i][j]=-w[i][j];
+	ll best=-km();
+	vector<int>pm(k);iota(pm.begin(),pm.end(),1);
+	ll ref=LLONG_MIN;
+	do{
+		ll s=0;
+		for(int i=1;i<=k;i++)s+=w[i][pm[i-1]];
+		ref=max(ref,s);
+	}while(next_permutation(pm.begin(),pm.end()));
+	assert(best==ref);
+	ll s=0;
+	for(int i=1;i<=k;i++)s+=w[i][ans[i]];
+	assert(s==best);
+	checks++;
+}
+// max weight matching, vertices may stay unmatched: -max(w,0), pad 0
+void testMaxAny(int L,int R){
+	vector<vector<ll>>w(L+1,vector<ll>(R+1));
+	n=m=max(L,R);
+	for(int i=1;i<=n;i++)for(int j=1;j<=m;j++)a[i][j]=0;
+	for(int i=1;i<=L;i++)for(int j=1;j<=R;j++){
+		w[i][j]=rnd(-50,50);a[i][j]=-max(w[i][j],0LL);
+	}
+	ll best=-km();
+	// brute: dp over left, each left may skip
+	vector<ll>dp(1<<R,LLONG_MIN);dp[0]=0;
+	for(int i=1;i<=L;i++){
+		vector<ll>nd=dp;
+		for(int s=0;s<(1<<R);s++)if(dp[s]!=LLONG_MIN)
+			for(int j=1;j<=R;j++)if(!(s>>(j-1)&1))
+				nd[s|1<<(j-1)]=max(nd[s|1<<(j-1)],dp[s]+w[i][j]);
+		dp=nd;
+	}
+	assert(best==*max_element(dp.begin(),dp.end()));
+	checks++;
+}
+int main(){
+	for(int it=0;it<5000;it++)testMaxAny(rnd(1,7),rnd(1,7));
+	for(int it=0;it<30000;it++){
+		int nn=rnd(1,7),mm=rnd(nn,8);
+		test(nn,mm,rnd(0,1)?-10:-1000000000,rnd(0,1)?10:1000000000,true);
+	}
+	for(int it=0;it<5000;it++)testMax(rnd(1,7));
+	for(int it=0;it<200;it++){
+		int nn=rnd(1,100),mm=rnd(nn,120);
+		test(nn,mm,-1000000,1000000,false);
+	}
+	test(500,500,0,1000000000,false);
+	test(300,500,-1000000000,1000000000,false);
+	cout<<"checks: "<<checks<<endl;
+	cout<<"Tests passed!"<<endl;
 }

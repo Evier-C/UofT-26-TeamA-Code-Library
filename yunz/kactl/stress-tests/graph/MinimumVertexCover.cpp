@@ -1,92 +1,47 @@
-#include "../utilities/template.h"
-
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
 #include "../../content/graph/MinimumVertexCover.h"
-#include "../../content/graph/HopcroftKarp.h"
 
-vi coverHK(vector<vi>& g, int n, int m) {
-	vi match(m, -1);
-	int res = hopcroftKarp(g, match);
-	vector<bool> lfound(n, true), seen(m);
-	for(auto &it: match) if (it != -1) lfound[it] = false;
-	vi q, cover;
-	rep(i,0,n) if (lfound[i]) q.push_back(i);
-	while (!q.empty()) {
-		int i = q.back(); q.pop_back();
-		lfound[i] = 1;
-		for(auto &e: g[i]) if (!seen[e] && match[e] != -1) {
-			seen[e] = true;
-			q.push_back(match[e]);
-		}
+mt19937 rng(17);
+int rnd(int l,int r){return uniform_int_distribution<int>(l,r)(rng);}
+
+long long checks=0;
+void test(int nn,int mm,int ne,bool br){
+	init(nn,mm);
+	vector<pair<int,int>>ed;
+	for(int k=0;k<ne;k++){
+		int a=rnd(1,nn),b=rnd(1,mm);
+		ed.push_back({a,b});g[a].push_back(b);
 	}
-	rep(i,0,n) if (!lfound[i]) cover.push_back(i);
-	rep(i,0,m) if (seen[i]) cover.push_back(n+i);
-	assert(sz(cover) == res);
-	return cover;
+	vector<int>A,B;
+	int k=cover(A,B);
+	assert((int)A.size()+(int)B.size()==k);
+	vector<int>inA(nn+1),inB(mm+1);
+	for(int x:A)assert(1<=x&&x<=nn&&!inA[x]),inA[x]=1;
+	for(int x:B)assert(1<=x&&x<=mm&&!inB[x]),inB[x]=1;
+	for(auto [a,b]:ed)assert(inA[a]||inB[b]);
+	// complement is an independent set (implied) and k is a matching
+	int got=0;
+	for(int u=1;u<=nn;u++)if(mL[u])got++;
+	assert(got==k);
+	if(br){ // brute force minimum vertex cover over all subsets
+		int tot=nn+mm,best=tot;
+		for(int s=0;s<(1<<tot);s++){
+			int c=__builtin_popcount(s);
+			if(c>=best)continue;
+			bool ok=true;
+			for(auto [a,b]:ed)
+				if(!(s>>(a-1)&1)&&!(s>>(nn+b-1)&1)){ok=false;break;}
+			if(ok)best=c;
+		}
+		assert(best==k);
+	}
+	checks++;
 }
-
-int main() {
-	const int MAXN = 20;
-	mt19937 rng(17);
-	rep(it,0,300'000) {
-		int N = rand() % MAXN, M = rand() % MAXN;
-		vector<vi> gr(N);
-		int co = rand() % 128 < 10 ? 2 : 1;
-		rep(_,0,co) {
-			int prop = rand();
-			if (max(N, M) >= 5 && rand() % 128 < 90) {
-				prop /= max(N, M);
-				prop *= 2;
-			}
-			rep(i,0,N) rep(j,0,M) if (rand() < prop) {
-				gr[i].push_back(j);
-			}
-		}
-		if (rand() % 128 < 20 && N && M) {
-			int paths = rand() % min(N, M);
-			vi left(N), right(M);
-			rep(i,0,N) left[i] = i;
-			rep(i,0,M) right[i] = i;
-			rep(_,0,paths) {
-				shuffle(all(left), rng);
-				shuffle(all(right), rng);
-				int len = rand() % min(N, M) + 1;
-				if (rand() & 128) gr[left[0]].push_back(right[0]);
-				rep(i,1,len-1) {
-					gr[left[i]].push_back(right[i-1]);
-					gr[left[i]].push_back(right[i]);
-				}
-				if (len > 1 && (rand() & 128)) gr[left.back()].push_back(right.back());
-			}
-		}
-		rep(i,0,N) {
-			// Duplicate edges are okay
-			// sort(all(gr[i]));
-			// gr[i].erase(unique(all(gr[i])), gr[i].end());
-			shuffle(all(gr[i]), rng);
-		}
-		auto verify = [&](vi& cover) {
-			vi left(N), right(M);
-			for(auto &x: cover) {
-				if (x < N) left[x] = 1;
-				else right[x - N] = 1;
-			}
-			rep(i,0,N) if (!left[i]) for(auto &j:gr[i]) {
-				assert(right[j]);
-				/* if (!right[j]) {
-					cout << N << ' ' << M << endl;
-					rep(i,0,N) for(auto &j: gr[i]) cout << i << " - " << j << endl;
-					cout << "yields " << sz(cover) << endl;
-					for(auto &x: cover) cout << x << endl;
-					abort();
-				} */
-			}
-		};
-		vi cover1 = cover(gr, N, M);
-		vi cover2 = coverHK(gr, N, M);
-		assert(sz(cover1) == sz(cover2));
-		verify(cover1);
-		verify(cover2);
-		// cout << '.' << endl;
-	}
+int main(){
+	for(int it=0;it<30000;it++)test(rnd(1,7),rnd(1,7),rnd(0,20),true);
+	for(int it=0;it<500;it++)test(rnd(1,300),rnd(1,300),rnd(0,2000),false);
+	cout<<"checks: "<<checks<<endl;
 	cout<<"Tests passed!"<<endl;
 }

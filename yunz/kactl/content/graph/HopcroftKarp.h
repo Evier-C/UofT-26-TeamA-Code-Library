@@ -1,35 +1,50 @@
 /**
- * Author: Adam Soltan
- * Date: 2026-01-13
- * License: CC0
- * Description: 快速二分图匹配. $g$ 为左部各点的邻接表 (存右部点编号),
- * $r$ 为长度等于右部点数且全为 $-1$ 的数组. 返回匹配数.
- * $r[i]$ 为右部点 $i$ 匹配的左部点, 未匹配为 $-1$.
- * Usage 中的 $l[i]$ 为左部点 $i$ 匹配的右部点.
- * Usage: vi r(m, -1); hopcroftKarp(g, r);
- * vi l(sz(g), -1); rep(j,0,m) if (r[j] != -1) l[r[j]] = j;
+ * Description: 二分图最大匹配 Hopcroft-Karp. 左部点 $1..n$, 右部点 $1..m$,
+ * g[u] 存左部点 $u$ 连向的右部点. 返回匹配数.
+ * mL[u] 为左部点 $u$ 匹配的右部点, mR[v] 为右部点 $v$ 匹配的左部点,
+ * 未匹配为 0. bfs 按层分组, dfs 只走下一层, 每轮找一批最短增广路.
+ * Usage: init(n,m); // 多组数据每次调用
+ * g[u].push_back(v); // 左 u 连右 v
+ * int res=hk();
+ * for(int u=1;u<=n;u++) if(mL[u]) cout<<u<<' '<<mL[u]<<endl;
  * Time: O(E \sqrt{V})
- * Status: stress-tested by MinimumVertexCover and tested on Library Checker
  */
 #pragma once
 
-int hopcroftKarp(vector<vi>&g,vi&r){
-	int n=sz(g),res=0;
-	vi l(n,-1),q(n),d(n);
-	auto dfs=[&](auto f,int u)->bool{
-		int t=exchange(d[u],0)+1;
-		for(int v:g[u])
-			if(r[v]==-1||(d[r[v]]==t&&f(f,r[v])))
-				return l[u]=v,r[v]=u,1;
-		return 0;
-	};
-	for(int t=0,f=0;;t=f=0,d.assign(n,0)){
-		rep(i,0,n)if(l[i]==-1)q[t++]=i,d[i]=1;
-		rep(i,0,t)for(int v:g[q[i]]){
-			if(r[v]==-1)f=1;
-			else if(!d[r[v]])d[r[v]]=d[q[i]]+1,q[t++]=r[v];
+const int N=1e5+5; // 左右部点数的最大值
+int n,m,mL[N],mR[N],d[N];
+vector<int>g[N];
+void init(int _n,int _m){
+	n=_n;m=_m;
+	for(int i=1;i<=n;i++)g[i].clear();
+}
+bool dfs(int u){
+	int t=d[u]+1;d[u]=0; // 本轮不再访问 u
+	for(int v:g[u])
+		if(!mR[v]||(d[mR[v]]==t&&dfs(mR[v]))){
+			mL[u]=v;mR[v]=u;return true;
 		}
-		if(!f)return res;
-		rep(i,0,n)if(l[i]==-1)res+=dfs(dfs,i);
+	return false;
+}
+int hk(){
+	for(int i=1;i<=n;i++)mL[i]=0;
+	for(int i=1;i<=m;i++)mR[i]=0;
+	int res=0;
+	while(true){
+		// d[u] 为左部点 u 的层数, 0 表示不可用
+		queue<int>q;bool found=false;
+		for(int i=1;i<=n;i++){
+			d[i]=0;
+			if(!mL[i])d[i]=1,q.push(i);
+		}
+		while(!q.empty()){
+			int u=q.front();q.pop();
+			for(int v:g[u]){
+				if(!mR[v])found=true;
+				else if(!d[mR[v]])d[mR[v]]=d[u]+1,q.push(mR[v]);
+			}
+		}
+		if(!found)return res;
+		for(int i=1;i<=n;i++)if(!mL[i])res+=dfs(i);
 	}
 }
